@@ -34,7 +34,7 @@ def VGG16_tranfer_stage_one(weights=None):
         layer.trainable = False
 
     # Add a dense and reshape layer
-    fca = Dense(4096, activation='relu',
+    fca = Dense(4096, activation='sigmoid',
                 kernel_initializer=RandomNormal(mean=0.0, stddev=1))(fc7)
     saliency = Reshape((64, 64))(fca)
 
@@ -44,7 +44,8 @@ def VGG16_tranfer_stage_one(weights=None):
     if weights is not None:
         model.load_weights(weights)
 
-    model.compile(optimizer=SGD(lr=1e-3, decay=5e-4, momentum=0.9), loss=euc_dist_keras)
+    # model.compile(optimizer=SGD(lr=1e-3, decay=5e-4, momentum=0.9), loss=euc_dist_keras)
+    model.compile(optimizer='adam', loss='mse')
 
     return model
 
