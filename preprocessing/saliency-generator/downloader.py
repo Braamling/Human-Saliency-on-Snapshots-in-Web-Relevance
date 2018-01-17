@@ -42,7 +42,18 @@ def save_response_content(response, destination):
                 f.write(chunk)
 
 if __name__ == "__main__":
-    if FLAGS.type is 'full':
+
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--type', type=str, default='full',
+                        help='Set the type of download, (full, train, infer).')
+
+    FLAGS, unparsed = parser.parse_known_args()
+
+
+    downloads = {}
+    if FLAGS.type == 'full':
         downloads = {
         "1hPb_KXh--9i0qDz-1Ofjh7NGUTQiqZ5p": "storage/salicon/fixations_train2014.json",
         "12fuhhQQTBzfKr4FdqnFW4PkSWdCqiQvq": "storage/salicon/fixations_val2014.json",
@@ -50,11 +61,12 @@ if __name__ == "__main__":
         "12mNb_GHahzWx6lJJcp-cbNg7Cn63To2d": "storage/salicon/train_images.zip",
         "1d_iCP85VZZ57vCLoJagdPudzZqeeBUqM": "storage/FiWi/dataset.zip"
         }
-    elif FLAGS.type is 'train':
+    elif FLAGS.type == 'train':
         downloads = {
-        "1hPb_KXh--9i0qDz-1Ofjh7NGUTQiqZ5p": "storage/dataset.zip",
+        "1BMyMreJrNMxthz0kDCd-OxHfm7XlL90Z": "storage/dataset.zip",
         }
-    elif FLAGS.type is 'infer':
+    elif FLAGS.type == 'infer':
+        raise NotImplemented("inference is not yet implemented")
         downloads = {
         "1hPb_KXh--9i0qDz-1Ofjh7NGUTQiqZ5p": "storage/weights/final_weights.h5",
         }
@@ -63,16 +75,3 @@ if __name__ == "__main__":
         print("Downloading from Google drive to", destination)
         download_file_from_google_drive(file_id, destination)
         
-
-    parser = argparse.ArgumentParser()
-
-    # Stage one arguments
-    # TODO change train path back to training dir
-    parser.add_argument('--type', type=str, default='full',
-                        help='Set the type of download, (full, train, infer).')
-
-    # Stage two arguments
-    # TODO create stage two arguments.
-    FLAGS, unparsed = parser.parse_known_args()
-    
-    train()

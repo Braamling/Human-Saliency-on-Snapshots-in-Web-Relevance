@@ -9,11 +9,5 @@ pip3 install -r requirements.txt
 python3 downloader.py --type train
 
 # Extract all required folders and remove the zip files
-unzip storage/salicon/val_images.zip -d storage/salicon/images
-
-rm storage/salicon/val_images.zip
-rm storage/salicon/train_images.zip
-rm storage/FiWi/dataset.zip
-
-# Create the fixation data.
-python3 createFixationImages.py
+unzip storage/dataset.zip -d storage/
+rm storage/dataset.zip

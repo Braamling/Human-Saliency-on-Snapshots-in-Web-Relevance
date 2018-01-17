@@ -25,10 +25,10 @@ def train():
     val_generator = SaliencyDataIterator(FLAGS.s2_val_image_path, FLAGS.s2_val_heatmap_path)
 
     model.fit_generator(train_generator,
-                        steps_per_epoch=train_generator.samples // FLAGS.s2_batch_size,
-                        epochs=FLAGS.s2_epochs,
+                        steps_per_epoch=1, #train_generator.samples // FLAGS.s2_batch_size,
+                        epochs=1, #FLAGS.s2_epochs,
                         validation_data=val_generator,
-                        validation_steps=val_generator.samples // FLAGS.s2_batch_size)
+                        validation_steps=1)#val_generator.samples // FLAGS.s2_batch_size)
 
     # Save the final weights
     model.save_weights(FLAGS.s2_weights_path)
