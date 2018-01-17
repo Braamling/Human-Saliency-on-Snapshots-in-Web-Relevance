@@ -3,3 +3,5 @@ scikit-image
 keras
 tensorflow
 requests
+Pillow
+h5py

@@ -1,6 +1,5 @@
 from models.vgg16 import VGG16_tranfer_stage_one, VGG16_stage_one_to_stage_two
 from saliencyDataIterator import SaliencyDataIterator
-from salicon.salicon import SALICON
 
 import argparse
 
@@ -11,10 +10,10 @@ def train():
     val_generator = SaliencyDataIterator(FLAGS.s1_val_image_path, FLAGS.s1_val_heatmap_path)
 
     model.fit_generator(train_generator,
-                        steps_per_epoch=1,#train_generator.samples // FLAGS.s1_batch_size,
-                        epochs=1,#FLAGS.s1_epochs,
+                        steps_per_epoch=train_generator.samples // FLAGS.s1_batch_size,
+                        epochs=FLAGS.s1_epochs,
                         validation_data=val_generator,
-                        validation_steps=1)#val_generator.samples // FLAGS.s1_batch_size)
+                        validation_steps=val_generator.samples // FLAGS.s1_batch_size)
 
     # Save the intermediate weights of stage one and convert the model to stage two.
     model.save_weights(FLAGS.s1_weights_path)
@@ -25,10 +24,10 @@ def train():
     val_generator = SaliencyDataIterator(FLAGS.s2_val_image_path, FLAGS.s2_val_heatmap_path)
 
     model.fit_generator(train_generator,
-                        steps_per_epoch=1, #train_generator.samples // FLAGS.s2_batch_size,
-                        epochs=1, #FLAGS.s2_epochs,
+                        steps_per_epoch=train_generator.samples // FLAGS.s2_batch_size,
+                        epochs=FLAGS.s2_epochs,
                         validation_data=val_generator,
-                        validation_steps=1)#val_generator.samples // FLAGS.s2_batch_size)
+                        validation_steps=val_generator.samples // FLAGS.s2_batch_size)
 
     # Save the final weights
     model.save_weights(FLAGS.s2_weights_path)
