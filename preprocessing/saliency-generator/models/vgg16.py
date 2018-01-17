@@ -35,7 +35,7 @@ def VGG16_tranfer_stage_one(weights=None):
 
     # Add a dense and reshape layer
     fca = Dense(4096, activation='sigmoid',
-                kernel_initializer=RandomNormal(mean=0.0, stddev=1))(fc7)
+                kernel_initializer=RandomNormal(mean=0.0, stddev=0.01))(fc7)
     saliency = Reshape((64, 64))(fca)
 
     # Rebuild the new model.
