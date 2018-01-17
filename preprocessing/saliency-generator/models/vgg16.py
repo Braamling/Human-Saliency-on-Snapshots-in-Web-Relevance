@@ -34,7 +34,7 @@ def VGG16_tranfer_stage_one(weights=None):
         layer.trainable = False
 
     # Add a dense and reshape layer
-    fca = Dense(4096, activation='sigmoid',
+    fca = Dense(4096, activation='relu',
                 kernel_initializer=RandomNormal(mean=0.0, stddev=1))(fc7)
     saliency = Reshape((64, 64))(fca)
 
