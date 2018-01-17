@@ -4,20 +4,30 @@ from saliencyDataIterator import SaliencyDataIterator
 import argparse
 
 def train():
-    model = VGG16_tranfer_stage_one()
+    # If weights are specific, load from weights, otherwise load from imagenet.
+    if FLAGS.s1_from_weights is not None: 
+        model = VGG16_tranfer_stage_one(FLAGS.s1_from_weights)
+    else:
+        model = VGG16_tranfer_stage_one()
 
-    train_generator = SaliencyDataIterator(FLAGS.s1_train_image_path, FLAGS.s1_train_heatmap_path)
-    val_generator = SaliencyDataIterator(FLAGS.s1_val_image_path, FLAGS.s1_val_heatmap_path)
+    # If s2 weights are set, load these weight directly.
+    if FLAGS.s2_from_weights is not None: 
+        model = VGG16_tranfer_stage_one(FLAGS.s2_from_weights)
+        model = VGG16_stage_one_to_stage_two(model)
+    else:
+        train_generator = SaliencyDataIterator(FLAGS.s1_train_image_path, FLAGS.s1_train_heatmap_path)
+        val_generator = SaliencyDataIterator(FLAGS.s1_val_image_path, FLAGS.s1_val_heatmap_path)
 
-    model.fit_generator(train_generator,
-                        steps_per_epoch=train_generator.samples // FLAGS.s1_batch_size,
-                        epochs=FLAGS.s1_epochs,
-                        validation_data=val_generator,
-                        validation_steps=val_generator.samples // FLAGS.s1_batch_size)
+        model.fit_generator(train_generator,
+                            steps_per_epoch=train_generator.samples // FLAGS.s1_batch_size,
+                            epochs=FLAGS.s1_epochs,
+                            validation_data=val_generator,
+                            validation_steps=val_generator.samples // FLAGS.s1_batch_size)
 
-    # Save the intermediate weights of stage one and convert the model to stage two.
-    model.save_weights(FLAGS.s1_weights_path)
-    model = VGG16_stage_one_to_stage_two(model)
+        # Save the intermediate weights of stage one and convert the model to stage two.
+        model.save_weights(FLAGS.s1_weights_path)
+
+        model = VGG16_stage_one_to_stage_two(model)
 
     # train_salicon = SALICON(FLAGS.s1_train_heatmap_path)
     train_generator = SaliencyDataIterator(FLAGS.s2_train_image_path, FLAGS.s2_train_heatmap_path)
@@ -27,7 +37,7 @@ def train():
                         steps_per_epoch=train_generator.samples // FLAGS.s2_batch_size,
                         epochs=FLAGS.s2_epochs,
                         validation_data=val_generator,
-                        validation_steps=val_generator.samples // FLAGS.s2_batch_size)
+                        validation_steps=train_generator.samples // FLAGS.s2_batch_size)
 
     # Save the final weights
     model.save_weights(FLAGS.s2_weights_path)
@@ -53,6 +63,8 @@ if __name__ == '__main__':
                         help='The batch size used for training.')
     parser.add_argument('--s1_epochs', type=int, default=10,
                         help='The amount of epochs used to train.')
+    parser.add_argument('--s1_from_weights', type=str, default=None,
+                        help='The model to start stage 1 from, if None it will start from scratch (or skip if only stage two is configured).')
 
     parser.add_argument('--s2_train_heatmap_path', type=str, default='storage/FiWi/heatmaps/train/',
                         help='The location of the FiWi heatmaps data for training.')
@@ -66,10 +78,12 @@ if __name__ == '__main__':
 
     parser.add_argument('--s2_weights_path', type=str, default='storage/weights/s2_weights.h5',
                         help='The location to store the stage two model weights.')
-    parser.add_argument('--s2_batch_size', type=int, default=32,
+    parser.add_argument('--s2_batch_size', type=int, default=29,
                         help='The batch size used for training.')
     parser.add_argument('--s2_epochs', type=int, default=10,
                         help='The amount of epochs used to train.')
+    parser.add_argument('--s2_from_weights', type=str, default=None,
+                        help='The model to start stage 2 from, if None it will start from scratch at stage one.')
 
     # Stage two arguments
     # TODO create stage two arguments.
