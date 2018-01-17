@@ -141,7 +141,7 @@ class SaliencyDataIterator(Iterator):
                                target_size=self.saliency_size,
                                interpolation=self.interpolation)
 
-                img = np.asarray(img, dtype=K.floatx())
+                img = np.asarray(img, dtype=K.floatx())/255
 
         # optionally save augmented images to disk for debugging purposes
         if self.save_to_dir:
