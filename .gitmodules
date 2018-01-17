@@ -1,3 +1,0 @@
-[submodule "preprocessing/saliency-generator/cocoapi"]
-	path = preprocessing/saliency-generator/cocoapi
-	url = git@github.com:cocodataset/cocoapi.git

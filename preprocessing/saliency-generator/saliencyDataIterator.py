@@ -65,19 +65,20 @@ class SaliencyDataIterator(Iterator):
             "hamming" are also supported. By default, "nearest" is used.
     """
 
-    def __init__(self, directory, saliency_set,
-                 target_size=(256, 256), saliency_size=(64, 64), 
-                 saliency_type='salicon', color_mode='rgb', 
-                 batch_size=32, shuffle=True, seed=None,
-                 data_format=None, save_to_dir=None,
+    def __init__(self, img_directory, saliency_directory=None, 
+                 saliency_api=None, target_size=(224, 224), 
+                 saliency_size=(64, 64), batch_size=32, 
+                 shuffle=True, interpolation='nearest', 
+                 seed=None, data_format=None, save_to_dir=None,
                  save_prefix='', save_format='png',
-                 follow_links=False, interpolation='nearest'):
+                 color_mode='rgb'):
         if data_format is None:
             data_format = K.image_data_format()
-        self.directory = directory
+        self.img_directory = img_directory
+        self.saliency_directory = saliency_directory        
+        self.saliency_api = saliency_api        
         self.target_size = tuple(target_size)
         self.saliency_size = tuple(saliency_size)
-        self.saliency_type = saliency_type
         if color_mode not in {'rgb', 'grayscale'}:
             raise ValueError('Invalid color mode:', color_mode,
                              '; expected "rgb" or "grayscale".')
@@ -98,12 +99,11 @@ class SaliencyDataIterator(Iterator):
         self.save_prefix = save_prefix
         self.save_format = save_format
         self.interpolation = interpolation
-        self.saliency_set = saliency_set
 
         # second, build an index of the images in the different class subfolders
         results = []
 
-        self.filenames = os.listdir(self.directory)
+        self.filenames = os.listdir(self.img_directory)
         self.samples = len(self.filenames)
 
         print('Found %d samples.' % (self.samples))
@@ -114,15 +114,14 @@ class SaliencyDataIterator(Iterator):
         # Remove file extension, everything before number and convert to int to remove leading 0's.
         return int(filename.split('.')[0].split("_")[-1])
 
-    def _get_batch(self, index_array):
+    def _get_batches_of_transformed_samples(self, index_array):
         batch_x = np.zeros((len(index_array),) + self.image_shape, dtype=K.floatx())
         batch_y = np.zeros((len(index_array),) + self.saliency_size, dtype=K.floatx())
         grayscale = self.color_mode == 'grayscale'
         # build batch of image data
         for i, j in enumerate(index_array):
             fname = self.filenames[j]
-            print(fname)
-            img = load_img(os.path.join(self.directory, fname),
+            img = load_img(os.path.join(self.img_directory, fname),
                            grayscale=grayscale,
                            target_size=self.target_size,
                            interpolation=self.interpolation)
@@ -130,11 +129,20 @@ class SaliencyDataIterator(Iterator):
             batch_x[i] = x
 
             # TODO store saliency maps on disk for speedup?
-            if self.saliency_type is 'salicon':
+            if self.saliency_api != None:
                 annIds = self.saliency_set.getAnnIds(imgIds=self.filename_to_id(fname))
                 anns = self.saliency_set.loadAnns(annIds)
+                # TODO is this step correct? Should this just happen with buildFixMap?
                 sal_img = pil_image.fromarray(np.uint8((self.saliency_set.buildFixMap(anns)*255)))
                 batch_y[i] = _reshape_image(sal_img, self.saliency_size, self.interpolation)
+            elif self.saliency_directory != None:
+                img = load_img(os.path.join(self.saliency_directory, fname),
+                               grayscale=True,
+                               target_size=self.saliency_size,
+                               interpolation=self.interpolation)
+
+                img = np.asarray(img, dtype=K.floatx())
+
         # optionally save augmented images to disk for debugging purposes
         if self.save_to_dir:
             for i, j in enumerate(index_array):
@@ -156,4 +164,4 @@ class SaliencyDataIterator(Iterator):
             index_array = next(self.index_generator)
         # The transformation of images is not under thread lock
         # so it can be done in parallel
-        return self._get_batch(index_array)
+        return self._get_batches_of_transformed_samples(index_array)

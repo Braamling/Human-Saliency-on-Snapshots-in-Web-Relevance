@@ -1,2 +1,5 @@
 Cython
 scikit-image
+keras
+tensorflow
+requests==2.12.4
