@@ -1,14 +1,6 @@
 ## Two-Stage Transfer Learning of End-to-End Convolutional Neural Networks for Webpage Saliency Prediction
 Implementation by *Bram van den Akker*.
 Original paper by *Shan, Wei and Sun, Guangling and Zhou, Xiaofei and Liu, Zhi*
->@inproceedings{shan2017two,
->  title={Two-Stage Transfer Learning of End-to-End Convolutional Neural Networks for Webpage Saliency Prediction},
->  author={Shan, Wei and Sun, Guangling and Zhou, Xiaofei and Liu, Zhi},
->  booktitle={International Conference on Intelligent Science and Big Data Engineering},
->  pages={316--324},
->  year={2017},
->  organization={Springer}
->}
 
 **Note: Before starting, make sure unzip, python3 and pip3 are installed.**
 #### Setting up saliency predictor.
@@ -33,3 +25,11 @@ SALICON-api has been forked from https://github.com/NUS-VIP/salicon-api and is m
 COCO-api has been forked from https://github.com/cocodataset/cocoapi
 Drive-download code has been taken from Stackoverflow user `turdus-merula` on
 https://stackoverflow.com/questions/38511444/python-download-files-from-google-drive-using-url
+>@inproceedings{shan2017two,
+>  title={Two-Stage Transfer Learning of End-to-End Convolutional Neural Networks for Webpage Saliency Prediction},
+>  author={Shan, Wei and Sun, Guangling and Zhou, Xiaofei and Liu, Zhi},
+>  booktitle={International Conference on Intelligent Science and Big Data Engineering},
+>  pages={316--324},
+>  year={2017},
+>  organization={Springer}
+>}
