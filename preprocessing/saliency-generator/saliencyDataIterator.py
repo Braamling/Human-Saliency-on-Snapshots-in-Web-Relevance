@@ -128,7 +128,7 @@ class SaliencyDataIterator(Iterator):
             x = img_to_array(img, data_format=self.data_format)
             batch_x[i] = x
 
-            # TODO store saliency maps on disk for speedup?
+            # TODO remove saliency API support?
             if self.saliency_api != None:
                 annIds = self.saliency_set.getAnnIds(imgIds=self.filename_to_id(fname))
                 anns = self.saliency_set.loadAnns(annIds)
@@ -141,17 +141,19 @@ class SaliencyDataIterator(Iterator):
                                target_size=self.saliency_size,
                                interpolation=self.interpolation)
 
-                img = np.asarray(img, dtype=K.floatx())/255
+                # TODO, this is inefficient, so change it either to the model or in the images itself.
+                img_array = np.asarray(img, dtype=K.floatx())
+                batch_y[i] = img_array / 255
 
         # optionally save augmented images to disk for debugging purposes
-        if self.save_to_dir:
-            for i, j in enumerate(index_array):
-                img = array_to_img(batch_x[i], self.data_format, scale=True)
-                fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix,
-                                                                  index=j,
-                                                                  hash=np.random.randint(1e7),
-                                                                  format=self.save_format)
-                img.save(os.path.join(self.save_to_dir, fname))
+        # if self.save_to_dir:
+        #     for i, j in enumerate(index_array):
+        #         img = array_to_img(batch_x[i], self.data_format, scale=True)
+        #         fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix,
+        #                                                           index=j,
+        #                                                           hash=np.random.randint(1e7),
+        #                                                           format=self.save_format)
+        #         img.save(os.path.join(self.save_to_dir, fname))
         
         return batch_x, batch_y
 

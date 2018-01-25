@@ -1,7 +1,7 @@
 Cython
 scikit-image
-keras
 tensorflow
+keras
 requests
 Pillow
 h5py
