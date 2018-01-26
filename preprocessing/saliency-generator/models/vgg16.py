@@ -44,7 +44,8 @@ def VGG16_tranfer_stage_one(weights=None):
     if weights is not None:
         model.load_weights(weights)
 
-    model.compile(optimizer='adam', loss=euc_dist_keras)
+    model.compile(optimizer=SGD(lr=1e-3, decay=5e-4, momentum=0.9), loss=euc_dist_keras)
+    # model.compile(optimizer='adam', loss=euc_dist_keras)
 
     return model
 
@@ -59,7 +60,8 @@ def VGG16_stage_one_to_stage_two(model):
     for layer in model.layers[:-1]:
         layer.trainable = False
 
-    model.compile(optimizer='adam', loss=euc_dist_keras)
+    model.compile(optimizer=SGD(lr=1e-3, decay=5e-4, momentum=0.9), loss=euc_dist_keras)
+    # model.compile(optimizer='adam', loss=euc_dist_keras)
 
     return model
     
