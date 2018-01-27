@@ -1,6 +1,6 @@
 from models.vgg16 import VGG16_tranfer_stage_one, VGG16_stage_one_to_stage_two
 from saliencyDataIterator import SaliencyDataIterator
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, TensorBoard
 
 import argparse
 
@@ -21,12 +21,13 @@ def train():
         val_generator = SaliencyDataIterator(FLAGS.s1_val_image_path, FLAGS.s1_val_heatmap_path)
 
         checkpointer = ModelCheckpoint(filepath=FLAGS.s1_checkpoint, verbose=1, save_best_only=True)
+        tensorboard = TensorBoard(FLAGS.s1_log_dir)
         model.fit_generator(train_generator,
                             steps_per_epoch=train_generator.samples // FLAGS.s1_batch_size,
                             epochs=FLAGS.s1_epochs,
                             validation_data=val_generator,
                             validation_steps=val_generator.samples // FLAGS.s1_batch_size, 
-                            callbacks=[checkpointer])
+                            callbacks=[checkpointer, tensorboard])
 
         # Save the intermediate weights of stage one and convert the model to stage two.
         model.save_weights(FLAGS.s1_weights_path)
@@ -74,6 +75,8 @@ if __name__ == '__main__':
                         help='The amount of epochs used to train.')
     parser.add_argument('--s1_from_weights', type=str, default=None,
                         help='The model to start stage 1 from, if None it will start from scratch (or skip if only stage two is configured).')
+    parser.add_argument('--s1_log_dir', type=str, default='logs/example_run',
+                        help='The location to place the tensorboard logs.')
 
     parser.add_argument('--s2_train_heatmap_path', type=str, default='storage/FiWi/heatmaps/train/',
                         help='The location of the FiWi heatmaps data for training.')
