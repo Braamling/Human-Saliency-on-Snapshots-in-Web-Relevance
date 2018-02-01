@@ -1,11 +1,12 @@
-from models.vgg16 import VGG16_tranfer_stage_one, VGG16_stage_one_to_stage_two
-from saliencyDataIterator import SaliencyDataIterator
-from keras.callbacks import ModelCheckpoint, TensorBoard
-
+import tensorflow as tf
 # Configure the amount of GPU being used.
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 1
 session = tf.Session(config=config)
+
+from models.vgg16 import VGG16_tranfer_stage_one, VGG16_stage_one_to_stage_two
+from saliencyDataIterator import SaliencyDataIterator
+from keras.callbacks import ModelCheckpoint, TensorBoard
 
 import argparse
 
