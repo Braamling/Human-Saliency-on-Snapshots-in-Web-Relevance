@@ -12,18 +12,33 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
+from PIL import Image
 
+from models.vgg16 import vgg16_bn, vgg16
 from saliencyDataIterator import SaliencyDataset
 
 plt.ion()   # interactive mode
 
 import argparse
+import tensorboard_logger as tfl
 
-def train_model(model, dataloaders, use_gpu, criterion, optimizer, scheduler, num_epochs=25):
+def save_image(data, name, grayscale=False):
+    # image = data.data.cpu().numpy()[0]
+    if grayscale:
+        data = (255.0 / data.max() * (data - data.min())).astype(np.uint8)
+    im = Image.fromarray(data)
+    if not grayscale:
+        im.mode = "RGB"
+    im.save(name)
+
+
+def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, num_epochs=25):
     since = time.time()
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
+
+    tfl.configure(FLAGS.s1_log_dir)
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -32,7 +47,8 @@ def train_model(model, dataloaders, use_gpu, criterion, optimizer, scheduler, nu
         # Each epoch has a training and validation phase
         for phase in ['train', 'val']:
             if phase == 'train':
-                scheduler.step()
+                if scheduler is not None:
+                    scheduler.step()
                 model.train(True)  # Set model to training mode
             else:
                 model.train(False)  # Set model to evaluate mode
@@ -47,19 +63,19 @@ def train_model(model, dataloaders, use_gpu, criterion, optimizer, scheduler, nu
 
                 # wrap them in Variable
                 if use_gpu:
-                    inputs = Variable(inputs.cuda())
-                    labels = Variable(labels.cuda())
+                    inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
                 else:
                     inputs, labels = Variable(inputs), Variable(labels)
 
                 # zero the parameter gradients
-                optimizer.zero_grad()
 
                 # forward
                 outputs = model(inputs)
-                _, preds = torch.max(outputs.data, 1)
+
+                # Compute and print loss
                 loss = criterion(outputs, labels)
 
+                optimizer.zero_grad()
                 # backward + optimize only if in training phase
                 if phase == 'train':
                     loss.backward()
@@ -67,20 +83,18 @@ def train_model(model, dataloaders, use_gpu, criterion, optimizer, scheduler, nu
 
                 # statistics
                 running_loss += loss.data[0] * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
+                print('{} Loss: {:4f}'.format(phase, loss.data[0]))
 
-            epoch_loss = running_loss / dataset_sizes[phase]
-            epoch_acc = running_corrects / dataset_sizes[phase]
+            epoch_loss = running_loss / 1
+            tfl.log_value('{}_loss'.format(phase), epoch_loss, epoch)
 
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(
-                phase, epoch_loss, epoch_acc))
+        outputs = model(inputs)
+        save_image(inputs.data.cpu().numpy()[0][0], "input.png")
+        save_image(outputs.data.cpu().numpy()[0], "output.png", True)
+        save_image(labels.data.cpu().numpy()[0][0], "label.png", True)
 
-            # deep copy the model
-            if phase == 'val' and epoch_acc > best_acc:
-                best_acc = epoch_acc
-                best_model_wts = copy.deepcopy(model.state_dict())
+        torch.save(model.state_dict(), FLAGS.s1_checkpoint)
 
-        print()
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(
@@ -89,50 +103,39 @@ def train_model(model, dataloaders, use_gpu, criterion, optimizer, scheduler, nu
 
     # load best model weights
     model.load_state_dict(best_model_wts)
+    torch.save(model.state_dict(), FLAGS.s1_weights_path)
     return model
-
-def imshow(inp, title=None):
-    """Imshow for Tensor."""
-    inp = inp.numpy().transpose((1, 2, 0))
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    inp = std * inp + mean
-    inp = np.clip(inp, 0, 1)
-    plt.imshow(inp)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
-
 
 def train():
 
     image_datasets = {x: SaliencyDataset(os.path.join(FLAGS.s1_image_path, x), 
                                      os.path.join(FLAGS.s1_heatmap_path, x)) for x in ['train', 'val']}
-    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=1,
+    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=FLAGS.s1_batch_size,
                                              shuffle=True, num_workers=4) for x in ['train', 'val']}
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
     use_gpu = torch.cuda.is_available()
 
-    inputs, classes = next(iter(dataloaders['train']))
+    if FLAGS.s1_from_weights is not None:
+        model_ft = vgg16(pretrained=False, state_dict=FLAGS.s1_from_weights)
+    else:
+        model_ft = vgg16(pretrained=True)
 
-    model_ft = models.vgg16(pretrained=True)
-    # num_ftrs = model_ft.fc.in_features
-    # model_ft.fc = nn.Linear(num_ftrs, 2)
+    for p in model_ft.classifier.parameters():
+        p.features=False
 
     if use_gpu:
         model_ft = model_ft.cuda()
 
-    criterion = nn.CrossEntropyLoss()
+    # # Observe that all parameters are being optimized
+    # optimizer_ft = optim.SGD(model_ft.classifier.parameters(), lr=0.01, momentum=0.9)
+    optimizer = optim.Adam(model_ft.classifier.parameters(), lr=0.0001, weight_decay=1e-5)
 
-    # Observe that all parameters are being optimized
-    optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
+    # # Decay LR by a factor of 0.1 every 7 epochs
+    # exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
-    # Decay LR by a factor of 0.1 every 7 epochs
-    exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
-
-    model_ft = train_model(model_ft, dataloaders, use_gpu, criterion, optimizer_ft, exp_lr_scheduler,
-                       num_epochs=25)
+    model_ft = train_model(model_ft, nn.MSELoss(), dataloaders, use_gpu, optimizer, None,
+                       num_epochs=FLAGS.s1_epochs)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -144,9 +147,9 @@ if __name__ == '__main__':
     parser.add_argument('--s1_image_path', type=str, default='storage/salicon/images/',
                         help='The location of the salicon images for training.')
 
-    parser.add_argument('--s1_weights_path', type=str, default='storage/weights/s1_weights.h5',
+    parser.add_argument('--s1_weights_path', type=str, default='storage/weights/s1_weights.pth',
                         help='The location to store the stage one model weights.')
-    parser.add_argument('--s1_checkpoint', type=str, default='storage/weights/s1_weights_checkpoint.h5',
+    parser.add_argument('--s1_checkpoint', type=str, default='storage/weights/s1_checkpoint.pth',
                         help='The location to store the stage one model intermediate checkpoint weights.')
     parser.add_argument('--s1_batch_size', type=int, default=32,
                         help='The batch size used for training.')

@@ -1,73 +1,120 @@
-from keras.applications.vgg16 import VGG16
-from keras.preprocessing import image
-from keras.models import Model
-from keras.initializers import RandomNormal
-from keras.layers import Dense, Reshape
-from keras.optimizers import Adam, SGD
-from keras import backend as K 
+import torch.nn as nn
+import torch.utils.model_zoo as model_zoo
+from torch import load
+import math
 
-from keras.applications.vgg16 import preprocess_input, decode_predictions
 
-import numpy as np
+__all__ = [
+    'VGG', 'vgg16', 'vgg16_bn'
+]
 
-"""
-Load a stage one model from memory. Provide the pretrained weights location to initaiize a pretrained model
-or leave it empty to recontruct the model from VGG16 trained using imagenet. 
-"""
-def VGG16_tranfer_stage_one(weights=None):
-    if weights is None:
-        # Load the VGG16 pretrained model on imagenet.
-        base_model = VGG16(weights='imagenet')
-    else:
-        base_model = VGG16()
 
-    # Get the output the fully connected layer #7. 
-    fc7 = base_model.layers[-2].output
+model_urls = {
+    'vgg16': 'https://download.pytorch.org/models/vgg16-397923af.pth',
+    'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth',
+}
 
-    # Remove final fully-connected layer of imagenet.
-    base_model.layers.pop()
-    base_model.outputs = [base_model.layers[-1].output]
-    base_model.layers[-1].outbound_nodes = []
 
-    # Fix all non-fully connected during training.
-    for layer in base_model.layers[:-3]:
-        layer.trainable = False
+class VGG(nn.Module):
 
-    # Add a dense and reshape layer
-    fca = Dense(4096, #activation='sigmoid',
-                kernel_initializer=RandomNormal(mean=0.0, stddev=0.01))(fc7)
-    saliency = Reshape((64, 64))(fca)
+    def __init__(self, features, num_classes=1000, init_weights=True):
+        super(VGG, self).__init__()
+        self.features = features
+        self.classifier = nn.Sequential(
+            nn.Linear(512 * 7 * 7, 4096),
+            nn.ReLU(True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(True),
+            nn.Dropout(),
+            nn.Linear(4096, num_classes),
+        )
+        if init_weights:
+            self._initialize_weights()
 
-    # Rebuild the new model.
-    model = Model(inputs=base_model.input, outputs=saliency)
+        # Change layer
 
-    if weights is not None:
-        model.load_weights(weights)
-
-    #model.compile(optimizer=SGD(lr=0.001, decay=0.0005, momentum=0.9), loss=euc_dist_keras)
-    model.compile(optimizer=Adam(lr=0.00001, amsgrad=True), loss=euc_dist_keras)
-
-    return model
-
-"""
-Convert a pretrained stage one model to a trainable stage two model.
-"""
-def VGG16_stage_one_to_stage_two(model):
-    # Load the VGG16 pretrained model on imagenet.
-
-    # TODO check whether this is actually just the FCA layer of the saliency layer (if that is possible :P)
-    # Fix all but the model fully connected during training.
-    for layer in model.layers[:-1]:
-        layer.trainable = False
-
-    model.compile(optimizer=SGD(lr=0.01, decay=0.0005, momentum=0.9), loss=euc_dist_keras)
-    # model.compile(optimizer='adam', loss=euc_dist_keras)
-
-    return model
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.classifier(x)
+        x = x.view(x.size(0), 64, 64)
+        return x
     
-def euc_dist_keras(y_true, y_pred):
-    return K.sqrt(K.sum(K.square(y_true - y_pred), axis=-1, keepdims=True))
+    def change_output(self, output_size):
+        self.classifier._modules['6'] = nn.Linear(4096, output_size)
 
-if __name__ == "__main__":
-    print("This file is not executable")
-    exit(-1)
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+                if m.bias is not None:
+                    m.bias.data.zero_()
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+            elif isinstance(m, nn.Linear):
+                m.weight.data.normal_(0, 0.01)
+                m.bias.data.zero_()
+
+
+def make_layers(cfg, batch_norm=False):
+    layers = []
+    in_channels = 3
+    for v in cfg:
+        if v == 'M':
+            layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+        else:
+            conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
+            if batch_norm:
+                layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
+            else:
+                layers += [conv2d, nn.ReLU(inplace=True)]
+            in_channels = v
+    return nn.Sequential(*layers)
+
+
+cfg = {
+    'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
+}
+
+def vgg16(pretrained=False, state_dict=None, output_size=4096, **kwargs):
+    """VGG 16-layer model (configuration "D")
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+    """
+    if pretrained:
+        kwargs['init_weights'] = False
+    model = VGG(make_layers(cfg['D']), **kwargs)
+    if pretrained:
+        model.load_state_dict(model_zoo.load_url(model_urls['vgg16']))
+    
+    model.change_output(output_size)
+
+    if state_dict != None:
+        model.load_state_dict(load(state_dict))
+
+    return model
+
+
+def vgg16_bn(pretrained=False, state_dict=None, output_size=4096, **kwargs):
+    """VGG 16-layer model (configuration "D") with batch normalization
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+    """
+    if pretrained:
+        kwargs['init_weights'] = False
+    model = VGG(make_layers(cfg['D'], batch_norm=True), **kwargs)
+    if pretrained:
+        model.load_state_dict(model_zoo.load_url(model_urls['vgg16_bn']))
+    
+    model.change_output(output_size)
+
+    if state_dict != None:
+        model.load_state_dict(load(state_dict))
+
+    return model
+
