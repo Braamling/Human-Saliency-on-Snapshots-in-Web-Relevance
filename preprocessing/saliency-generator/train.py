@@ -2,6 +2,11 @@ from models.vgg16 import VGG16_tranfer_stage_one, VGG16_stage_one_to_stage_two
 from saliencyDataIterator import SaliencyDataIterator
 from keras.callbacks import ModelCheckpoint, TensorBoard
 
+# Configure the amount of GPU being used.
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 1
+session = tf.Session(config=config)
+
 import argparse
 
 def train():
@@ -17,8 +22,10 @@ def train():
         model = VGG16_tranfer_stage_one(FLAGS.s2_from_weights)
         model = VGG16_stage_one_to_stage_two(model)
     else:
-        train_generator = SaliencyDataIterator(FLAGS.s1_train_image_path, FLAGS.s1_train_heatmap_path)
-        val_generator = SaliencyDataIterator(FLAGS.s1_val_image_path, FLAGS.s1_val_heatmap_path)
+        train_generator = SaliencyDataIterator(FLAGS.s1_train_image_path, FLAGS.s1_train_heatmap_path, 
+                                               batch_size=FLAGS.s1_batch_size)
+        val_generator = SaliencyDataIterator(FLAGS.s1_val_image_path, FLAGS.s1_val_heatmap_path, 
+                                             batch_size=FLAGS.s1_batch_size)
 
         checkpointer = ModelCheckpoint(filepath=FLAGS.s1_checkpoint, verbose=1, save_best_only=True)
         tensorboard = TensorBoard(FLAGS.s1_log_dir)
@@ -27,7 +34,8 @@ def train():
                             epochs=FLAGS.s1_epochs,
                             validation_data=val_generator,
                             validation_steps=val_generator.samples // FLAGS.s1_batch_size, 
-                            callbacks=[checkpointer, tensorboard])
+                            callbacks=[checkpointer, tensorboard],
+                            initial_epoch=0)
 
         # Save the intermediate weights of stage one and convert the model to stage two.
         model.save_weights(FLAGS.s1_weights_path)

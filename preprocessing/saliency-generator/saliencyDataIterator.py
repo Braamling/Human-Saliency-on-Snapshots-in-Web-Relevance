@@ -65,8 +65,8 @@ class SaliencyDataIterator(Iterator):
             "hamming" are also supported. By default, "nearest" is used.
     """
 
-    def __init__(self, img_directory, saliency_directory=None, 
-                 saliency_api=None, target_size=(224, 224), 
+    def __init__(self, img_directory, saliency_directory=None,
+                 target_size=(224, 224), 
                  saliency_size=(64, 64), batch_size=32, 
                  shuffle=True, interpolation='nearest', 
                  seed=None, data_format=None, save_to_dir=None,
@@ -76,7 +76,6 @@ class SaliencyDataIterator(Iterator):
             data_format = K.image_data_format()
         self.img_directory = img_directory
         self.saliency_directory = saliency_directory        
-        self.saliency_api = saliency_api        
         self.target_size = tuple(target_size)
         self.saliency_size = tuple(saliency_size)
         if color_mode not in {'rgb', 'grayscale'}:
@@ -99,6 +98,7 @@ class SaliencyDataIterator(Iterator):
         self.save_prefix = save_prefix
         self.save_format = save_format
         self.interpolation = interpolation
+        self.batch_size = batch_size
 
         # second, build an index of the images in the different class subfolders
         results = []
@@ -121,6 +121,7 @@ class SaliencyDataIterator(Iterator):
         # build batch of image data
         for i, j in enumerate(index_array):
             fname = self.filenames[j]
+            # Load the input image
             img = load_img(os.path.join(self.img_directory, fname),
                            grayscale=grayscale,
                            target_size=self.target_size,
@@ -128,33 +129,15 @@ class SaliencyDataIterator(Iterator):
             x = img_to_array(img, data_format=self.data_format)
             batch_x[i] = x
 
-            # TODO remove saliency API support?
-            if self.saliency_api != None:
-                annIds = self.saliency_set.getAnnIds(imgIds=self.filename_to_id(fname))
-                anns = self.saliency_set.loadAnns(annIds)
-                # TODO is this step correct? Should this just happen with buildFixMap?
-                sal_img = pil_image.fromarray(np.uint8((self.saliency_set.buildFixMap(anns)*255)))
-                batch_y[i] = _reshape_image(sal_img, self.saliency_size, self.interpolation)
-            elif self.saliency_directory != None:
-                img = load_img(os.path.join(self.saliency_directory, fname),
-                               grayscale=True,
-                               target_size=self.saliency_size,
-                               interpolation=self.interpolation)
+            # Load the saliency image
+            img = load_img(os.path.join(self.saliency_directory, fname),
+                           grayscale=True,
+                           target_size=self.saliency_size,
+                           interpolation=self.interpolation)
 
-                # TODO, this is inefficient, so change it either to the model or in the images itself.
-                img_array = np.asarray(img, dtype=K.floatx())
-                batch_y[i] = img_array / 255
+            img_array = np.asarray(img, dtype=K.floatx())
+            batch_y[i] = img_array
 
-        # optionally save augmented images to disk for debugging purposes
-        # if self.save_to_dir:
-        #     for i, j in enumerate(index_array):
-        #         img = array_to_img(batch_x[i], self.data_format, scale=True)
-        #         fname = '{prefix}_{index}_{hash}.{format}'.format(prefix=self.save_prefix,
-        #                                                           index=j,
-        #                                                           hash=np.random.randint(1e7),
-        #                                                           format=self.save_format)
-        #         img.save(os.path.join(self.save_to_dir, fname))
-        
         return batch_x, batch_y
 
     def next(self):

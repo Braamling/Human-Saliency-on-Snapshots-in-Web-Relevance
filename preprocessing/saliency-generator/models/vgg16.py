@@ -3,7 +3,7 @@ from keras.preprocessing import image
 from keras.models import Model
 from keras.initializers import RandomNormal
 from keras.layers import Dense, Reshape
-from keras.optimizers import SGD
+from keras.optimizers import Adam, SGD
 from keras import backend as K 
 
 from keras.applications.vgg16 import preprocess_input, decode_predictions
@@ -22,7 +22,7 @@ def VGG16_tranfer_stage_one(weights=None):
         base_model = VGG16()
 
     # Get the output the fully connected layer #7. 
-    fc7 = base_model.layers[-1].output
+    fc7 = base_model.layers[-2].output
 
     # Remove final fully-connected layer of imagenet.
     base_model.layers.pop()
@@ -30,11 +30,11 @@ def VGG16_tranfer_stage_one(weights=None):
     base_model.layers[-1].outbound_nodes = []
 
     # Fix all non-fully connected during training.
-    for layer in base_model.layers[:-2]:
+    for layer in base_model.layers[:-3]:
         layer.trainable = False
 
     # Add a dense and reshape layer
-    fca = Dense(4096, activation='sigmoid',
+    fca = Dense(4096, #activation='sigmoid',
                 kernel_initializer=RandomNormal(mean=0.0, stddev=0.01))(fc7)
     saliency = Reshape((64, 64))(fca)
 
@@ -44,8 +44,8 @@ def VGG16_tranfer_stage_one(weights=None):
     if weights is not None:
         model.load_weights(weights)
 
-    model.compile(optimizer=SGD(lr=0.01, decay=0.0005, momentum=0.9), loss=euc_dist_keras)
-    # model.compile(optimizer='adam', loss=euc_dist_keras)
+    #model.compile(optimizer=SGD(lr=0.001, decay=0.0005, momentum=0.9), loss=euc_dist_keras)
+    model.compile(optimizer=Adam(lr=0.00001, amsgrad=True), loss=euc_dist_keras)
 
     return model
 
