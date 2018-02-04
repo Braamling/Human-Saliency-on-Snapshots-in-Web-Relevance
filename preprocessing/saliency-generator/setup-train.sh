@@ -3,7 +3,11 @@ mkdir storage
 mkdir storage/weights
 
 # Install all required packages
-pip3 install -r requirements.txt
+pip3 install --user -r requirements.txt
+
+cd libraries/saliconeval/
+python3 setup.py build_ext install --user
+cd ../..
 
 # Download all the training files
 python3 downloader.py --type train

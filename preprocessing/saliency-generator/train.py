@@ -15,6 +15,7 @@ import copy
 from PIL import Image
 
 from models.vgg16 import vgg16_bn, vgg16
+import evaluation.saliconeval.eval as evaluation
 from saliencyDataIterator import SaliencyDataset
 
 plt.ion()   # interactive mode
@@ -30,7 +31,6 @@ def save_image(data, name, grayscale=False):
     if not grayscale:
         im.mode = "RGB"
     im.save(name)
-
 
 def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, num_epochs=25):
     since = time.time()
@@ -54,6 +54,9 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
                 model.train(False)  # Set model to evaluate mode
 
             running_loss = 0.0
+            cc_score = 0.0
+            nss_score = 0.0
+            auc_score = 0.0
             running_corrects = 0
 
             # Iterate over data.
@@ -81,17 +84,31 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
                     loss.backward()
                     optimizer.step()
 
+                # Print the loss
+                print('{} Loss: {}'.format(phase, loss.data[0]))
+
                 # statistics
                 running_loss += loss.data[0] * inputs.size(0)
-                print('{} Loss: {:4f}'.format(phase, loss.data[0]))
+                running_corrects += 1
+                labels = labels.data.cpu().numpy()
+                outputs = outputs.data.cpu().numpy()
 
-            epoch_loss = running_loss / 1
-            tfl.log_value('{}_loss'.format(phase), epoch_loss, epoch)
+                # Do the evaluation
+                scores = evaluation.compute_scores(labels, outputs)
+                cc_score += scores['cc']
+                auc_score += scores['auc']
+                nss_score += scores['nss']
 
-        outputs = model(inputs)
+            # Print evaluation scores
+            tfl.log_value('{}_loss'.format(phase), running_loss / running_corrects, epoch)
+            tfl.log_value('{}_cc'.format(phase), cc_score / running_corrects, epoch)
+            tfl.log_value('{}_auc'.format(phase), auc_score / running_corrects, epoch)
+            tfl.log_value('{}_nss'.format(phase), nss_score / running_corrects, epoch)
+
+        # outputs = model(inputs)
         save_image(inputs.data.cpu().numpy()[0][0], "input.png")
-        save_image(outputs.data.cpu().numpy()[0], "output.png", True)
-        save_image(labels.data.cpu().numpy()[0][0], "label.png", True)
+        save_image(outputs[0], "output.png", True)
+        save_image(labels[0][0], "label.png", True)
 
         torch.save(model.state_dict(), FLAGS.s1_checkpoint)
 
@@ -128,13 +145,13 @@ def train():
         model_ft = model_ft.cuda()
 
     # # Observe that all parameters are being optimized
-    # optimizer_ft = optim.SGD(model_ft.classifier.parameters(), lr=0.01, momentum=0.9)
-    optimizer = optim.Adam(model_ft.classifier.parameters(), lr=0.0001, weight_decay=1e-5)
+    optimizer = optim.SGD(model_ft.classifier.parameters(), lr=0.01, momentum=0.9)
+    # optimizer = optim.Adam(model_ft.classifier.parameters(), lr=0.0001, weight_decay=1e-5)
 
     # # Decay LR by a factor of 0.1 every 7 epochs
-    # exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
+    exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
-    model_ft = train_model(model_ft, nn.MSELoss(), dataloaders, use_gpu, optimizer, None,
+    model_ft = train_model(model_ft, nn.MSELoss(), dataloaders, use_gpu, optimizer, exp_lr_scheduler,
                        num_epochs=FLAGS.s1_epochs)
 
 if __name__ == '__main__':

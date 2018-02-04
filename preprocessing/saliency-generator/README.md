@@ -23,6 +23,7 @@ TODO, but for now please check the content of the bash scripts above.
 Credits:
 SALICON-api has been forked from https://github.com/NUS-VIP/salicon-api and is modified to work with python3.
 COCO-api has been forked from https://github.com/cocodataset/cocoapi
+Salicon-evaluation has been forked from https://github.com/NUS-VIP/salicon-evaluation
 Drive-download code has been taken from Stackoverflow user `turdus-merula` on
 https://stackoverflow.com/questions/38511444/python-download-files-from-google-drive-using-url
 >@inproceedings{shan2017two,
