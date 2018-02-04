@@ -6,6 +6,7 @@ mkdir storage/inference
 mkdir storage/inference/images
 mkdir storage/inference/output
 mkdir storage/logs
+mkdir storage/tmp
 mkdir storage/FiWi
 mkdir storage/salicon/images
 mkdir storage/salicon/heatmaps

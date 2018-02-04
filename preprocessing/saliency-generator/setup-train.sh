@@ -5,6 +5,7 @@ mkdir storage/inference
 mkdir storage/inference/images
 mkdir storage/inference/output
 mkdir storage/logs
+mkdir storage/tmp
 
 
 # Install all required packages

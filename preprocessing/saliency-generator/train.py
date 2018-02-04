@@ -18,13 +18,16 @@ from dataIterators import SaliencyDataset
 import argparse
 import tensorboard_logger as tfl
 
+available_models = {'vgg16': vgg16, 'vgg16_bn': vgg16_bn}
+
 def save_image(data, name, grayscale=False):
     # image = data.data.cpu().numpy()[0]
-    if grayscale:
-        data = (255.0 / data.max() * (np.clip(data, 0, None))).astype(np.uint8)
-    im = Image.fromarray(data)
     if not grayscale:
-        im.mode = "RGB"
+        data = data.mean(axis=0)
+    # if grayscale:
+    data = (255.0 / data.max() * (np.clip(data, 0, None))).astype(np.uint8)
+    im = Image.fromarray(data)
+        # im.mode = "RGB"
     im.save(name)
 
 """
@@ -49,10 +52,12 @@ Prepare the model with the correct weights and format the the configured use.
 def prepare_model(phase=1, use_scheduler=True):
     use_gpu = torch.cuda.is_available()
 
+    model_type = available_models[FLAGS.model_type]
+
     if FLAGS.from_weights is not None:
-        model = vgg16(pretrained=False, state_dict=FLAGS.from_weights)
+        model = model_type(pretrained=False, state_dict=FLAGS.from_weights)
     else:
-        model = vgg16(pretrained=True)
+        model = model_type(pretrained=True)
 
     for param in model.features.parameters():
             param.requires_grad = False
@@ -83,8 +88,8 @@ def prepare_model(phase=1, use_scheduler=True):
 Handle the storage and removal of checkpoints.
 """
 def handle_checkpoints(model, epoch, meta_data=None, keep=3):
-    checkpoint_info = "_{}_epoch_{}".format(epoch, meta_data)
-    remove_checkpoint = "_{}_epoch_{}".format(epoch - keep, meta_data)
+    checkpoint_info = "{}_epoch_{}_{}".format(FLAGS.description, epoch, meta_data)
+    remove_checkpoint = "{}_epoch_{}_{}".format(FLAGS.description, epoch - keep, meta_data)
 
     try:
         os.remove(FLAGS.checkpoint.format(remove_checkpoint))
@@ -96,9 +101,9 @@ def handle_checkpoints(model, epoch, meta_data=None, keep=3):
 def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, num_epochs=25):
 
     best_model_wts = copy.deepcopy(model.state_dict())
-    best_cc = 0.0
+    best_sauc = 0.0
 
-    tfl.configure(FLAGS.log_dir)
+    tfl.configure(FLAGS.log_dir.format(FLAGS.description))
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -170,19 +175,25 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
             tfl.log_value('{}_nss'.format(phase), nss_score, epoch)
 
         # outputs = model(inputs)
-        save_image(inputs.data.cpu().numpy()[0][0], "storage/tmp/input.png")
-        save_image(outputs[0], "storage/tmp/output.png", True)
-        save_image(labels[0][0], "storage/tmp/label.png", True)
+        save_image(inputs.data.cpu().numpy()[0], "{}{}_epoch_{}_input.png".format(FLAGS.tmp_dir, 
+                                                                                  FLAGS.description,
+                                                                                  epoch))
+        save_image(outputs[0], "{}{}_epoch_{}_output.png".format(FLAGS.tmp_dir, 
+                                                                 FLAGS.description,
+                                                                 epoch), True)
+        save_image(labels[0][0], "{}{}_epoch_{}_label.png".format(FLAGS.tmp_dir, 
+                                                                  FLAGS.description,
+                                                                  epoch), True)
 
         handle_checkpoints(model, epoch, phase, keep=5)
 
-        if cc_score / running_corrects > best_cc:
-            best_cc = cc_score
+        if sauc_score / running_corrects > best_sauc:
+            best_sauc = sauc_score
             best_model_wts = copy.deepcopy(model.state_dict())
 
     # load and save best model weights
     model.load_state_dict(best_model_wts)
-    torch.save(model.state_dict(), FLAGS.weights_path)
+    torch.save(model.state_dict(), FLAGS.weights_path.format(FLAGS.description))
     return model
 
 def train():
@@ -201,20 +212,26 @@ if __name__ == '__main__':
     parser.add_argument('--image_path', type=str, default='storage/salicon/images/',
                         help='The location of the salicon images for training.')
 
-    parser.add_argument('--weights_path', type=str, default='storage/weights/weights.pth',
-                        help='The location to store the stage one model weights.')
-    parser.add_argument('--checkpoint', type=str, default='storage/weights/checkpoint_{}.pth',
-                        help='The location to store the stage one model intermediate checkpoint weights.')
+    parser.add_argument('--weights_path', type=str, default='storage/weights/{}.pth',
+                        help='The location to store the model weights.')
+    parser.add_argument('--checkpoint', type=str, default='storage/weights/{}_checkpoint.pth',
+                        help='The location to store the model intermediate checkpoint weights.')
     parser.add_argument('--batch_size', type=int, default=32,
                         help='The batch size used for training.')
+    parser.add_argument('--model_type', type=str, default="vgg16_bn",
+                        help='The pretrained vgg model to start from. (if training from loaded weights, the same models has to be used.).')
     parser.add_argument('--epochs', type=int, default=10,
                         help='The amount of epochs used to train.')
     parser.add_argument('--from_weights', type=str, default=None,
-                        help='The model to start stage 1 from, if None it will start from scratch (or skip if only stage two is configured).')
-    parser.add_argument('--log_dir', type=str, default='storage/logs/example_run',
+                        help='The model to start training from, if None it will start from scratch (pretrained vgg). ')
+    parser.add_argument('--log_dir', type=str, default='storage/logs/{}',
                         help='The location to place the tensorboard logs.')
+    parser.add_argument('--tmp_dir', type=str, default='storage/tmp/',
+                        help='The location to place temporary files that are generated during training.')
     parser.add_argument('--phase', type=int, default=1,
                         help='The transfer learning phase to start')
+    parser.add_argument('--description', type=str, default='example_run',
+                        help='The description of the run, for logging, output and weights naming.')
 
     FLAGS, unparsed = parser.parse_known_args()
 
