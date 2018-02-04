@@ -2,6 +2,10 @@
 mkdir storage
 mkdir storage/salicon
 mkdir storage/weights
+mkdir storage/inference
+mkdir storage/inference/images
+mkdir storage/inference/output
+mkdir storage/logs
 mkdir storage/FiWi
 mkdir storage/salicon/images
 mkdir storage/salicon/heatmaps

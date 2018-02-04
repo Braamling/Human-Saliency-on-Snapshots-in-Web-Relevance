@@ -23,18 +23,6 @@ def is_image_file(filename):
     filename_lower = filename.lower()
     return any(filename_lower.endswith(ext) for ext in IMG_EXTENSIONS)
 
-def make_dataset(image_dir, heatmap_dir):
-    images = []
-
-    for fname in os.listdir(image_dir):
-        image = os.path.join(image_dir, fname)
-        heatmap = os.path.join(heatmap_dir, fname)
-        if is_image_file(image) and is_image_file(heatmap):
-            item = (image, heatmap)
-            images.append(item)
-
-    return images
-
 class SaliencyDataset(Dataset):
     """Face Landmarks dataset."""
 
@@ -46,12 +34,24 @@ class SaliencyDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        self.dataset = make_dataset(image_dir, heatmap_dir)
+        self.make_dataset(image_dir, heatmap_dir)
         self.img_transform = transforms.Compose([transforms.Resize((224,224), interpolation=2), 
                                                  transforms.ToTensor()])
         self.heatmap_transform = transforms.Compose([transforms.Resize((64,64), interpolation=2), 
                                                  transforms.Grayscale(),
                                                  transforms.ToTensor()])
+
+    def make_dataset(self, image_dir, heatmap_dir):
+        images = []
+
+        for fname in os.listdir(image_dir):
+            image = os.path.join(image_dir, fname)
+            heatmap = os.path.join(heatmap_dir, fname)
+            if is_image_file(image) and is_image_file(heatmap):
+                item = (image, heatmap)
+                images.append(item)
+
+        self.dataset = images
 
     def __len__(self):
         return len(self.dataset)
@@ -61,5 +61,42 @@ class SaliencyDataset(Dataset):
         heatmap = self.heatmap_transform(default_loader(self.dataset[idx][1]))
 
         sample = (image, heatmap)
+
+        return sample
+
+
+class ImageDataset(Dataset):
+    """Face Landmarks dataset."""
+
+    def __init__(self, image_dir):
+        """
+        Args:
+            csv_file (string): Path to the csv file with annotations.
+            root_dir (string): Directory with all the images.
+            transform (callable, optional): Optional transform to be applied
+                on a sample.
+        """
+        self.make_dataset(image_dir)
+        self.img_transform = transforms.Compose([transforms.Resize((224,224), interpolation=2), 
+                                                 transforms.ToTensor()])
+
+    def make_dataset(self, image_dir):
+        images = []
+
+        for fname in os.listdir(image_dir):
+            image = os.path.join(image_dir, fname)
+            if is_image_file(image):
+                item = (image, fname)
+                images.append(item)
+
+        self.dataset = images
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        image = self.img_transform(default_loader(self.dataset[idx][0]))
+
+        sample = (image, self.dataset[idx][1])
 
         return sample

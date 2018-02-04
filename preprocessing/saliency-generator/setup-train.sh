@@ -1,6 +1,11 @@
 # Create all the required folders
 mkdir storage
 mkdir storage/weights
+mkdir storage/inference
+mkdir storage/inference/images
+mkdir storage/inference/output
+mkdir storage/logs
+
 
 # Install all required packages
 pip3 install --user -r requirements.txt
