@@ -5,3 +5,4 @@ keras
 requests
 Pillow
 h5py
+tensorboard_logger
