@@ -76,7 +76,7 @@ def prepare_model(phase=1, use_scheduler=True):
         model = model.cuda()
 
 
-    optimizer = optim.Adam(opt_parameters, lr=0.0001, weight_decay=1e-5)
+    optimizer = optim.Adam(opt_parameters, lr=FLAGS.learning_rate, weight_decay=1e-5)
     # optimizer = optim.SGD(opt_parameters, lr=0.01, momentum=0.9)
 
     if use_scheduler:
@@ -216,7 +216,7 @@ if __name__ == '__main__':
                         help='The location to store the model weights.')
     parser.add_argument('--checkpoint', type=str, default='storage/weights/{}_checkpoint.pth',
                         help='The location to store the model intermediate checkpoint weights.')
-    parser.add_argument('--batch_size', type=int, default=32,
+    parser.add_argument('--batch_size', type=int, default=10,
                         help='The batch size used for training.')
     parser.add_argument('--model_type', type=str, default="vgg16_bn",
                         help='The pretrained vgg model to start from. (if training from loaded weights, the same models has to be used.).')
@@ -232,6 +232,8 @@ if __name__ == '__main__':
                         help='The transfer learning phase to start')
     parser.add_argument('--description', type=str, default='example_run',
                         help='The description of the run, for logging, output and weights naming.')
+    parser.add_argument('--learning_rate', type=float, default='0.0001',
+                        help='The learning rate to use for the experiment')
 
     FLAGS, unparsed = parser.parse_known_args()
 
