@@ -24,8 +24,6 @@ def is_image_file(filename):
     return any(filename_lower.endswith(ext) for ext in IMG_EXTENSIONS)
 
 class SaliencyDataset(Dataset):
-    """Face Landmarks dataset."""
-
     def __init__(self, image_dir, heatmap_dir):
         """
         Args:
@@ -66,8 +64,6 @@ class SaliencyDataset(Dataset):
 
 
 class ImageDataset(Dataset):
-    """Face Landmarks dataset."""
-
     def __init__(self, image_dir):
         """
         Args:

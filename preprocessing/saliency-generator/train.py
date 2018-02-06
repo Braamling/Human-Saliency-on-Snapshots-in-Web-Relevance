@@ -185,7 +185,7 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
                                                                   FLAGS.description,
                                                                   epoch), True)
 
-        handle_checkpoints(model, epoch, phase, keep=5)
+        handle_checkpoints(model, epoch, phase, keep=3)
 
         if sauc_score / running_corrects > best_sauc:
             best_sauc = sauc_score
