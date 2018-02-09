@@ -218,7 +218,7 @@ if __name__ == '__main__':
                         help='The location to store the model intermediate checkpoint weights.')
     parser.add_argument('--batch_size', type=int, default=10,
                         help='The batch size used for training.')
-    parser.add_argument('--model_type', type=str, default="vgg16_bn",
+    parser.add_argument('--model_type', type=str, default="vgg16",
                         help='The pretrained vgg model to start from. (if training from loaded weights, the same models has to be used.).')
     parser.add_argument('--epochs', type=int, default=10,
                         help='The amount of epochs used to train.')

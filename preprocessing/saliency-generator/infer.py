@@ -15,6 +15,8 @@ from dataIterators import ImageDataset
 
 import argparse
 
+available_models = {'vgg16': vgg16, 'vgg16_bn': vgg16_bn}
+
 def save_image(data, name, grayscale=False):
     if grayscale:
         # Small negative values will screw up the image, so are clipped to 0
@@ -55,7 +57,9 @@ def infer():
 
     use_gpu = torch.cuda.is_available()
 
-    model = vgg16(pretrained=False, state_dict=FLAGS.weights_path)
+    model_type = available_models[FLAGS.model_type]
+    model = model_type(pretrained=False, state_dict=FLAGS.weights_path)
+
 
     if use_gpu:
         model = model.cuda()
@@ -71,8 +75,10 @@ if __name__ == '__main__':
                         help='Batch size to use during inference.')
     parser.add_argument('--target_path', type=str, default='storage/inference/output',
                         help='The location to store the stage one model weights.')
-    parser.add_argument('--weights_path', type=str, default='storage/weights/s1_weights.h5',
-                        help='The location to store the stage one model weights.')
+    parser.add_argument('--model_type', type=str, default="vgg16",
+                        help='The model type to use for inference (vgg16 or vgg16_bn).')
+    parser.add_argument('--weights_path', type=str, default='storage/weights/s1_weights.pth',
+                        help='The location to store the model weights.')
 
     FLAGS, unparsed = parser.parse_known_args()
     
