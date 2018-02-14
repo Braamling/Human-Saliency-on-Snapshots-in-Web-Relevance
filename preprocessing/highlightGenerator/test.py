@@ -51,19 +51,18 @@ def checkWaybackAvail(url, date):
 def urlGenerator(path):
     with open(path, 'r') as f:
         for line in f:
-            query_id, doc_id, url = line.rstrip().split(" ")
-            yield (query_id, doc_id, url)
+            query_id, doc_id, url, query = line.rstrip().split(" ", 3)
+            print(query_id, doc_id, url, query)
+            yield (query_id, doc_id, url, query)
 
 
 def main():
     highlighter = Highlighter() 
-    query = "raspberry pi"
     date = "20120202"
-    path = "examples"
-    output_dir = "storage/html"
+    path = "storage/TREC/trec_201-204"
 
     global_start = time.time()
-    for i, (query_id, doc_id, url) in enumerate(urlGenerator(path)):
+    for i, (query_id, doc_id, url, query) in enumerate(urlGenerator(path)):
         try:
             start = time.time()
             url = getWebLink(url, date)
