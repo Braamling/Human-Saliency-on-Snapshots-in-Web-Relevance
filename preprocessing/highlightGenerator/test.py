@@ -51,7 +51,7 @@ def checkWaybackAvail(url, date):
 
 def make_queries_dict():
     queries = {}
-    with open("storage/prep/queries", 'r') as f:
+    with open("storage/TREC/queries", 'r') as f:
         for line in f:
             query_id, query = line.rstrip().split(":", 1)
             queries[query_id] = query
@@ -59,8 +59,8 @@ def make_queries_dict():
     return queries
 
 def documentGenerator():
-    with open("storage/prep/{}_docs".format(FLAGS.query), 'r') as fd:
-        with open("storage/prep/{}_urls".format(FLAGS.query), 'r') as fu:
+    with open("storage/TREC/{}_docs".format(FLAGS.query), 'r') as fd:
+        with open("storage/TREC/{}_urls".format(FLAGS.query), 'r') as fu:
             for doc_id, url in zip(fd, fu):
                 yield doc_id.strip(), url.strip()
 
