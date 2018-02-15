@@ -70,7 +70,7 @@ def main():
         except Exception as e:
             raise e
             print("failed to retrieve", doc_id, "from url", url)
-        sleep(max(0, 30 - (time.time() - start)))
+        sleep(max(0, 90 - (time.time() - start)))
         print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
 
 if __name__ == '__main__':
