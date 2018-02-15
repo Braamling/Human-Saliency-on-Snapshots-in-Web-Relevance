@@ -49,27 +49,37 @@ def checkWaybackAvail(url, date):
 
     return False, ""
 
-def urlGenerator(path):
-    with open(path, 'r') as f:
+def make_queries_dict():
+    queries = {}
+    with open("storage/prep/queries", 'r') as f:
         for line in f:
-            query_id, doc_id, url, query = line.rstrip().split(" ", 3)
-            print(query_id, doc_id, url, query)
-            yield (query_id, doc_id, url, query)
+            query_id, query = line.rstrip().split(":", 1)
+            queries[query_id] = query
+
+    return queries
+
+def documentGenerator():
+    with open("storage/prep/{}_docs".format(FLAGS.query), 'r') as fd:
+        with open("storage/prep/{}_urls".format(FLAGS.query), 'r') as fu:
+            for doc_id, url in zip(fd, fu):
+                yield doc_id.strip(), url.strip()
 
 
 def main():
     highlighter = Highlighter() 
     date = "20120202"
-    # path = "storage/TREC/trec_201-204"
+    
+    queries = make_queries_dict()
+
+    query = queries[FLAGS.query]
 
     global_start = time.time()
-    for i, (query_id, doc_id, url, query) in enumerate(urlGenerator(FLAGS.from_file)):
+    for i, (doc_id, url) in enumerate(documentGenerator()):
         try:
             start = time.time()
             url = getWebLink(url, date)
-            createSnapshots(highlighter, url, query, query_id, doc_id)
+            createSnapshots(highlighter, url, query, FLAGS.query, doc_id)
         except Exception as e:
-            raise e
             print("failed to retrieve", doc_id, "from url", url)
         sleep(max(0, 90 - (time.time() - start)))
         print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
@@ -77,7 +87,9 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--from_file', type=str, default='storage/TREC/trec_201-204',
+    parser.add_argument('--dir', type=str, default='storage/TREC/',
+                        help='The location of the trec files')
+    parser.add_argument('--query', type=str, default='207',
                         help='The location of the trec file with urls, query and doc_ids.')
 
     FLAGS, unparsed = parser.parse_known_args()
