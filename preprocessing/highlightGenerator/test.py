@@ -5,6 +5,7 @@ import requests
 import os
 import time
 import subprocess
+import argparse
 
 def createSnapshots(highlighter, webpage, query, query_id, name):
     highlighter.prepare(webpage, wayback=True)
@@ -59,10 +60,10 @@ def urlGenerator(path):
 def main():
     highlighter = Highlighter() 
     date = "20120202"
-    path = "storage/TREC/trec_201-204"
+    # path = "storage/TREC/trec_201-204"
 
     global_start = time.time()
-    for i, (query_id, doc_id, url, query) in enumerate(urlGenerator(path)):
+    for i, (query_id, doc_id, url, query) in enumerate(urlGenerator(FLAGS.from_file)):
         try:
             start = time.time()
             url = getWebLink(url, date)
@@ -74,4 +75,11 @@ def main():
         print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--from_file', type=str, default='storage/TREC/trec_201-204',
+                        help='The location of the trec file with urls, query and doc_ids.')
+
+    FLAGS, unparsed = parser.parse_known_args()
+
     main()
