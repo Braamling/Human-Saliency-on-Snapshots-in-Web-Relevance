@@ -68,6 +68,7 @@ def main():
             url = getWebLink(url, date)
             createSnapshots(highlighter, url, query, query_id, doc_id)
         except Exception as e:
+            raise e
             print("failed to retrieve", doc_id, "from url", url)
         sleep(max(0, 30 - (time.time() - start)))
         print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
