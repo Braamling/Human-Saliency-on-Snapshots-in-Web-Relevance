@@ -87,10 +87,8 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--dir', type=str, default='storage/TREC/',
-                        help='The location of the trec files')
     parser.add_argument('--query', type=str, default='207',
-                        help='The location of the trec file with urls, query and doc_ids.')
+                        help='The query id to retrieve.')
 
     FLAGS, unparsed = parser.parse_known_args()
 
