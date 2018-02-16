@@ -7,7 +7,7 @@ import numpy as np
 class Highlighter():
 
     def __init__(self):
-
+        os.environ['MOZ_HEADLESS'] = '1'
         self.loadLocalFiles()
 
     def storeSnapshot(self, img_target, grayscale=False):
@@ -29,17 +29,19 @@ class Highlighter():
     def prepare(self, webpage, wayback=False):
         # self.driver = webdriver.Chrome("./libraries/chromedriver")
 
-        # firefoxProfile = webdriver.FirefoxProfile()
-        # firefoxProfile.set_preference('permissions.default.stylesheet', 1)
-        # firefoxProfile.set_preference('permissions.default.image', 1)
-        # firefoxProfile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so','false')
-        # firefoxProfile.set_preference("http.response.timeout", 30)
-        # firefoxProfile.set_preference("dom.max_script_run_time", 30)
+        firefoxProfile = webdriver.FirefoxProfile()
+        firefoxProfile.set_preference('permissions.default.stylesheet', 1)
+        firefoxProfile.set_preference('permissions.default.image', 1)
+        firefoxProfile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so','false')
+        firefoxProfile.set_preference("http.response.timeout", 90)
+        firefoxProfile.set_preference("dom.max_script_run_time", 90)
 
         # # now create browser instance and APPLY the FirefoxProfile
-        # self.driver = webdriver.Firefox(firefox_profile=firefoxProfile)
-        self.driver = webdriver.PhantomJS();
-        self.driver.set_window_size(1366, 1366) 
+        self.driver = webdriver.Firefox(firefox_profile=firefoxProfile)
+        #self.driver = webdriver.PhantomJS();
+        # self.driver.set_window_position(0, 0)
+        # we remove 74 pixels at the top.
+        self.driver.set_window_size(1366, 1366 + 74) 
         print(self.driver.get_window_size(windowHandle='current'))
         self.driver.get(webpage)
 

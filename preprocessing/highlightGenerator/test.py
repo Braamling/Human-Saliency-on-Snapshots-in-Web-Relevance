@@ -6,6 +6,7 @@ import os
 import time
 import subprocess
 import argparse
+import random
 
 def createSnapshots(highlighter, webpage, query, query_id, name):
     highlighter.prepare(webpage, wayback=True)
@@ -80,8 +81,9 @@ def main():
             url = getWebLink(url, date)
             createSnapshots(highlighter, url, query, FLAGS.query, doc_id)
         except Exception as e:
+            print(e)
             print("failed to retrieve", doc_id, "from url", url)
-        sleep(max(0, 90 - (time.time() - start)))
+        sleep(max(0, random.randint(60, 75) - (time.time() - start)))
         print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
 
 if __name__ == '__main__':
