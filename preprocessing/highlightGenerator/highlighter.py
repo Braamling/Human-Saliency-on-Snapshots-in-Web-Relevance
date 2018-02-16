@@ -3,6 +3,7 @@ from selenium import webdriver
 from PIL import Image
 from io import BytesIO
 import numpy as np
+import subprocess
 
 class Highlighter():
 
@@ -70,7 +71,11 @@ class Highlighter():
             self.injectCSS = 'addStyleString("{}");'.format(file.read().replace('\n', ''))
 
     def close(self):
-        self.driver.close();
+        self.driver.close()
+        firefox = "pkill -f firefox"
+        geckodriver = "pkill -f geckdriver"
+        subprocess.Popen(["pkill", "-f", "firefox"])
+        subprocess.Popen(["pkill", "-f", "geckodriver"])
 
     search = "$('html').highlight('{}');"
     
