@@ -76,6 +76,9 @@ class Highlighter():
         self.driver.close()
         subprocess.Popen(["killall", "firefox"])
         subprocess.Popen(["killall", "geckodriver"])
+        subprocess.Popen(["pkill", "-f", "firefox"])
+        subprocess.Popen(["pkill", "-f", "geckodriver"])
+
 
     search = "$('html').highlight('{}');"
     
