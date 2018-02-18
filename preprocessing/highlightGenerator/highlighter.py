@@ -30,8 +30,8 @@ class Highlighter():
     def prepare(self, webpage, wayback=False):
         # self.driver = webdriver.Chrome("./libraries/chromedriver")
 
-        caps = webdriver.DesiredCapabilities.FIREFOX
-        caps["marionette"] = False
+        # caps = webdriver.DesiredCapabilities.FIREFOX
+        # caps["marionette"] = False
         firefoxProfile = webdriver.FirefoxProfile()
         firefoxProfile.set_preference('permissions.default.stylesheet', 1)
         firefoxProfile.set_preference('permissions.default.image', 1)
@@ -40,7 +40,7 @@ class Highlighter():
         firefoxProfile.set_preference("dom.max_script_run_time", 90)
 
         # # now create browser instance and APPLY the FirefoxProfile
-        self.driver = webdriver.Firefox(capabilities=caps, firefox_profile=firefoxProfile)
+        self.driver = webdriver.Firefox(firefox_profile=firefoxProfile)
         #self.driver = webdriver.PhantomJS();
         # self.driver.set_window_position(0, 0)
         # we remove 74 pixels at the top.
