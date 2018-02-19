@@ -71,6 +71,7 @@ def main():
     date = "20120202"
     
     queries = make_queries_dict()
+    print(queries)
 
     query = queries[FLAGS.query]
 
@@ -81,7 +82,10 @@ def main():
             url = getWebLink(url, date)
             createSnapshots(highlighter, url, query, FLAGS.query, doc_id)
         except Exception as e:
-            highlighter.close()
+            subprocess.Popen(["killall", "firefox"])
+            subprocess.Popen(["killall", "geckodriver"])
+            subprocess.Popen(["pkill", "-f", "firefox"])
+            subprocess.Popen(["pkill", "-f", "geckodriver"])
             print(e)
             print("failed to retrieve", doc_id, "from url", url)
         sleep(max(0, random.randint(60, 75) - (time.time() - start)))

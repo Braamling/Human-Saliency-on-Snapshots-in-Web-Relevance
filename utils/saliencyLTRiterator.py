@@ -35,8 +35,10 @@ class ClueWeb12Dataset(Dataset):
             scores_file (string): a file containing the scores for each query document pair.
         """
         self.make_dataset(image_dir, features_file)
-        self.img_transform = transforms.Compose([transforms.Resize((224,224), interpolation=2), 
+        self.img_transform = transforms.Compose([transforms.Resize((64,64), interpolation=2), 
                                                  transforms.ToTensor()])
+        # self.img_transform = transforms.Compose([transforms.Resize((224,224), interpolation=2), 
+                                                 # transforms.ToTensor()])
 
     def make_dataset(self, image_dir, features_file):
         featureStorage = FeatureStorage(features_file)
@@ -108,6 +110,7 @@ class ClueWeb12Dataset(Dataset):
         # p_image = self.img_transform(default_loader(p_image))
         # n_image = self.img_transform(default_loader(n_image))
 
+        p_image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
         positive_sample = (p_image, p_vec, p_score)
         negative_sample = (n_image, n_vec, n_score)
         return positive_sample, negative_sample

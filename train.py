@@ -5,27 +5,9 @@ from torch.optim import lr_scheduler
 import torch.optim as optim
 import numpy as np
 import argparse
+from models.models import LTR_features, ViP_features
 
 from utils.saliencyLTRiterator import ClueWeb12Dataset
-
-class LTR_features(nn.Module):
-    def __init__(self, input_size, feature_size):
-        super(LTR_features, self).__init__()
-        self.feature_size = feature_size
-        self.input_size = input_size
-        self.model = nn.Sequential(
-            nn.Linear(input_size, 4096),
-            nn.ReLU(True),
-            nn.Dropout(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(True),
-            nn.Dropout(),
-            nn.Linear(4096, feature_size),
-        )
-
-    def forward(self, x):
-        features = self.model(x)
-        return features
 
 class LTR_score(nn.Module):
     def __init__(self, static_feature_size, feature_model=None):
@@ -99,6 +81,11 @@ def train_model(model, criterion, dataloader, use_gpu, optimizer, scheduler, num
                 p_static_features = Variable(data[0][1].float())
                 n_static_features = Variable(data[1][1].float())
 
+            image = Variable(data[0][0].float())
+            feature_nn = ViP_features(4)
+            feature_nn.forward(image)
+
+
             # Do the forward prop.
             positive = model.forward(None, p_static_features)
             negative = model.forward(None, n_static_features)
@@ -124,7 +111,6 @@ Prepare the model with the correct weights and format the the configured use.
 def prepare_model(use_scheduler=True):
     use_gpu = torch.cuda.is_available()
 
-    # feature_nn = LTR_features(input_size, 28)
     model = LTR_score(3)
 
     if use_gpu:
