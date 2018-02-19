@@ -71,7 +71,6 @@ def main():
     date = "20120202"
     
     queries = make_queries_dict()
-    print(queries)
 
     query = queries[FLAGS.query]
 
