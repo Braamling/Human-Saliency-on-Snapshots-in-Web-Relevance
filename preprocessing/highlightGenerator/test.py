@@ -8,13 +8,14 @@ import subprocess
 import argparse
 import random
 
-def createSnapshots(highlighter, webpage, query, query_id, name):
+def createSnapshots(highlighter, webpage, query, query_id, doc_id):
+    print(" gathering snapshot for {} {}".format(query_id, doc_id))
     highlighter.prepare(webpage, wayback=True)
-    highlighter.storeSnapshot("storage/snapshots/{}.png".format(name))
+    highlighter.storeSnapshot("storage/snapshots/{}.png".format(doc_id))
     highlighter.setHighlights(query)
-    highlighter.storeSnapshot("storage/highlights/{}-{}.png".format(query_id, name))
+    highlighter.storeSnapshot("storage/highlights/{}-{}.png".format(query_id, doc_id))
     highlighter.removeContent()
-    highlighter.storeSnapshot("storage/masks/{}-{}.png".format(query_id, name), grayscale=True)
+    highlighter.storeSnapshot("storage/masks/{}-{}.png".format(query_id, doc_id), grayscale=True)
     highlighter.close()
 
 def getWebLink(url, date):
@@ -76,19 +77,22 @@ def main():
 
     global_start = time.time()
     for i, (doc_id, url) in enumerate(documentGenerator()):
-        try:
-            start = time.time()
-            url = getWebLink(url, date)
-            createSnapshots(highlighter, url, query, FLAGS.query, doc_id)
-        except Exception as e:
-            subprocess.Popen(["killall", "firefox"])
-            subprocess.Popen(["killall", "geckodriver"])
-            subprocess.Popen(["pkill", "-f", "firefox"])
-            subprocess.Popen(["pkill", "-f", "geckodriver"])
-            print(e)
-            print("failed to retrieve", doc_id, "from url", url)
-        sleep(max(0, random.randint(60, 75) - (time.time() - start)))
-        print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
+        if not os.path.isfile("storage/highlights/{}-{}.png".format(FLAGS.query, doc_id)):
+            try:
+                start = time.time()
+                url = getWebLink(url, date)
+                createSnapshots(highlighter, url, query, FLAGS.query, doc_id)
+            except Exception as e:
+                subprocess.Popen(["killall", "firefox"])
+                subprocess.Popen(["killall", "geckodriver"])
+                subprocess.Popen(["pkill", "-f", "firefox"])
+                subprocess.Popen(["pkill", "-f", "geckodriver"])
+                print(e)
+                print("failed to retrieve", doc_id, "from url", url)
+            sleep(max(0, random.randint(60, 75) - (time.time() - start)))
+            print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
+        else:
+            print("File has already been scraped.")  
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
