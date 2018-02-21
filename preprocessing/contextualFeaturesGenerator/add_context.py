@@ -3,35 +3,35 @@ from utils.trecIterator import TrecIterator
 from utils.pyndriScorer import PyndriScorer
 import argparse
 
-def parse_pyndri(featureStorage, trecIterator):
+def parse_pyndri(feature_storage, trec_iterator):
     scorer = PyndriScorer(FLAGS.context_path)
 
-    for query_id, query, documents in trecIterator.query_document_iterator():
+    for query_id, query, documents in trec_iterator.query_document_iterator():
         doc_ids = list(documents.keys())
         for doc_id, score in scorer.bm_scores(doc_ids, query):
-            featureStorage.add_query_document_feature(query_id, doc_id, documents[doc_id],
+            feature_storage.add_query_document_feature(query_id, doc_id, documents[doc_id],
                                                       'bm25', score)
 
-    for query_id, query, documents in trecIterator.query_document_iterator():
+    for query_id, query, documents in trec_iterator.query_document_iterator():
         doc_ids = list(documents.keys())
         for doc_id, score in scorer.tfidf_scores(doc_ids, query):
-            featureStorage.add_query_document_feature(query_id, doc_id, documents[doc_id],
+            feature_storage.add_query_document_feature(query_id, doc_id, documents[doc_id],
                                                       'tfidf', score)
 
-    for query_id, query, documents in trecIterator.query_document_iterator():
+    for query_id, query, documents in trec_iterator.query_document_iterator():
         doc_ids = list(documents.keys())
         for doc_id, score in scorer.lm_scores(doc_ids, query):
-            featureStorage.add_query_document_feature(query_id, doc_id, documents[doc_id],
+            feature_storage.add_query_document_feature(query_id, doc_id, documents[doc_id],
                                                       'lm', score)
 
 def main():
-    featureStorage = FeatureStorage(FLAGS.hdf5_path)
-    trecIterator = TrecIterator(FLAGS.trec_path)
+    feature_storage = FeatureStorage(FLAGS.hdf5_path)
+    trec_iterator = TrecIterator(FLAGS.trec_path)
 
     if FLAGS.context_type == 'pyndri':
-        parse_pyndri(featureStorage, trecIterator)
+        parse_pyndri(feature_storage, trec_iterator)
 
-    print(featureStorage.get_pairs())
+    print(feature_storage.get_pairs())
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
