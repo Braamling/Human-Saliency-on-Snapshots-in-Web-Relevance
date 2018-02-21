@@ -17,13 +17,13 @@ query: string containing the query to highlight
 query_id: query id used for storing snapshots
 doc_id: document id to use for storing snapshots
 """
-def createSnapshots(highlighter, url, query, query_id, doc_id):
+def create_snapshots(highlighter, url, query, query_id, doc_id):
     highlighter.prepare(url, wayback=True)
-    highlighter.storeSnapshot("storage/snapshots/{}.png".format(doc_id))
-    highlighter.setHighlights(query)
-    highlighter.storeSnapshot("storage/highlights/{}-{}.png".format(query_id, doc_id))
-    highlighter.removeContent()
-    highlighter.storeSnapshot("storage/masks/{}-{}.png".format(query_id, doc_id), grayscale=True)
+    highlighter.store_snapshot("storage/snapshots/{}.png".format(doc_id))
+    highlighter.set_highlights(query)
+    highlighter.store_snapshot("storage/highlights/{}-{}.png".format(query_id, doc_id))
+    highlighter.remove_content()
+    highlighter.store_snapshot("storage/masks/{}-{}.png".format(query_id, doc_id), grayscale=True)
     highlighter.close()
 
 """
@@ -35,9 +35,9 @@ If the domain root is not available, the url is returned as is.
 url: url check at wayback
 date: YYYYMMDD string that should be used for retrieving the snapshot
 """
-def getWebLink(url, date):
+def get_web_link(url, date):
     # Try to get the actual link
-    avail, waybackUrl = checkWaybackAvail(url, date)
+    avail, waybackUrl = check_wayback_avail(url, date)
     if avail:
         print(waybackUrl)
         return waybackUrl
@@ -45,7 +45,7 @@ def getWebLink(url, date):
     domain = "{0.scheme}://{0.netloc}/".format(urlsplit(url))
 
     # Attempt to get the root domain instead.
-    avail, waybackUrl = checkWaybackAvail(domain, date)
+    avail, waybackUrl = check_wayback_avail(domain, date)
     if avail:
         print(waybackUrl)
         return waybackUrl
@@ -60,7 +60,7 @@ Check whether a url/date combination is available in the wayback machine.
 url: url check at wayback
 date: YYYYMMDD string that should be used for retrieving the snapshot
 """ 
-def checkWaybackAvail(url, date):
+def check_wayback_avail(url, date):
     waybackUrl = "http://archive.org/wayback/available?url={}&timestamp={}"
 
     url = waybackUrl.format(url, date)
@@ -78,7 +78,7 @@ def checkWaybackAvail(url, date):
 """ 
 Create a dict with all query id's and their corresponding queries.
 """
-def makeQueriesDict():
+def make_queries_dict():
     queries = {}
     with open("storage/TREC/queries", 'r') as f:
         for line in f:
@@ -90,7 +90,7 @@ def makeQueriesDict():
 """
 Yield doc_id, url pairs for the configured query.
 """
-def documentGenerator():
+def document_generator():
     with open("storage/TREC/{}_docs".format(FLAGS.query), 'r') as fd:
         with open("storage/TREC/{}_urls".format(FLAGS.query), 'r') as fu:
             for doc_id, url in zip(fd, fu):
@@ -99,16 +99,16 @@ def documentGenerator():
 
 def main():
     highlighter = Highlighter() 
-    queries = makeQueriesDict()
+    queries = make_queries_dict()
 
     query = queries[FLAGS.query]
 
     global_start = time.time()
-    for i, (doc_id, url) in enumerate(documentGenerator()):
+    for i, (doc_id, url) in enumerate(document_generator()):
         try:
             start = time.time()
-            url = getWebLink(url, FLAGS.date)
-            createSnapshots(highlighter, url, query, FLAGS.query, doc_id)
+            url = get_web_link(url, FLAGS.date)
+            create_snapshots(highlighter, url, query, FLAGS.query, doc_id)
         except Exception as e:
             highlighter.close(driver=False)
             print(e)

@@ -9,9 +9,9 @@ class Highlighter():
 
     def __init__(self):
         os.environ['MOZ_HEADLESS'] = '1'
-        self.loadLocalFiles()
+        self.load_local_files()
 
-    def storeSnapshot(self, img_target, grayscale=False):
+    def store_snapshot(self, img_target, grayscale=False):
         data = self.driver.get_screenshot_as_png()
 
         if grayscale:
@@ -55,14 +55,14 @@ class Highlighter():
         if wayback:
             self.driver.execute_script('$("#wm-ipp").remove();')
 
-    def setHighlights(self, query):
+    def set_highlights(self, query):
         for word in query.split(" "):
             self.driver.execute_script(self.search.format(word))
 
-    def removeContent(self):
+    def remove_content(self):
         self.driver.execute_script(self.coverAll)
 
-    def loadLocalFiles(self):
+    def load_local_files(self):
         with open('libraries/jquery-3.2.1.min.js', 'r') as file:
             self.injectJquery = file.read().replace('\n', '')
 

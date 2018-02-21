@@ -6,19 +6,19 @@ import argparse
 def parse_pyndri(featureStorage, trecIterator):
     scorer = PyndriScorer(FLAGS.context_path)
 
-    for query_id, query, documents in trecIterator.queryDocumentIterator():
+    for query_id, query, documents in trecIterator.query_document_iterator():
         doc_ids = list(documents.keys())
         for doc_id, score in scorer.bm_scores(doc_ids, query):
             featureStorage.add_query_document_feature(query_id, doc_id, documents[doc_id],
                                                       'bm25', score)
 
-    for query_id, query, documents in trecIterator.queryDocumentIterator():
+    for query_id, query, documents in trecIterator.query_document_iterator():
         doc_ids = list(documents.keys())
         for doc_id, score in scorer.tfidf_scores(doc_ids, query):
             featureStorage.add_query_document_feature(query_id, doc_id, documents[doc_id],
                                                       'tfidf', score)
 
-    for query_id, query, documents in trecIterator.queryDocumentIterator():
+    for query_id, query, documents in trecIterator.query_document_iterator():
         doc_ids = list(documents.keys())
         for doc_id, score in scorer.lm_scores(doc_ids, query):
             featureStorage.add_query_document_feature(query_id, doc_id, documents[doc_id],
