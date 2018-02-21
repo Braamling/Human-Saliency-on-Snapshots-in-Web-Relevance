@@ -72,8 +72,9 @@ class Highlighter():
         with open('libraries/style.css', 'r') as file:
             self.injectCSS = 'addStyleString("{}");'.format(file.read().replace('\n', ''))
 
-    def close(self):
-        self.driver.close()
+    def close(self, driver=True):
+        if driver:
+            self.driver.close()
         subprocess.Popen(["killall", "firefox"])
         subprocess.Popen(["killall", "geckodriver"])
         subprocess.Popen(["pkill", "-f", "firefox"])

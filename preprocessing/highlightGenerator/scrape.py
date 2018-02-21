@@ -8,15 +8,33 @@ import subprocess
 import argparse
 import random
 
-def createSnapshots(highlighter, webpage, query, query_id, name):
-    highlighter.prepare(webpage, wayback=True)
-    highlighter.storeSnapshot("storage/snapshots/{}.png".format(name))
+"""
+Create a set of three snapshots from a url.
+
+highligher: Highligher object containing a selenium driver
+url: url to use for snapshots
+query: string containing the query to highlight
+query_id: query id used for storing snapshots
+doc_id: document id to use for storing snapshots
+"""
+def createSnapshots(highlighter, url, query, query_id, doc_id):
+    highlighter.prepare(url, wayback=True)
+    highlighter.storeSnapshot("storage/snapshots/{}.png".format(doc_id))
     highlighter.setHighlights(query)
-    highlighter.storeSnapshot("storage/highlights/{}-{}.png".format(query_id, name))
+    highlighter.storeSnapshot("storage/highlights/{}-{}.png".format(query_id, doc_id))
     highlighter.removeContent()
-    highlighter.storeSnapshot("storage/masks/{}-{}.png".format(query_id, name), grayscale=True)
+    highlighter.storeSnapshot("storage/masks/{}-{}.png".format(query_id, doc_id), grayscale=True)
     highlighter.close()
 
+"""
+Convert a url and date to a wayback url.
+The closed available wayback machine snapshot url is returned.
+If the full path is not available, the url will be stripped to just the domain root.
+If the domain root is not available, the url is returned as is.
+
+url: url check at wayback
+date: YYYYMMDD string that should be used for retrieving the snapshot
+"""
 def getWebLink(url, date):
     # Try to get the actual link
     avail, waybackUrl = checkWaybackAvail(url, date)
@@ -35,6 +53,13 @@ def getWebLink(url, date):
     print(url)
     return url
 
+
+"""
+Check whether a url/date combination is available in the wayback machine.
+
+url: url check at wayback
+date: YYYYMMDD string that should be used for retrieving the snapshot
+""" 
 def checkWaybackAvail(url, date):
     waybackUrl = "http://archive.org/wayback/available?url={}&timestamp={}"
 
@@ -50,7 +75,10 @@ def checkWaybackAvail(url, date):
 
     return False, ""
 
-def make_queries_dict():
+""" 
+Create a dict with all query id's and their corresponding queries.
+"""
+def makeQueriesDict():
     queries = {}
     with open("storage/TREC/queries", 'r') as f:
         for line in f:
@@ -59,6 +87,9 @@ def make_queries_dict():
 
     return queries
 
+"""
+Yield doc_id, url pairs for the configured query.
+"""
 def documentGenerator():
     with open("storage/TREC/{}_docs".format(FLAGS.query), 'r') as fd:
         with open("storage/TREC/{}_urls".format(FLAGS.query), 'r') as fu:
@@ -68,9 +99,7 @@ def documentGenerator():
 
 def main():
     highlighter = Highlighter() 
-    date = "20120202"
-    
-    queries = make_queries_dict()
+    queries = makeQueriesDict()
 
     query = queries[FLAGS.query]
 
@@ -78,13 +107,10 @@ def main():
     for i, (doc_id, url) in enumerate(documentGenerator()):
         try:
             start = time.time()
-            url = getWebLink(url, date)
+            url = getWebLink(url, FLAGS.date)
             createSnapshots(highlighter, url, query, FLAGS.query, doc_id)
         except Exception as e:
-            subprocess.Popen(["killall", "firefox"])
-            subprocess.Popen(["killall", "geckodriver"])
-            subprocess.Popen(["pkill", "-f", "firefox"])
-            subprocess.Popen(["pkill", "-f", "geckodriver"])
+            highlighter.close(driver=False)
             print(e)
             print("failed to retrieve", doc_id, "from url", url)
         sleep(max(0, random.randint(60, 75) - (time.time() - start)))
@@ -95,6 +121,9 @@ if __name__ == '__main__':
 
     parser.add_argument('--query', type=str, default='207',
                         help='The query id to retrieve.')
+    parser.add_argument('--date', type=str, default='20120202',
+                        help='The date (YYYYMMDD) to aim for while scraping.')
+
 
     FLAGS, unparsed = parser.parse_known_args()
 
