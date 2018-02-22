@@ -105,7 +105,7 @@ def main():
 
     global_start = time.time()
     for i, (doc_id, url) in enumerate(document_generator()):
-        if not os.path.isfile("storage/highlights/{}-{}.png".format(FLAGS.query, doc_id)):
+        if not os.path.isfile("storage/masks/{}-{}.png".format(FLAGS.query, doc_id)):
             try:
                 start = time.time()
                 url = get_web_link(url, FLAGS.date)
