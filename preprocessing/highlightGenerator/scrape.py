@@ -105,16 +105,19 @@ def main():
 
     global_start = time.time()
     for i, (doc_id, url) in enumerate(document_generator()):
-        try:
-            start = time.time()
-            url = get_web_link(url, FLAGS.date)
-            create_snapshots(highlighter, url, query, FLAGS.query, doc_id)
-        except Exception as e:
-            highlighter.close(driver=False)
-            print(e)
-            print("failed to retrieve", doc_id, "from url", url)
-        sleep(max(0, random.randint(60, 75) - (time.time() - start)))
-        print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
+        if not os.path.isfile("storage/highlights/{}-{}.png".format(FLAGS.query, doc_id)):
+            try:
+                start = time.time()
+                url = get_web_link(url, FLAGS.date)
+                create_snapshots(highlighter, url, query, FLAGS.query, doc_id)
+            except Exception as e:
+                highlighter.close(driver=False)
+                print(e)
+                print("failed to retrieve", doc_id, "from url", url)
+            sleep(max(0, random.randint(60, 75) - (time.time() - start)))
+            print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
+        else:
+            print("File has already been scraped.") 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
