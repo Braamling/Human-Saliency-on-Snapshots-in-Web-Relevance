@@ -40,7 +40,7 @@ def get_web_link(url, date):
     avail, waybackUrl = check_wayback_avail(url, date)
     if avail:
         print(waybackUrl)
-        return waybackUrl
+        return 1, waybackUrl
 
     domain = "{0.scheme}://{0.netloc}/".format(urlsplit(url))
 
@@ -48,10 +48,10 @@ def get_web_link(url, date):
     avail, waybackUrl = check_wayback_avail(domain, date)
     if avail:
         print(waybackUrl)
-        return waybackUrl
+        return 2, waybackUrl
 
     print(url)
-    return url
+    return 3, url
 
 
 """
@@ -90,11 +90,20 @@ def make_queries_dict():
 """
 Yield doc_id, url pairs for the configured query.
 """
-def document_generator():
-    with open("storage/TREC/{}_docs".format(FLAGS.query), 'r') as fd:
-        with open("storage/TREC/{}_urls".format(FLAGS.query), 'r') as fu:
+def document_generator(query):
+    with open("storage/TREC/{}_docs".format(query), 'r') as fd:
+        with open("storage/TREC/{}_urls".format(query), 'r') as fu:
             for doc_id, url in zip(fd, fu):
                 yield doc_id.strip(), url.strip()
+
+def create_wayback_index():
+    with open("storage/TREC/wayback_urls", 'a') as fd:
+        # for q_id in queries.keys():
+        for doc_id, url in document_generator(FLAGS.query):
+            state, waybackurl = get_web_link(url, FLAGS.date)
+            fd.write("{} {} {} {}\n".format(FLAGS.query, doc_id, state, waybackurl))
+            sleep(1)
+
 
 
 def main():
@@ -103,12 +112,15 @@ def main():
 
     query = queries[FLAGS.query]
 
+    create_wayback_index()
+    return
+
     global_start = time.time()
-    for i, (doc_id, url) in enumerate(document_generator()):
+    for i, (doc_id, url) in enumerate(document_generator(FLAGS.query)):
         if not os.path.isfile("storage/masks/{}-{}.png".format(FLAGS.query, doc_id)):
             try:
                 start = time.time()
-                url = get_web_link(url, FLAGS.date)
+                _, url = get_web_link(url, FLAGS.date)
                 create_snapshots(highlighter, url, query, FLAGS.query, doc_id)
             except Exception as e:
                 highlighter.close(driver=False)
