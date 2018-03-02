@@ -96,19 +96,17 @@ def document_generator():
             for doc_id, url in zip(fd, fu):
                 yield doc_id.strip(), url.strip()
 
-
-def main():
-    highlighter = Highlighter() 
-    queries = make_queries_dict()
-
-    query = queries[FLAGS.query]
-
+"""
+Scrape a file with all entries for a specific query. 
+"""
+def scrape_query_file(query, highlighter):
     global_start = time.time()
     for i, (doc_id, url) in enumerate(document_generator()):
         if not os.path.isfile("storage/masks/{}-{}.png".format(FLAGS.query, doc_id)):
             try:
                 start = time.time()
-                url = get_web_link(url, FLAGS.date)
+                if FLAGS.get_wayback:
+                    url = get_web_link(url, FLAGS.date)
                 create_snapshots(highlighter, url, query, FLAGS.query, doc_id)
             except Exception as e:
                 highlighter.close(driver=False)
@@ -119,6 +117,41 @@ def main():
         else:
             print("File has already been scraped.") 
 
+"""
+Scrape all documents in a file containing the query_id, document_id and url
+"""
+def scrape_document_file(file, queries, highlighter):
+    global_start = time.time()
+    with open(file, 'r') as f:
+        for line in f:
+            query_id, doc_id, url = line.rstrip().split(" ")
+            query = queries[query_id]
+            if not os.path.isfile("storage/masks/{}-{}.png".format(query_id, doc_id)):
+                try:
+                    start = time.time()
+                    if FLAGS.get_wayback:
+                        url = get_web_link(url, FLAGS.date)
+                    create_snapshots(highlighter, url, query, query_id, doc_id)
+                except Exception as e:
+                    highlighter.close(driver=False)
+                    print(e)
+                    print("failed to retrieve", doc_id, "from url", url)
+                sleep(max(0, random.randint(60, 75) - (time.time() - start)))
+                print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
+            else:
+                print("File has already been scraped.") 
+
+def main():
+    highlighter = Highlighter() 
+    queries = make_queries_dict()
+
+    if FLAGS.input_file is not None:
+        scrape_document_file(FLAGS.input_file, queries, highlighter)
+    else:
+        scrape_query_file(queries[FLAGS.query], highlighter)
+
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -126,7 +159,10 @@ if __name__ == '__main__':
                         help='The query id to retrieve.')
     parser.add_argument('--date', type=str, default='20120202',
                         help='The date (YYYYMMDD) to aim for while scraping.')
-
+    parser.add_argument('--get_wayback', type=bool, default=True,
+                        help='Select whether the url should be looked up in the wayback machine.')
+    parser.add_argument('--input_file', type=str,
+                        help='Select whether the url should be looked up in the wayback machine.')
 
     FLAGS, unparsed = parser.parse_known_args()
 
