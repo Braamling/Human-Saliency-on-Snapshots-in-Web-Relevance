@@ -149,6 +149,21 @@ class FeatureStorage():
 
             self.pairs.append((q_id, score, d_id, vec))
 
+    """
+    Get all available query-document pairs in an array of with tuple values of
+    (query_id, score, document_id, feature_vectore)
+    """
+    def get_queries(self):
+        self.queries = []
+        self.f.visit(self._add_query)
+        return self.queries
+
+    def _add_query(self, route):
+        if len(route.split("/")) == 1:
+            q_id = int(route)
+
+            self.queries.append(q_id)
+
     def print_index(self):
         self.f.visit(self.printname)
 
