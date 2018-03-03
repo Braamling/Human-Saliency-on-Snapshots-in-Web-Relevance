@@ -9,4 +9,6 @@ sbt -java-home /usr/lib/jvm/java-7-openjdk-amd64/ assembly
     --master yarn \
     --deploy-mode cluster \
     --num-executors 100 --executor-cores 4 --executor-memory 19G
-    
+    target/scala-2.11/spark-assembly-0.0.1.jar
+
+spark-submit --class main.GetFeatures --master yarn --deploy-mode cluster --num-executors 3 --executor-cores 4 --executor-memory 19G target/scala-2.11/spark-assembly-0.0.1.jar

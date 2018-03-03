@@ -109,7 +109,6 @@ class FeatureStorage():
     """
     def get_documents_in_query(self, query_id):
         self.pairs = []
-        # self.f[query_id]
         self.f[str(query_id)].visit(self._add_document)
         return self.pairs
 
