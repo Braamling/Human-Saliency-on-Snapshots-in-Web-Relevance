@@ -8,7 +8,12 @@ import argparse
 from models.models import LTR_features, ViP_features
 
 from utils.saliencyLTRiterator import ClueWeb12Dataset
+from utils.evaluate import Evaluate
 
+"""
+The LTR score model can hold a second feature network that can be fed
+external features. The model is then trained end-to-end.
+"""
 class LTR_score(nn.Module):
     def __init__(self, static_feature_size, feature_model=None):
         super(LTR_score, self).__init__()
@@ -19,7 +24,6 @@ class LTR_score(nn.Module):
         else:
             x_in = feature_model.feature_size + static_feature_size
 
-
         self.model = nn.Sequential(
             nn.Linear(x_in, 10),
             nn.ReLU(True),
@@ -27,10 +31,12 @@ class LTR_score(nn.Module):
             nn.Linear(10, 1),
         )
 
-    def forward(self, x, features):
+    def forward(self, image, static_features):
         if self.feature_model is not None:
-            x = self.feature_model(x)
-            features = torch.cat((x, features), 1)
+            image = self.feature_model(image)
+            features = torch.cat((image, static_features), 1)
+        else:
+            features = static_features
         output = self.model(features)
 
         return output
@@ -44,24 +50,28 @@ def pair_hinge_loss(positive, negative):
 """
 This method prepares the dataloaders for training and returns a training/validation dataloader.
 """
-def prepare_dataloaders(image_path, features_dir, batch_size):
-    # Get the train/val datasets
-    dataset = ClueWeb12Dataset(image_path, features_dir)
+def prepare_dataloaders():
+    # Get the train/test datasets
+    train_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.train_file)
+    test_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.test_file)
     
     # Prepare the loaders
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+    dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
                                                   shuffle=True, num_workers=4)
-    # Get the datasizes for logging purposes.
-    dataset_sizes = len(dataset)
+    # Initiate the Evaluation classes
+    trainEval = Evaluate(FLAGS.train_file, train_dataset)
+    testEval = Evaluate(FLAGS.test_file, test_dataset)
 
-    return dataloader
+    return dataloader, trainEval, testEval
 
-def train_model(model, criterion, dataloader, use_gpu, optimizer, scheduler, num_epochs=25):
-
+def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, num_epochs=25):
+    dataloader, trainEval, testEval = dataloaders
     model.train(True)  # Set model to training mode
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
+        trainEval.eval(model)
+
 
         # Each epoch has a training and validation phase
         
@@ -81,9 +91,9 @@ def train_model(model, criterion, dataloader, use_gpu, optimizer, scheduler, num
                 p_static_features = Variable(data[0][1].float())
                 n_static_features = Variable(data[1][1].float())
 
-            image = Variable(data[0][0].float())
-            feature_nn = ViP_features(4)
-            feature_nn.forward(image)
+            # image = Variable(data[0][0].float())
+            # feature_nn = ViP_features(4)
+            # feature_nn.forward(image)
 
 
             # Do the forward prop.
@@ -118,6 +128,7 @@ def prepare_model(use_scheduler=True):
 
     opt_parameters = model.model.parameters()
     optimizer = optim.Adam(opt_parameters, lr=FLAGS.learning_rate, weight_decay=1e-5)
+    # optimizer = optim.SGD(opt_parameters, lr=FLAGS.learning_rate, weight_decay=1e-5)
 
     if use_gpu:
         model = model.cuda()
@@ -129,15 +140,17 @@ def prepare_model(use_scheduler=True):
 
 
 def train():
-    dataloader = prepare_dataloaders(FLAGS.image_path, FLAGS.features_file, FLAGS.batch_size)
+    dataloaders = prepare_dataloaders()
     model, optimizer, scheduler, use_gpu = prepare_model()
-    train_model(model, pair_hinge_loss, dataloader, use_gpu, optimizer, scheduler, num_epochs=FLAGS.epochs)
+    train_model(model, pair_hinge_loss, dataloaders, use_gpu, optimizer, scheduler, num_epochs=FLAGS.epochs)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--features_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/hdf5/context_features.hdf5',
+    parser.add_argument('--train_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/hdf5/test_split_train.hdf5',
+                        help='The location of the salicon heatmaps data for training.')
+    parser.add_argument('--test_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/hdf5/test_split_test.hdf5',
                         help='The location of the salicon heatmaps data for training.')
     parser.add_argument('--image_path', type=str, default='storage/salicon/images/',
                         help='The location of the salicon images for training.')

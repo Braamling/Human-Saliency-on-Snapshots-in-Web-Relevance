@@ -43,8 +43,10 @@ class ClueWeb12Dataset(Dataset):
     def make_dataset(self, image_dir, features_file):
         featureStorage = FeatureStorage(features_file)
         dataset = []
+        train_dataset = []
 
         # External doc id to internal doc id
+        train_ext2int = {}
         self.ext2int = {}
         self.idx2posneg = {}
 
@@ -58,18 +60,24 @@ class ClueWeb12Dataset(Dataset):
 
                 self.idx2posneg[qs_idx] = posnegs
 
+            # TODO how to use this for both train and test
+            self.ext2int[d_id] = i
+
+            # Create the dataset entry
+            image = os.path.join(image_dir, d_id)
+            item = (image, q_id, score, d_id, vec)
+            dataset.append(item)
+
             # Only add query-document pairs with available negative or positive samples.
             if len(self.idx2posneg[qs_idx]) != 0:
-                self.ext2int[d_id] = i
-
-                image = os.path.join(image_dir, d_id)
-                item = (image, q_id, score, d_id, vec)
-                dataset.append(item)
+                train_ext2int[d_id] = i
+                train_dataset.append(item)
 
         # Convert all external ids in idx2posneg to internal ids.
         for qs_idx in self.idx2posneg.keys():
-            self.idx2posneg[qs_idx] = [self.ext2int[i] for i in self.idx2posneg[qs_idx]]
+            self.idx2posneg[qs_idx] = [train_ext2int[i] for i in self.idx2posneg[qs_idx]]
 
+        self.train_dataset = train_dataset
         self.dataset = dataset
 
     """
@@ -88,10 +96,10 @@ class ClueWeb12Dataset(Dataset):
         return ids
 
     def __len__(self):
-        return len(self.dataset)
+        return len(self.train_dataset)
 
     def __getitem__(self, idx):
-        _, q_id, score, _, _ = self.dataset[idx]
+        _, q_id, score, _, _ = self.train_dataset[idx]
 
         # Get the id for the query-score pair
         qs_idx = "{}:{}".format(q_id, score)
@@ -99,12 +107,12 @@ class ClueWeb12Dataset(Dataset):
         # Sample a second document with a different score for the same query.
         posneg_idx = random.randint(0, len(self.idx2posneg[qs_idx]))
 
-        if self.dataset[idx][2] > self.dataset[posneg_idx][2]:
-            p_image, _, p_score, _, p_vec = self.dataset[idx]
-            n_image, _, n_score, _, n_vec = self.dataset[posneg_idx]
+        if self.train_dataset[idx][2] > self.train_dataset[posneg_idx][2]:
+            p_image, _, p_score, _, p_vec = self.train_dataset[idx]
+            n_image, _, n_score, _, n_vec = self.train_dataset[posneg_idx]
         else:
-            p_image, _, p_score, _, p_vec = self.dataset[posneg_idx]
-            n_image, _, n_score, _, n_vec = self.dataset[idx]
+            p_image, _, p_score, _, p_vec = self.train_dataset[posneg_idx]
+            n_image, _, n_score, _, n_vec = self.train_dataset[idx]
 
         # Load the postive and negative input image
         # p_image = self.img_transform(default_loader(p_image))
@@ -114,3 +122,10 @@ class ClueWeb12Dataset(Dataset):
         positive_sample = (p_image, p_vec, p_score)
         negative_sample = (n_image, n_vec, n_score)
         return positive_sample, negative_sample
+
+    """
+    Get a specific Clueweb document
+    """
+    def get_document(self, doc_id):
+        image, _, score, _, vec = self.dataset[self.ext2int[doc_id]]
+        return (image, vec, score)
