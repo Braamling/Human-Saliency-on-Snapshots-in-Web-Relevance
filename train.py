@@ -95,7 +95,6 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
             # feature_nn = ViP_features(4)
             # feature_nn.forward(image)
 
-
             # Do the forward prop.
             positive = model.forward(None, p_static_features)
             negative = model.forward(None, n_static_features)

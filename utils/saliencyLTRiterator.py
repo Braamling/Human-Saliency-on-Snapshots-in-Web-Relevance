@@ -49,15 +49,15 @@ class ClueWeb12Dataset(Dataset):
         train_ext2int = {}
         self.ext2int = {}
         self.idx2posneg = {}
-
+        j = 0
         # Create a dataset with all query-document pairs
         for i, (q_id, score, d_id, vec) in enumerate(featureStorage.get_pairs()):
             # Calculate the query-score index.
             qs_idx = "{}:{}".format(q_id, score)
 
+            # Add an entry with all documents that have a different score
             if qs_idx not in self.idx2posneg:
                 posnegs = self._get_alt_scores_docs(featureStorage, q_id, score)
-
                 self.idx2posneg[qs_idx] = posnegs
 
             # TODO how to use this for both train and test
@@ -70,7 +70,8 @@ class ClueWeb12Dataset(Dataset):
 
             # Only add query-document pairs with available negative or positive samples.
             if len(self.idx2posneg[qs_idx]) != 0:
-                train_ext2int[d_id] = i
+                train_ext2int[d_id] = j
+                j += 1
                 train_dataset.append(item)
 
         # Convert all external ids in idx2posneg to internal ids.
@@ -106,7 +107,9 @@ class ClueWeb12Dataset(Dataset):
 
         # Sample a second document with a different score for the same query.
         posneg_idx = random.randint(0, len(self.idx2posneg[qs_idx]))
+        posneg_idx = self.idx2posneg[qs_idx][posneg_idx-1]
 
+        # print(self.train_dataset[idx][2], self.train_dataset[posneg_idx][2])
         if self.train_dataset[idx][2] > self.train_dataset[posneg_idx][2]:
             p_image, _, p_score, _, p_vec = self.train_dataset[idx]
             n_image, _, n_score, _, n_vec = self.train_dataset[posneg_idx]
