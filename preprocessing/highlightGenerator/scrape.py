@@ -19,12 +19,17 @@ doc_id: document id to use for storing snapshots
 """
 def create_snapshots(highlighter, url, query, query_id, doc_id):
     highlighter.prepare(url, wayback=True)
+    append_log(highlighter.get_final_url(), query_id, doc_id)
     highlighter.store_snapshot("storage/snapshots/{}.png".format(doc_id))
     highlighter.set_highlights(query)
     highlighter.store_snapshot("storage/highlights/{}-{}.png".format(query_id, doc_id))
     highlighter.remove_content()
     highlighter.store_snapshot("storage/masks/{}-{}.png".format(query_id, doc_id), grayscale=True)
     highlighter.close()
+
+def append_log(final_url, query_id, doc_id):
+    with open(FLAGS.log_file, 'a') as f:
+        f.write("{} {} {}\n".format(query_id, doc_id, final_url))
 
 """
 Convert a url and date to a wayback url.
@@ -129,7 +134,7 @@ def scrape_document_file(file, queries, highlighter):
             if not os.path.isfile("storage/masks/{}-{}.png".format(query_id, doc_id)):
                 try:
                     start = time.time()
-                    if FLAGS.get_wayback:
+                    if FLAGS.get_wayback is "True":
                         url = get_web_link(url, FLAGS.date)
                     create_snapshots(highlighter, url, query, query_id, doc_id)
                 except Exception as e:
@@ -159,10 +164,12 @@ if __name__ == '__main__':
                         help='The query id to retrieve.')
     parser.add_argument('--date', type=str, default='20120202',
                         help='The date (YYYYMMDD) to aim for while scraping.')
-    parser.add_argument('--get_wayback', type=bool, default=True,
+    parser.add_argument('--get_wayback', type=str, default="False",
                         help='Select whether the url should be looked up in the wayback machine.')
     parser.add_argument('--input_file', type=str,
                         help='Select whether the url should be looked up in the wayback machine.')
+    parser.add_argument('--log_file', type=str, default="scrape_logs",
+                        help='This file is used to store logs during scraping.')
 
     FLAGS, unparsed = parser.parse_known_args()
 

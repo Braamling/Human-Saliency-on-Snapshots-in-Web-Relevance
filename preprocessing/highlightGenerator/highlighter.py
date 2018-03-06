@@ -80,6 +80,8 @@ class Highlighter():
         subprocess.Popen(["pkill", "-f", "firefox"])
         subprocess.Popen(["pkill", "-f", "geckodriver"])
 
+    def get_final_url(self):
+        return self.driver.current_url
 
     search = "$('html').highlight('{}');"
     
