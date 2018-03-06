@@ -123,7 +123,7 @@ Scrape all documents in a file containing the query_id, document_id and url
 def scrape_document_file(file, queries, highlighter):
     global_start = time.time()
     with open(file, 'r') as f:
-        for line in f:
+        for i, line in enumerate(f):
             query_id, doc_id, url = line.rstrip().split(" ")
             query = queries[query_id]
             if not os.path.isfile("storage/masks/{}-{}.png".format(query_id, doc_id)):
@@ -136,7 +136,7 @@ def scrape_document_file(file, queries, highlighter):
                     highlighter.close(driver=False)
                     print(e)
                     print("failed to retrieve", doc_id, "from url", url)
-                sleep(max(0, random.randint(60, 75) - (time.time() - start)))
+                sleep(max(0, random.randint(60, 65) - (time.time() - start)))
                 print("Elapsed time", time.time() - global_start, "average time", (time.time() - global_start)/(i+1))
             else:
                 print("File has already been scraped.") 
@@ -159,11 +159,11 @@ if __name__ == '__main__':
                         help='The query id to retrieve.')
     parser.add_argument('--date', type=str, default='20120202',
                         help='The date (YYYYMMDD) to aim for while scraping.')
-    parser.add_argument('--get_wayback', type=bool, default=True,
+    parser.add_argument('--get_wayback', type=str, default="True",
                         help='Select whether the url should be looked up in the wayback machine.')
     parser.add_argument('--input_file', type=str,
                         help='Select whether the url should be looked up in the wayback machine.')
 
     FLAGS, unparsed = parser.parse_known_args()
-
+    FLAGS.get_wayback = FLAGS.get_wayback is "True"
     main()
