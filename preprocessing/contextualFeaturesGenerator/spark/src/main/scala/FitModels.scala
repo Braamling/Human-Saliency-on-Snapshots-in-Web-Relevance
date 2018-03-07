@@ -22,12 +22,15 @@ object FitModels {
 
 //    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/0012wb/0012wb-99.warc.gz"
     val path = "/data/private/clueweb12/Disk[0-4]*/*/*/*.warc.gz"
+//    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/0012wb/*.warc.gz"
+    val docIDs = sc.textFile("all_ids").collect().toSet
 
-    // Read all Warc records that have a TREC-ID.
+      // Read all Warc records that have a TREC-ID.
     val warcRdd = sc.newAPIHadoopFile[LongWritable, WarcRecord, WarcInputFormat](path).
       filter(x => (null != x._2.getHeader("WARC-TREC-ID"))).
-      map(x => Try(getWarcRecord(x._2))).collect{ case Success(df) => df }
+      map(x => Try(getWarcRecord(x._2, docIDs))).collect{ case Success(df) => df }
 
+    // Convert the rdd to a dataframe
     val warcDf = spark.createDataFrame(warcRdd).toDF()
 
     // Use a tokenizer on the warc content.
