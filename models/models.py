@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.autograd as autograd
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 
 class LTR_features(nn.Module):
@@ -59,6 +60,7 @@ class LTR_score(nn.Module):
 class ViP_features(nn.Module):
     def __init__(self, region_height, feature_size, batch_size):
         super(ViP_features, self).__init__()
+        self.use_gpu = torch.cuda.is_available()
         self.batch_size = batch_size
         self.feature_size = feature_size
         self.region_height = region_height
@@ -80,8 +82,12 @@ class ViP_features(nn.Module):
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
-                autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
+        if self.use_gpu:
+            return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim).cuda()),
+                    Variable(torch.zeros(1, self.batch_size, self.hidden_dim).cuda()))
+        else
+            return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
+                    Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
 
     def apply_lstm(self, x):
         hidden = self.hidden
@@ -90,15 +96,15 @@ class ViP_features(nn.Module):
             if layer.dim() == 3:
                 layer = layer.unsqueeze(0)
 
-            layer = autograd.Variable(layer)
+            if self.use_gpu:
+                layer = Variable(layer.cuda())
+            else:
+                layer = Variable(layer)
+
             layer = self.local_perception_layer(layer)
             out, hidden = self.lstm(layer.view(1, self.batch_size, -1), hidden)
 
         return out.squeeze(0)
-
-    def prepare_sequence(self, seq):
-        # tensor = torch.LongTensor(seq)
-        return autograd.Variable(seq)
 
     def forward(self, x):
         height = x.size()[2]
