@@ -83,11 +83,11 @@ class ViP_features(nn.Module):
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         if self.use_gpu:
-            return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim).cuda()),
-                    Variable(torch.zeros(1, self.batch_size, self.hidden_dim).cuda()))
-        else
-            return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
-                    Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
+            return (Variable(torch.zeros(1, -1, self.hidden_dim).cuda()),
+                    Variable(torch.zeros(1, -1, self.hidden_dim).cuda()))
+        else:
+            return (Variable(torch.zeros(1, -1, self.hidden_dim)),
+                    Variable(torch.zeros(1, -1, self.hidden_dim)))
 
     def apply_lstm(self, x):
         hidden = self.hidden
@@ -102,7 +102,7 @@ class ViP_features(nn.Module):
                 layer = Variable(layer)
 
             layer = self.local_perception_layer(layer)
-            out, hidden = self.lstm(layer.view(1, self.batch_size, -1), hidden)
+            out, hidden = self.lstm(layer.view(1, -1, 208), hidden)
 
         return out.squeeze(0)
 

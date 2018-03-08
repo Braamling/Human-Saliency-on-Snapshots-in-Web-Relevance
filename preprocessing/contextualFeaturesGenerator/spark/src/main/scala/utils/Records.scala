@@ -11,10 +11,11 @@ object Records {
 
   def getWarcRecord(in: WarcRecord, docIDs: Set[String]): warcSparkRecord = {
     // scalastyle:off
-    println("Parsing document")
-    // Filter out all documents that are to long.
-    if(in.header.contentLength > 50000 && !docIDs.contains(in.getHeader("WARC-TREC-ID").toString)){
-      println(in.header.contentLength)
+//    log.error(in.getHeader("WARC-TREC-ID").value)
+
+    // Filter out all documents that are to long. (The largest document size in ClueWeb is 10 million)
+    if(in.header.contentLength > 1000000 && !docIDs.contains(in.getHeader("WARC-TREC-ID").value)){
+      log.error(in.header.contentLength)
       throw new IllegalStateException()
     }
 

@@ -21,10 +21,12 @@ object GetFeatures {
     val spark: SparkSession = SparkSession.builder.getOrCreate
     val sc = spark.sparkContext
     val docIDs = sc.textFile("all_ids").collect().toSet
+
+//    val docIDs = Set("")
     
-    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/0012wb/0012wb-99.warc.gz"
+//    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/0012wb/0012wb-99.warc.gz"
 //    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/*/*.warc.gz"
-//    val path = "/data/private/clueweb12/Disk[0-4]*/*/*/*.warc.gz"
+    val path = "/data/private/clueweb12/Disk[0-4]*/*/*/*.warc.gz"
 
 //    val total_cores = sc.hadoopConfiguration.get("spark.executor.instances").toInt *
 //      sc.hadoopConfiguration.get("spark.executor.cores").toInt
@@ -35,7 +37,7 @@ object GetFeatures {
     // Read all Warc records that have a TREC-ID.
     val warcRdd = sc.newAPIHadoopFile[LongWritable, WarcRecord, WarcInputFormat](path).
       filter(x => (null != x._2.getHeader("WARC-TREC-ID"))).
-      filter(x => docIDs.contains(x._2.getHeader("WARC-TREC-ID").toString)).
+      filter(x => docIDs.contains(x._2.getHeader("WARC-TREC-ID").value)).
       map(x => Try(getWarcRecord(x._2, docIDs))).collect{ case Success(df) => df }
 
     // Create a dataframe with only the required Warc Files.
