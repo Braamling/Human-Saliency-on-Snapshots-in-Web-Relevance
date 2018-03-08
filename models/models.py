@@ -1,5 +1,8 @@
 import torch
 import torch.nn as nn
+import torch.autograd as autograd
+import torch.nn.functional as F
+
 
 class LTR_features(nn.Module):
     def __init__(self, input_size, feature_size):
@@ -20,9 +23,44 @@ class LTR_features(nn.Module):
         features = self.model(x)
         return features
 
+
+"""
+The LTR score model can hold a second feature network that can be fed
+external features. The model is then trained end-to-end.
+"""
+class LTR_score(nn.Module):
+    def __init__(self, static_feature_size, feature_model=None):
+        super(LTR_score, self).__init__()
+        self.feature_model = feature_model
+        if feature_model is None:
+            x_in = static_feature_size
+        else:
+            x_in = feature_model.feature_size + static_feature_size
+
+        self.hidden = torch.nn.Linear(x_in, 10)   # hidden layer
+        self.predict = torch.nn.Linear(10, 1) 
+
+    def forward(self, image, static_features):
+        if self.feature_model is not None:
+            image = self.feature_model(image)
+            if static_features.dim() == 1:
+                static_features = static_features.unsqueeze(0)
+
+            features = torch.cat((image, static_features), 1)
+        else:
+            features = static_features
+        # output = self.model(features)
+        x = F.relu(self.hidden(features))
+        x = self.predict(x)  
+
+        return x
+
+
 class ViP_features(nn.Module):
-    def __init__(self, region_height):
+    def __init__(self, region_height, feature_size, batch_size):
         super(ViP_features, self).__init__()
+        self.batch_size = batch_size
+        self.feature_size = feature_size
         self.region_height = region_height
         self.local_perception_layer = nn.Sequential(
             nn.Conv2d(3, 8, kernel_size=2),
@@ -32,15 +70,41 @@ class ViP_features(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
 
+        self.hidden_dim = 50 
+        self.lstm = nn.LSTM(208, self.hidden_dim)
+        self.reldecision = nn.Linear(self.hidden_dim, self.feature_size)
+        self.hidden = self.init_hidden()
+
+    def init_hidden(self):
+        # Before we've done anything, we dont have any hidden state.
+        # Refer to the Pytorch documentation to see exactly
+        # why they have this dimensionality.
+        # The axes semantics are (num_layers, minibatch_size, hidden_dim)
+        return (autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
+                autograd.Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
+
+    def apply_lstm(self, x):
+        hidden = self.hidden
+        for layer in x:
+            # Create correct dimensions
+            if layer.dim() == 3:
+                layer = layer.unsqueeze(0)
+
+            layer = autograd.Variable(layer)
+            layer = self.local_perception_layer(layer)
+            out, hidden = self.lstm(layer.view(1, self.batch_size, -1), hidden)
+
+        return out.squeeze(0)
+
+    def prepare_sequence(self, seq):
+        # tensor = torch.LongTensor(seq)
+        return autograd.Variable(seq)
+
     def forward(self, x):
         height = x.size()[2]
-        print(x.size())
         splits = int(height/self.region_height)
         x = torch.split(x, splits, 2)
-        print(x[0].size())
 
-        apply_conv = lambda layer: self.local_perception_layer(layer)
-        # TODO apply this to all in x.
-        features = apply_conv(x)
-        print(features.size())
-        return features
+        lstm_out = self.apply_lstm(x)
+        tag_space = self.reldecision(lstm_out)
+        return tag_space

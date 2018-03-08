@@ -122,6 +122,7 @@ class ClueWeb12Dataset(Dataset):
         # n_image = self.img_transform(default_loader(n_image))
 
         p_image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
+        n_image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
         positive_sample = (p_image, p_vec, p_score)
         negative_sample = (n_image, n_vec, n_score)
         return positive_sample, negative_sample
@@ -131,4 +132,5 @@ class ClueWeb12Dataset(Dataset):
     """
     def get_document(self, doc_id):
         image, _, score, _, vec = self.dataset[self.ext2int[doc_id]]
+        image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
         return (image, vec, score)

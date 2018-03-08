@@ -39,7 +39,7 @@ class Evaluate():
         for doc, score in self.queries[query_id]:
             image, vec, rel_score = self.dataset.get_document(doc)
             assert score is rel_score, "document {} has different rel scores".format(doc)
-            image = None
+            # image = None
 
             if self.use_gpu:
                 vec = Variable(torch.from_numpy(vec).float().cuda())
@@ -47,7 +47,7 @@ class Evaluate():
                 vec = Variable(torch.from_numpy(vec).float())
 
             # TODO check whether this can be done in batches
-            predictions.append((model.forward(image, vec).data[0], score))
+            predictions.append((model.forward(image, vec).data[0][0], score))
 
         # Sort predictions and replace with relevance scores.
         predictions = sorted(predictions, key=lambda x: -x[0])
