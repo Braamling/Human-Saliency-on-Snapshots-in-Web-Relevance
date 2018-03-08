@@ -75,23 +75,21 @@ class ViP_features(nn.Module):
         self.hidden_dim = 50 
         self.lstm = nn.LSTM(208, self.hidden_dim)
         self.reldecision = nn.Linear(self.hidden_dim, self.feature_size)
-        self.hidden = self.init_hidden()
 
-    def init_hidden(self):
+    def init_hidden(self, batch_size):
         # Before we've done anything, we dont have any hidden state.
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         if self.use_gpu:
-            return (Variable(torch.zeros(1, -1, self.hidden_dim).cuda()),
-                    Variable(torch.zeros(1, -1, self.hidden_dim).cuda()))
+            return (Variable(torch.zeros(1, batch_size, self.hidden_dim).cuda()),
+                    Variable(torch.zeros(1, batch_size, self.hidden_dim).cuda()))
         else:
-            return (Variable(torch.zeros(1, -1, self.hidden_dim)),
-                    Variable(torch.zeros(1, -1, self.hidden_dim)))
+            return (Variable(torch.zeros(1, batch_size, self.hidden_dim)),
+                    Variable(torch.zeros(1, batch_size, self.hidden_dim)))
 
     def apply_lstm(self, x):
-        hidden = self.hidden
-        for layer in x:
+        for i, layer in enumerate(x):
             # Create correct dimensions
             if layer.dim() == 3:
                 layer = layer.unsqueeze(0)
@@ -100,6 +98,10 @@ class ViP_features(nn.Module):
                 layer = Variable(layer.cuda())
             else:
                 layer = Variable(layer)
+            
+            if i is 0:
+                batch_size = layer.size()[0]
+                hidden = self.init_hidden(batch_size)
 
             layer = self.local_perception_layer(layer)
             out, hidden = self.lstm(layer.view(1, -1, 208), hidden)
