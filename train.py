@@ -28,8 +28,8 @@ def prepare_dataloaders():
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
                                                   shuffle=True, num_workers=4)
     # Initiate the Evaluation classes
-    trainEval = Evaluate(FLAGS.train_file, train_dataset)
-    testEval = Evaluate(FLAGS.test_file, test_dataset)
+    trainEval = Evaluate(FLAGS.train_file, train_dataset, FLAGS.images)
+    testEval = Evaluate(FLAGS.test_file, test_dataset, FLAGS.images)
 
     return dataloader, trainEval, testEval
 
@@ -65,6 +65,9 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
             # print(p_static_features, data[0][2])
             # print(n_static_features, data[1][2])
             # Do the forward prop.
+            if not FLAGS.images:
+                data[0][0] = data[1][0] = None
+
             positive = model.forward(data[0][0], p_static_features)
             negative = model.forward(data[1][0], n_static_features)
 
@@ -89,8 +92,12 @@ Prepare the model with the correct weights and format the the configured use.
 def prepare_model(use_scheduler=True):
     use_gpu = torch.cuda.is_available()
 
-
-    model = LTR_score(3, ViP_features(4, 10, FLAGS.batch_size))
+    if FLAGS.model is "ViP":
+        model = LTR_score(FLAGS.content_feature_size, ViP_features(4, 10, FLAGS.batch_size))
+    elif FLAGS.model is "features_only":
+        model = LTR_score(FLAGS.content_feature_size)
+    else:
+        raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 
     if use_gpu:
         model = model.cuda()
@@ -98,7 +105,6 @@ def prepare_model(use_scheduler=True):
     opt_parameters = model.parameters()
 
     optimizer = optim.Adam(opt_parameters, lr=FLAGS.learning_rate, weight_decay=1e-5)
-    # optimizer = optim.SGD(opt_parameters, lr=FLAGS.learning_rate, weight_decay=1e-5)
 
     if use_scheduler:
         scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
@@ -131,8 +137,16 @@ if __name__ == '__main__':
                         help='The description of the run, for logging, output and weights naming.')
     parser.add_argument('--learning_rate', type=float, default=0.01,
                         help='The learning rate to use for the experiment')
+    parser.add_argument('--content_feature_size', type=int, default=11,
+                        help='The amount of context features')
+    parser.add_argument('--model', type=str, default="features_only",
+                        help='chose the model to train, (features_only, ViP)')
+    parser.add_argument('--images', type=str, default="False",
+                        help='set whether the images should be included for training.')
 
     FLAGS, unparsed = parser.parse_known_args()
+
+    FLAGS.images = FLAGS.images is "True"
 
     train()
 

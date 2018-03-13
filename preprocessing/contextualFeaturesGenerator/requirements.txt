@@ -1,2 +1,1 @@
-pyndri
 h5py

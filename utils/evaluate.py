@@ -9,11 +9,12 @@ This class can be used to easily evaluate a LTR model in various
 stages of the training process.
 """
 class Evaluate():
-    def __init__(self, hdf5_path, dataset):
+    def __init__(self, hdf5_path, dataset, images):
         self.storage = FeatureStorage(hdf5_path)
         self.dataset = dataset
         self.prepare_eval_data()
         self.use_gpu = torch.cuda.is_available()
+        self.images = images
 
     """
     Get all the ranked queries and their scores. 
@@ -38,8 +39,9 @@ class Evaluate():
         predictions = []
         for doc, score in self.queries[query_id]:
             image, vec, rel_score = self.dataset.get_document(doc)
-            assert score is rel_score, "document {} has different rel scores".format(doc)
-            # image = None
+            if score is not rel_score:
+                print(doc, score, rel_score, vec)
+            # assert score is rel_score, "document {} has different rel scores".format(doc)
 
             if self.use_gpu:
                 vec = Variable(torch.from_numpy(vec).float().cuda())
@@ -47,6 +49,9 @@ class Evaluate():
                 vec = Variable(torch.from_numpy(vec).float())
 
             # TODO check whether this can be done in batches
+            if not self.images:
+                image = None
+
             predictions.append((model.forward(image, vec).data[0][0], score))
 
         # Sort predictions and replace with relevance scores.

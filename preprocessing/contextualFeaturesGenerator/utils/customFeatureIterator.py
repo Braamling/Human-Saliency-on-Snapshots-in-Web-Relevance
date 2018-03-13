@@ -17,5 +17,5 @@ class CustomFeatureIterator():
 			query_id = features[0] 
 			doc_id = features[1]
 			rel_score = features[2]
-			features = features[2:]
+			features = features[3:]
 			yield query_id, doc_id, rel_score, features

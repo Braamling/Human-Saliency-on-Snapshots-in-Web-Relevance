@@ -27,7 +27,7 @@ def add_custom_features(feature_storage, custom_feature_iterator):
     for query_id, doc_id, rel_score, features in custom_feature_iterator.feature_iterator():
         for i, feature_score in enumerate(features):
             feature_storage.add_query_document_feature(query_id, doc_id, rel_score,
-                                                       str(i), feature_score)
+                                                       str(i), float(feature_score))
         print(query_id, doc_id)
 
 
