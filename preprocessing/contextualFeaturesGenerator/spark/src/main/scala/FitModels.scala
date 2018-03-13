@@ -58,7 +58,7 @@ object FitModels {
 
     var output = model.transform(warcDf)
 
-    model.write.overwrite.save("pipeline-model.parquet")
+    model.write.overwrite.save("pipeline-model-2.parquet")
 
     // Calculate meanDocumentLength
     output = output.withColumn("contentSize", size(output("contentWords")))
@@ -67,7 +67,7 @@ object FitModels {
     val meanDocumentLength = output.select(Seq("contentSize", "titleSize").map(mean(_)): _*)
 
     meanDocumentLength.withColumnRenamed("avg(contentSize)", "avgContentSize").
-      withColumnRenamed("avg(titleSize)", "avgTitleSize").write.mode(SaveMode.Overwrite).save("meanDocument.parquet")
+      withColumnRenamed("avg(titleSize)", "avgTitleSize").write.mode(SaveMode.Overwrite).save("meanDocument-2.parquet")
 
     // Store the tf and idf model for later usage.
   }
