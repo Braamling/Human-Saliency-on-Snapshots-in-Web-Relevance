@@ -10,6 +10,8 @@ from models.models import LTR_features, LTR_score, ViP_features
 from utils.saliencyLTRiterator import ClueWeb12Dataset
 from utils.evaluate import Evaluate
 
+import tensorboard_logger as tf_logger
+
 def pair_hinge_loss(positive, negative):
     # TODO add L2 regularization
     loss = torch.clamp(1.0 - positive + negative, 0.0)
@@ -35,14 +37,22 @@ def prepare_dataloaders():
 
 def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, num_epochs=25):
     dataloader, trainEval, testEval = dataloaders
-    model.train(True)  # Set model to training mode
+
+
+    tf_logger.configure(FLAGS.log_dir.format(FLAGS.description))
+    
+
+    # Set model to training mode
     # model.model.train(True)  # Set model to training mode
+    
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
-        trainEval.eval(model)
-        testEval.eval(model)
 
+        model.train(False)  
+        trainEval.eval(model, tf_logger, epoch)
+        testEval.eval(model, tf_logger, epoch)
+        model.train(True)  
         # Each epoch has a training and validation phase
         if scheduler is not None:
             scheduler.step()
@@ -59,13 +69,6 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
                 p_static_features = Variable(data[0][1].float())
                 n_static_features = Variable(data[1][1].float())
 
-            # image = Variable(data[0][0].float())
-            # feature_nn = ViP_features(4)
-            # feature_nn.forward(image)
-            # break
-            # print(p_static_features, data[0][2])
-            # print(n_static_features, data[1][2])
-            # Do the forward prop.
             if not FLAGS.images:
                 data[0][0] = data[1][0] = None
 
@@ -77,13 +80,15 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
 
             running_loss += loss.data[0] * p_static_features.size(0)
 
+
             # print('{} Loss: {}'.format(i, loss.data[0]))
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
             # Print the loss
-        print('Loss: {}'.format(running_loss))
+        tf_logger.log_value('train_loss', running_loss)
+        print('Train_loss: {}'.format(running_loss))
 
     return model
 
@@ -144,6 +149,8 @@ if __name__ == '__main__':
                         help='chose the model to train, (features_only, ViP)')
     parser.add_argument('--images', type=str, default="False",
                         help='set whether the images should be included for training.')
+    parser.add_argument('--log_dir', type=str, default='storage/logs/{}',
+                        help='The location to place the tensorboard logs.')
 
     FLAGS, unparsed = parser.parse_known_args()
 

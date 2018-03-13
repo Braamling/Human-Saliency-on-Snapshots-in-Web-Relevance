@@ -83,13 +83,20 @@ class Evaluate():
         n = len(self.queries)
         for key in scores.keys():
             print("{}_{} {}".format(self.prefix, key, scores[key]/n))
+
+    def _log_scores(self, scores, tf_logger, epoch):
+        n = len(self.queries)
+        for key in scores.keys():
+            tf_logger.log_value('{}_{}'.format(prefix, key), scores[key]/n, epoch)
         
-    def eval(self, model):
+    def eval(self, model, tf_logger=None, epoch=None):
         scores = {}
         for q_id in self.queries.keys():
             self._add_scores(scores, self._eval_query(q_id, model))
 
         self._print_scores(scores)
+        if tf_logger is not None:
+            self._log_scores(scores, tf_logger, epoch)
 
 
 
