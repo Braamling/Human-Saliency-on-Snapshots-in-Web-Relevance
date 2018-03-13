@@ -28,8 +28,8 @@ def prepare_dataloaders():
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
                                                   shuffle=True, num_workers=4)
     # Initiate the Evaluation classes
-    trainEval = Evaluate(FLAGS.train_file, train_dataset, FLAGS.images)
-    testEval = Evaluate(FLAGS.test_file, test_dataset, FLAGS.images)
+    trainEval = Evaluate(FLAGS.train_file, train_dataset, FLAGS.images, "train")
+    testEval = Evaluate(FLAGS.test_file, test_dataset, FLAGS.images, "test")
 
     return dataloader, trainEval, testEval
 
@@ -40,7 +40,8 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
-        # trainEval.eval(model)
+        trainEval.eval(model)
+        testEval.eval(model)
 
         # Each epoch has a training and validation phase
         if scheduler is not None:

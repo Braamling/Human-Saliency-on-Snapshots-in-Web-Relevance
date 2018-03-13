@@ -12,6 +12,10 @@ but also to iterate over the content of a hdf5 file.
 class FeatureStorage():
     def __init__(self, hdf5_path):
         self.f = h5py.File(hdf5_path, "a")
+        self.pairs = []
+        self.queries = []
+        self.q_docs = {}
+
 
     """
     Add a feature to a query document pair. 
@@ -108,9 +112,11 @@ class FeatureStorage():
     Get all documents in a query in an array with typle values of (score, document_id)
     """
     def get_documents_in_query(self, query_id):
-        self.pairs = []
-        self.f[str(query_id)].visit(self._add_document)
-        return self.pairs
+        if query_id not in self.q_docs:
+            self.cur_query = query_id
+            self.q_docs[query_id] = []
+            self.f[str(query_id)].visit(self._add_document)
+        return self.q_docs[query_id]
 
     """
     Add all query-document pairs with their score to the class pairs variable.
@@ -121,15 +127,16 @@ class FeatureStorage():
         route = route.split("/")
         if len(route) == 2:
             score, d_id = route
-            self.pairs.append((int(score), d_id))
+            self.q_docs[self.cur_query].append((int(score), d_id))
 
     """
     Get all available query-document pairs in an array of with tuple values of
     (query_id, score, document_id, feature_vectore)
     """
     def get_pairs(self):
-        self.pairs = []
-        self.f.visit(self._add_pair)
+        if len(self.pairs) is 0:
+            self.f.visit(self._add_pair)
+
         return self.pairs
 
     """
@@ -153,8 +160,8 @@ class FeatureStorage():
     (query_id, score, document_id, feature_vectore)
     """
     def get_queries(self):
-        self.queries = []
-        self.f.visit(self._add_query)
+        if len(self.queries) is 0:
+            self.f.visit(self._add_query)
         return self.queries
 
     """
