@@ -11,11 +11,18 @@ from utils.saliencyLTRiterator import ClueWeb12Dataset
 from utils.evaluate import Evaluate
 
 import tensorboard_logger as tf_logger
+import logging
+
+FORMAT = '%(asctime)-15s %(message)s'
+logging.basicConfig(format=FORMAT, level=logging.INFO)
+
+logger = logging.getLogger("train")
 
 def pair_hinge_loss(positive, negative):
     # TODO add L2 regularization
+    # print(positive, negative)
     loss = torch.clamp(1.0 - positive + negative, 0.0)
-
+    # print(loss)
     return loss.mean()
 
 """
@@ -23,8 +30,8 @@ This method prepares the dataloaders for training and returns a training/validat
 """
 def prepare_dataloaders():
     # Get the train/test datasets
-    train_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.train_file)
-    test_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.test_file)
+    train_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.train_file, FLAGS.images)
+    test_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.test_file, FLAGS.images)
     
     # Prepare the loaders
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
@@ -32,6 +39,8 @@ def prepare_dataloaders():
     # Initiate the Evaluation classes
     trainEval = Evaluate(FLAGS.train_file, train_dataset, FLAGS.images, "train")
     testEval = Evaluate(FLAGS.test_file, test_dataset, FLAGS.images, "test")
+
+    logging.info("Training on: ")
 
     return dataloader, trainEval, testEval
 
@@ -80,14 +89,16 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
 
             running_loss += loss.data[0] * p_static_features.size(0)
 
-
-            # print('{} Loss: {}'.format(i, loss.data[0]))
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            # testEval.eval(model, tf_logger, epoch)
 
             # Print the loss
-        tf_logger.log_value('train_loss', running_loss)
+
+            # for param in model.parameters():
+            #   print(param.data)
+        tf_logger.log_value('train_loss', running_loss, epoch)
         print('Train_loss: {}'.format(running_loss))
 
     return model
@@ -108,9 +119,7 @@ def prepare_model(use_scheduler=True):
     if use_gpu:
         model = model.cuda()
 
-    opt_parameters = model.parameters()
-
-    optimizer = optim.Adam(opt_parameters, lr=FLAGS.learning_rate, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=FLAGS.learning_rate, weight_decay=1e-5)
 
     if use_scheduler:
         scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
@@ -119,8 +128,11 @@ def prepare_model(use_scheduler=True):
 
 
 def train():
-    dataloaders = prepare_dataloaders()
     model, optimizer, scheduler, use_gpu = prepare_model()
+
+    logger.info(model)
+
+    dataloaders = prepare_dataloaders()
 
     train_model(model, pair_hinge_loss, dataloaders, use_gpu, optimizer, scheduler, num_epochs=FLAGS.epochs)
 
@@ -155,6 +167,8 @@ if __name__ == '__main__':
     FLAGS, unparsed = parser.parse_known_args()
 
     FLAGS.images = FLAGS.images is "True"
+
+    logger.info(FLAGS)
 
     train()
 

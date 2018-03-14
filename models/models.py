@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.autograd as autograd
 import torch.nn.functional as F
 from torch.autograd import Variable
+from collections import OrderedDict
 
 
 class LTR_features(nn.Module):
@@ -39,6 +40,8 @@ class LTR_score(nn.Module):
             x_in = feature_model.feature_size + static_feature_size
 
         self.hidden = torch.nn.Linear(x_in, 10)   # hidden layer
+        self.dropout = torch.nn.Dropout(.5)
+        self.relu = torch.nn.ReLU()
         self.predict = torch.nn.Linear(10, 1) 
 
     def forward(self, image, static_features):
@@ -50,12 +53,13 @@ class LTR_score(nn.Module):
             features = torch.cat((image, static_features), 1)
         else:
             features = static_features
-        # output = self.model(features)
-        x = F.relu(self.hidden(features))
+
+        x = self.hidden(features)
+        x = self.relu(x)
+        x = self.dropout(x)
         x = self.predict(x)  
 
         return x
-
 
 class ViP_features(nn.Module):
     def __init__(self, region_height, feature_size, batch_size):

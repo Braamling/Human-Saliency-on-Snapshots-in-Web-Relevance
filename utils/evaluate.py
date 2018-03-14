@@ -1,9 +1,13 @@
 import torch
 import numpy as np
-
+import time
 from preprocessing.contextualFeaturesGenerator.utils.featureStorage import FeatureStorage
 from torch.autograd import Variable
 
+import logging 
+import time
+
+logger = logging.getLogger('Evaluate')
 """
 This class can be used to easily evaluate a LTR model in various 
 stages of the training process.
@@ -43,51 +47,69 @@ class Evaluate():
         return scores
 
     def _get_scores(self, query_id, model):
+        logger.debug('Starting to prepare {} batch to evaluate query {}'.format(self.prefix, query_id))
+        start = time.time()
+
         predictions = []
+        batch_vec = []
+        batch_score = []
         for doc, score in self.queries[query_id]:
-            image, vec, rel_score = self.dataset.get_document(doc)
+            image, vec, rel_score = self.dataset.get_document(doc, query_id)
+            batch_vec.append(vec)
+            batch_score.append(score)
+
             if score is not rel_score:
                 print(doc, score, rel_score, vec)
-            # assert score is rel_score, "document {} has different rel scores".format(doc)
 
-            if self.use_gpu:
-                vec = Variable(torch.from_numpy(vec).float().cuda())
-            else:
-                vec = Variable(torch.from_numpy(vec).float())
+        batch_vec = np.vstack( batch_vec )
 
-            # TODO check whether this can be done in batches
-            if not self.images:
-                image = None
+        logger.debug('Batch ready, {} seconds since start'.format(time.time() - start))
+        if self.use_gpu:
+            batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
+        else:
+            batch_vec = Variable(torch.from_numpy(batch_vec).float())
 
-            pred = model.forward(image, vec).data[0]
-            if type(pred) is not float:
-                pred = pred[0]
-            predictions.append((pred, score))
+        # TODO check whether this can be done in batches
+        if not self.images:
+            image = None
 
+        # batch_pred = model.forward(batch_vec).data.numpy()
+        batch_pred = model.forward(image, batch_vec).data.numpy()
+        # batch_pred = tmp
+
+        logger.debug('Made predictions, {} seconds since start'.format(time.time() - start))
+
+        predictions = [(pred[0], score) for pred, score in zip(batch_pred, batch_score)]
+        # print(predictions)
         # Sort predictions and replace with relevance scores.
+        logger.debug('test log')
+
+        # Shuffle the prediction before sorting to make sure equal predictions are 
+        # in random order.
+        np.random.shuffle(predictions)
         predictions = sorted(predictions, key=lambda x: -x[0])
         _, predictions = zip(*predictions)
 
+        logger.debug('Sorted predictions, {} seconds since start'.format(time.time() - start))
         return predictions
 
-    def _add_scores(self, scores, score):
-        for key in scores.keys():
+    def _add_scores(self, scores, to_add_scores):
+        for key in to_add_scores.keys():
             if key not in scores:
                 scores[key] = 0
-            scores[key] += score[key]
+            scores[key] += to_add_scores[key]
 
         return scores
 
     def _print_scores(self, scores):
-        print("scores: ")
-        n = len(self.queries)
+        n = len(self.queries.keys())
         for key in scores.keys():
             print("{}_{} {}".format(self.prefix, key, scores[key]/n))
 
     def _log_scores(self, scores, tf_logger, epoch):
-        n = len(self.queries)
+        n = len(self.queries.keys())
         for key in scores.keys():
-            tf_logger.log_value('{}_{}'.format(prefix, key), scores[key]/n, epoch)
+            tf_logger.log_value('{}_{}'.format(self.prefix, key), scores[key]/n, epoch)
         
     def eval(self, model, tf_logger=None, epoch=None):
         scores = {}
