@@ -53,9 +53,9 @@ class ClueWeb12Dataset(Dataset):
         train_ext2int = {}
         self.ext2int = {}
         self.idx2posneg = {}
-        j = 0
+        i = 0
         # Create a dataset with all query-document pairs
-        for i, (q_id, score, d_id, vec) in enumerate(featureStorage.get_all_entries()):
+        for q_id, score, d_id, vec in featureStorage.get_all_entries():
             # Make the query-score index.
             qs_idx = "{}:{}".format(q_id, score)
 
@@ -68,20 +68,18 @@ class ClueWeb12Dataset(Dataset):
                 self.idx2posneg[qs_idx] = posnegs
 
             # TODO how to use this for both train and test
-            self.ext2int[query_doc_idx] = i
 
-            # Create the dataset entry
-            image = os.path.join(image_dir, d_id)
-            item = (image, q_id, score, d_id, vec)
-            dataset.append(item)
-
-            # Only add query-document pairs with available negative or positive samples.
-            if len(self.idx2posneg[qs_idx]) == 0:
-                raise RuntimeError("Query without different rel judgements found.")
+            if len(self.idx2posneg[qs_idx]) > 0:
+                self.ext2int[query_doc_idx] = i
+                i += 1
+                # Create the dataset entry
+                image = os.path.join(image_dir, d_id)
+                item = (image, q_id, score, d_id, vec)
+                dataset.append(item)
 
         # Convert all external ids in idx2posneg to internal ids.
         for qs_idx in self.idx2posneg.keys():
-            self.idx2posneg[qs_idx] = [self.ext2int[i] for i in self.idx2posneg[qs_idx]]
+            self.idx2posneg[qs_idx] = [self.ext2int[i] for i in self.idx2posneg[qs_idx] if len(self.idx2posneg[qs_idx]) > 0]
 
         self.dataset = dataset
 
@@ -132,8 +130,6 @@ class ClueWeb12Dataset(Dataset):
         
         positive_sample = (p_image, p_vec, p_score)
         negative_sample = (n_image, n_vec, n_score)
-        # print(p_vec)
-        # print(p_vec)
         return positive_sample, negative_sample
 
     """
@@ -142,7 +138,15 @@ class ClueWeb12Dataset(Dataset):
     def get_document(self, doc_id, query_id):
         query_doc_idx = "{}:{}".format(query_id, doc_id)
 
-        image, _, score, _, vec = self.dataset[self.ext2int[query_doc_idx]]
+
+        if query_doc_idx not in self.ext2int:
+            raise Exception("document not in index, probably no relevant documents were found")
+
+        # image, _, score, _, vec = self.dataset[self.ext2int[query_doc_idx]]
+        image, q_id, score, d_id, vec = self.dataset[self.ext2int[query_doc_idx]]
+
+        # if d_id is not doc_id:
+            # print("here is something really wrong")
 
         if self.get_images:
             image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))

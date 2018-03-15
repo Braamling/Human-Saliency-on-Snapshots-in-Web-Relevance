@@ -33,16 +33,22 @@ class Evaluate():
             self.queries[q_id] = self.storage.get_scores(q_id)
 
     def _eval_query(self, query_id, model):
-        predictions = self._get_scores(query_id, model)
+        try:
+            predictions = self._get_scores(query_id, model)
+    
+            scores = {}
+            scores["ndcg@1"] = self.ndcg_at_k(predictions, 1)
+            scores["ndcg@5"] = self.ndcg_at_k(predictions, 5)
+            scores["ndcg@10"] = self.ndcg_at_k(predictions, 10)
+            scores["p@1"] = self.precision_at_k(predictions, 1)
+            scores["p@5"] = self.precision_at_k(predictions, 5)
+            scores["p@10"] = self.precision_at_k(predictions, 10)
+            scores["map"] = self.average_precision(predictions)
+        except Exception as e:
+            # logger.warning("query {} gave an exception".format(query_id))
+            self.failed += 1
+            return {}
 
-        scores = {}
-        scores["ndcg@1"] = self.ndcg_at_k(predictions, 1)
-        scores["ndcg@5"] = self.ndcg_at_k(predictions, 5)
-        scores["ndcg@10"] = self.ndcg_at_k(predictions, 10)
-        scores["p@1"] = self.precision_at_k(predictions, 1)
-        scores["p@5"] = self.precision_at_k(predictions, 5)
-        scores["p@10"] = self.precision_at_k(predictions, 10)
-        scores["map"] = self.average_precision(predictions)
 
         return scores
 
@@ -55,11 +61,12 @@ class Evaluate():
         batch_score = []
         for doc, score in self.queries[query_id]:
             image, vec, rel_score = self.dataset.get_document(doc, query_id)
+
             batch_vec.append(vec)
             batch_score.append(score)
 
             if score is not rel_score:
-                print(doc, score, rel_score, vec)
+                print(query_id, doc, score, rel_score, vec)
 
         batch_vec = np.vstack( batch_vec )
         # print(batch_vec)
@@ -102,7 +109,7 @@ class Evaluate():
         return scores
 
     def _print_scores(self, scores):
-        n = len(self.queries.keys())
+        n = len(self.queries.keys()) - self.failed
         for key in scores.keys():
             print("{}_{} {}".format(self.prefix, key, scores[key]/n))
 
@@ -112,6 +119,7 @@ class Evaluate():
             tf_logger.log_value('{}_{}'.format(self.prefix, key), scores[key]/n, epoch)
         
     def eval(self, model, tf_logger=None, epoch=None):
+        self.failed = 0 
         scores = {}
         for q_id in self.queries.keys():
             self._add_scores(scores, self._eval_query(q_id, model))
