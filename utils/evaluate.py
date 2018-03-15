@@ -62,7 +62,7 @@ class Evaluate():
                 print(doc, score, rel_score, vec)
 
         batch_vec = np.vstack( batch_vec )
-
+        # print(batch_vec)
         logger.debug('Batch ready, {} seconds since start'.format(time.time() - start))
         if self.use_gpu:
             batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())

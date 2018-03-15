@@ -19,10 +19,7 @@ logging.basicConfig(format=FORMAT, level=logging.INFO)
 logger = logging.getLogger("train")
 
 def pair_hinge_loss(positive, negative):
-    # TODO add L2 regularization
-    # print(positive, negative)
     loss = torch.clamp(1.0 - positive + negative, 0.0)
-    # print(loss)
     return loss.mean()
 
 """
@@ -140,9 +137,9 @@ def train():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--train_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/hdf5/test_split_train.hdf5',
+    parser.add_argument('--train_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/clueweb12_web_trec/Fold1/train.txt',
                         help='The location of the salicon heatmaps data for training.')
-    parser.add_argument('--test_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/hdf5/test_split_test.hdf5',
+    parser.add_argument('--test_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/clueweb12_web_trec/Fold1/test.txt',
                         help='The location of the salicon heatmaps data for training.')
     parser.add_argument('--image_path', type=str, default='storage/salicon/images/',
                         help='The location of the salicon images for training.')

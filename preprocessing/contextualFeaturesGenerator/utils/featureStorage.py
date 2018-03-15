@@ -1,6 +1,7 @@
-import h5py
 import numpy as np
 import os.path
+
+from .LETORIterator import LETORIterator
 
 """
 This class acts as an interface for the hdf5 storage containing all 
@@ -10,57 +11,29 @@ The interface can both be used to add new queries, documents and features,
 but also to iterate over the content of a hdf5 file.
 """
 class FeatureStorage():
-    def __init__(self, hdf5_path):
-        self.f = h5py.File(hdf5_path, "a")
+    def __init__(self, path):
+        # self.f = h5py.File(hdf5_path, "a")
+        self.letorIterator = LETORIterator(path)
         self.pairs = []
-        self.queries = []
+        self.scores = {}
+        self.queries = {}
         self.q_docs = {}
 
+        self.parse()
 
-    """
-    Add a feature to a query document pair. 
 
-    query_id: int, id of the query
-    document_id: str, id of the document
-    score: int, judgement score for the document query pair
-    feature_name: str, name to provide to the feature
-    value: float, value to add to the feature
-    """
-    def add_query_document_feature(self, query_id, document_id, score, feature_name, value):
-        location = self.format_location(query_id, document_id, score)
-        if location not in self.f:
-            group = self.f.create_group(location)
-        else:
-            group = self.f[location]
+    def parse(self):
+        for query_id, doc_id, rel_score, features in self.letorIterator.feature_iterator():
+            query_id, rel_score = int(query_id), int(rel_score)
+            if query_id not in self.queries:
+                self.queries[query_id] = {}
 
-        group.attrs[feature_name] = value
+            if rel_score not in self.queries[query_id]:
+                self.queries[query_id][rel_score] = {}
 
-    """
-    Add a feature to a document. 
+            features = [float(f) for f in features]
+            self.queries[query_id][rel_score][doc_id] = np.asarray(features)
 
-    document_id: str, id of the document
-    feature_name: str, name to provide to the feature
-    value: float, value to add to the feature
-    """
-    def add_document_feature(self, document_id, feature_name, value):
-        if document_id not in self.f:
-            group = self.f.create_group(document_id)
-        else:
-            group = self.f[document_id]
-
-        group.attrs[feature_name] = value
-
-    """
-    Retrieve all document features that are non query specific
-
-    document_id: str, document id to retrieve.
-    """
-    def get_all_document_features(self, document_id):
-        if document_id in self.f:
-            group = self.f[document_id]
-            return {x: group.attrs[x] for x in group.attrs}
-
-        return {}
 
     """
     Retrieve all features for a document and query pair. Both query and non
@@ -70,126 +43,62 @@ class FeatureStorage():
     document_id: str, id of the document
     score: int, judgement score for the document query pair
     """
-    def get_all_query_document_features(self, query_id, document_id, score):
-        location = self.format_location(query_id, document_id, score)
-
-        group = self.f[location]
-
-        features = self.get_all_document_features(document_id)
-        for x in group.attrs:
-            features[x] = group.attrs[x]
-
-        return features
-
-    """
-    Convert a dict with features into a numpy vector with the correct ordering.
-
-    features: dict, feature names as index with floats as feature values.
-    """
-    def make_feature_vector(self, features):
-        # Create a list of sorted feature names
-        feature_names = list(features.keys())
-        feature_names.sort()
-
-        vec = np.asarray([features[name] for name in feature_names])
-
-        return vec
-
-    """
-    Format a query_id, document_id and score to a valid (sub)group location.
-
-    query_id: int, id of the query
-    document_id: str, id of the document
-    score: int, judgement score for the document query pair
-    """ 
-    def format_location(self, query_id, document_id=None, score=None):
-        if document_id is None:
-            return "{}".format(query_id)
-            
-        return "{}/{}/{}".format(query_id, score, document_id)
+    def get_query_document_features(self, query_id, doc_id, rel_score):
+        return self.queries[query_id][rel_score][doc_id]
 
     """
     Get all documents in a query in an array with typle values of (score, document_id)
     """
     def get_documents_in_query(self, query_id):
-        if query_id not in self.q_docs:
-            self.cur_query = query_id
-            self.q_docs[query_id] = []
-            self.f[str(query_id)].visit(self._add_document)
-        return self.q_docs[query_id]
+        documents = []
+        for rel_score in self.queries[query_id]:
+            for doc_id in self.queries[query_id][rel_score]:
+                documents.append((rel_score, doc_id))
+                # documents = np.concatenate((documents, list(score.keys())))
+             
+        return documents
 
-    """
-    Add all query-document pairs with their score to the class pairs variable.
-
-    route: str, the route of the (sub)group that is being visited.
-    """
-    def _add_document(self, route):
-        route = route.split("/")
-        if len(route) == 2:
-            score, d_id = route
-            self.q_docs[self.cur_query].append((int(score), d_id))
 
     """
     Get all available query-document pairs in an array of with tuple values of
     (query_id, score, document_id, feature_vectore)
     """
-    def get_pairs(self):
-        if len(self.pairs) is 0:
-            self.f.visit(self._add_pair)
+    def get_all_entries(self):
+        for query_id in self.queries:
+            for rel_score in self.queries[query_id]:
+                for doc_id in self.queries[query_id][rel_score]:
+                    vec = self.queries[query_id][rel_score][doc_id]
+                    yield (query_id, rel_score, doc_id, vec)
 
-        return self.pairs
-
-    """
-    Add all query-document pairs with their score to the class pairs variable.
-
-    route: str, the route of the (sub)group that is being visited.
-    """
-    def _add_pair(self, route):
-        route = route.split("/")
-        if len(route) == 3:
-            q_id, score, d_id = route
-            q_id, score = int(q_id), int(score)
-            features = self.get_all_query_document_features(q_id, d_id, score)
-
-            vec = self.make_feature_vector(features)
-
-            self.pairs.append((q_id, score, d_id, vec))
 
     """
     Get all available query-document pairs in an array of with tuple values of
     (query_id, score, document_id, feature_vectore)
     """
     def get_queries(self):
-        if len(self.queries) is 0:
-            self.f.visit(self._add_query)
-        return self.queries
+        return list(self.queries.keys())
 
-    """
-    Add query to query list
-    """
-    def _add_query(self, route):
-        if len(route.split("/")) == 1:
-            q_id = int(route)
-
-            self.queries.append(q_id)
 
     """
     Get a sorted list of tuples (doc_id, score) for a specific query
     """
     def get_scores(self, query_id):
-        self.scores = []
-        self.f[str(query_id)].visit(self._add_score)
-        self.scores = sorted(self.scores, key=lambda x: -x[1])
-        return self.scores
+        if query_id not in self.scores:
+            self.scores[query_id] = []
+
+            for scores in self.queries[query_id].keys():
+                for doc_id in self.queries[query_id][scores].keys():
+                    self.scores[query_id].append((doc_id, int(scores)))
+
+            self.scores[query_id] = sorted(self.scores[query_id], key=lambda x: -x[1])
+
+        return self.scores[query_id]
 
     """
     Add query to query list
     """
-    def _add_score(self, route):
-        route = route.split("/")
-        if len(route) == 2:
-            score, doc_id = route
-            self.scores.append((doc_id, int(score)))
+    # def _add_score(self, route):
+        # route = route.split( _id, int(score)))
 
     def print_index(self):
         self.f.visit(self.printname)

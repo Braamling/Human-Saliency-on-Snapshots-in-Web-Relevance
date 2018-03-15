@@ -55,7 +55,7 @@ class ClueWeb12Dataset(Dataset):
         self.idx2posneg = {}
         j = 0
         # Create a dataset with all query-document pairs
-        for i, (q_id, score, d_id, vec) in enumerate(featureStorage.get_pairs()):
+        for i, (q_id, score, d_id, vec) in enumerate(featureStorage.get_all_entries()):
             # Make the query-score index.
             qs_idx = "{}:{}".format(q_id, score)
 
@@ -130,8 +130,10 @@ class ClueWeb12Dataset(Dataset):
             p_image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
             n_image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
         
-        positive_sample = (p_image, np.log(p_vec+10e-7), p_score)
-        negative_sample = (n_image, np.log(n_vec+10e-7), n_score)
+        positive_sample = (p_image, p_vec, p_score)
+        negative_sample = (n_image, n_vec, n_score)
+        # print(p_vec)
+        # print(p_vec)
         return positive_sample, negative_sample
 
     """
@@ -144,4 +146,4 @@ class ClueWeb12Dataset(Dataset):
 
         if self.get_images:
             image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
-        return (image, np.log(vec+10e-7), score)
+        return (image, vec, score)

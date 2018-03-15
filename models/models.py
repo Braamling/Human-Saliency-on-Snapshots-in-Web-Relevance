@@ -40,7 +40,7 @@ class LTR_score(nn.Module):
             x_in = feature_model.feature_size + static_feature_size
 
         self.hidden = torch.nn.Linear(x_in, 10)   # hidden layer
-        self.dropout = torch.nn.Dropout(.5)
+        self.dropout = torch.nn.Dropout(.1)
         self.relu = torch.nn.ReLU()
         self.predict = torch.nn.Linear(10, 1) 
 
@@ -56,6 +56,9 @@ class LTR_score(nn.Module):
 
         x = self.hidden(features)
         x = self.relu(x)
+        if torch.nonzero(x).size(0) < 100:
+            print("Warning, dead relu's", torch.nonzero(x).size(0))
+            
         x = self.dropout(x)
         x = self.predict(x)  
 
