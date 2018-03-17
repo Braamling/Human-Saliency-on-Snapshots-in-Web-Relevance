@@ -45,7 +45,7 @@ class Evaluate():
             scores["p@10"] = self.precision_at_k(predictions, 10)
             scores["map"] = self.average_precision(predictions)
         except Exception as e:
-            # logger.warning("query {} gave an exception".format(query_id))
+            logger.warning("query {} gave an exception: {}".format(query_id, e))
             self.failed += 1
             return {}
 
@@ -82,7 +82,7 @@ class Evaluate():
             image = None
 
         # batch_pred = model.forward(batch_vec).data.numpy()
-        batch_pred = model.forward(image, batch_vec).data.numpy()
+        batch_pred = model.forward(image, batch_vec).data.cpu().numpy()
         # batch_pred = tmp
 
         logger.debug('Made predictions, {} seconds since start'.format(time.time() - start))
