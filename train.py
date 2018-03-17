@@ -13,7 +13,7 @@ from utils.evaluate import Evaluate
 import tensorboard_logger as tf_logger
 import logging
 
-FORMAT = '%(asctime)-15s %(message)s'
+FORMAT = '%(name)s: [%(levelname)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 logger = logging.getLogger("train")
@@ -37,8 +37,6 @@ def prepare_dataloaders():
     trainEval = Evaluate(FLAGS.train_file, train_dataset, FLAGS.images, "train")
     testEval = Evaluate(FLAGS.test_file, test_dataset, FLAGS.images, "test")
 
-    logging.info("Training on: ")
-
     return dataloader, trainEval, testEval
 
 def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, num_epochs=25):
@@ -52,8 +50,8 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
     # model.model.train(True)  # Set model to training mode
     
     for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-        print('-' * 10)
+        logger.info('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        logger.info('-' * 10)
 
         model.train(False)  
         trainEval.eval(model, tf_logger, epoch)
@@ -89,14 +87,9 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            # testEval.eval(model, tf_logger, epoch)
 
-            # Print the loss
-
-            # for param in model.parameters():
-            #   print(param.data)
         tf_logger.log_value('train_loss', running_loss, epoch)
-        print('Train_loss: {}'.format(running_loss))
+        logger.info('Train_loss: {}'.format(running_loss))
 
     return model
 
@@ -107,9 +100,9 @@ def prepare_model(use_scheduler=True):
     use_gpu = torch.cuda.is_available()
 
     if FLAGS.model is "ViP":
-        model = LTR_score(FLAGS.content_feature_size, ViP_features(4, 10, FLAGS.batch_size))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(4, 10, FLAGS.batch_size))
     elif FLAGS.model is "features_only":
-        model = LTR_score(FLAGS.content_feature_size)
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 
@@ -160,6 +153,11 @@ if __name__ == '__main__':
                         help='set whether the images should be included for training.')
     parser.add_argument('--log_dir', type=str, default='storage/logs/{}',
                         help='The location to place the tensorboard logs.')
+
+    parser.add_argument('--dropout', type=float, default=.1,
+                        help='The dropout to use in the classification layer.')
+    parser.add_argument('--hidden_size', type=int, default=10,
+                        help='The amount of hidden layers in the classification layer')
 
     FLAGS, unparsed = parser.parse_known_args()
 

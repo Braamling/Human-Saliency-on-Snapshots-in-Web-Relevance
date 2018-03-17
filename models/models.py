@@ -1,10 +1,11 @@
 import torch
+import logging
 import torch.nn as nn
 import torch.autograd as autograd
 import torch.nn.functional as F
 from torch.autograd import Variable
 from collections import OrderedDict
-
+logger = logging.getLogger("model")
 
 class LTR_features(nn.Module):
     def __init__(self, input_size, feature_size):
@@ -31,7 +32,7 @@ The LTR score model can hold a second feature network that can be fed
 external features. The model is then trained end-to-end.
 """
 class LTR_score(nn.Module):
-    def __init__(self, static_feature_size, feature_model=None):
+    def __init__(self, static_feature_size, dropout, hidden_size, feature_model=None):
         super(LTR_score, self).__init__()
         self.feature_model = feature_model
         if feature_model is None:
@@ -39,10 +40,10 @@ class LTR_score(nn.Module):
         else:
             x_in = feature_model.feature_size + static_feature_size
 
-        self.hidden = torch.nn.Linear(x_in, 10)   # hidden layer
-        self.dropout = torch.nn.Dropout(.1)
+        self.hidden = torch.nn.Linear(x_in, hidden_size)   # hidden layer
+        self.dropout = torch.nn.Dropout(dropout)
         self.relu = torch.nn.ReLU()
-        self.predict = torch.nn.Linear(10, 1) 
+        self.predict = torch.nn.Linear(hidden_size, 1) 
 
     def forward(self, image, static_features):
         if self.feature_model is not None:
@@ -57,7 +58,7 @@ class LTR_score(nn.Module):
         x = self.hidden(features)
         x = self.relu(x)
         if torch.nonzero(x).size(0) < 100:
-            print("Warning, dead relu's", torch.nonzero(x).size(0))
+            logger.warning("dead relu's, only {} units are alive".format(torch.nonzero(x).size(0)))
             
         x = self.dropout(x)
         x = self.predict(x)  

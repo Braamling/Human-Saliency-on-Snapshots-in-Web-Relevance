@@ -66,10 +66,11 @@ class Evaluate():
             batch_score.append(score)
 
             if score is not rel_score:
-                print(query_id, doc, score, rel_score, vec)
+                logger.error(query_id, doc, score, rel_score, vec)
+                raise Exception("Somehow the relevance score in the dataset and feature storage are different.")
 
         batch_vec = np.vstack( batch_vec )
-        # print(batch_vec)
+
         logger.debug('Batch ready, {} seconds since start'.format(time.time() - start))
         if self.use_gpu:
             batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
@@ -111,7 +112,7 @@ class Evaluate():
     def _print_scores(self, scores):
         n = len(self.queries.keys()) - self.failed
         for key in scores.keys():
-            print("{}_{} {}".format(self.prefix, key, scores[key]/n))
+            logger.info("{}_{} {}".format(self.prefix, key, scores[key]/n))
 
     def _log_scores(self, scores, tf_logger, epoch):
         n = len(self.queries.keys())

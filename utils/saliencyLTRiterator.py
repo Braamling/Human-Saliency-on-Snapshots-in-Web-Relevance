@@ -45,7 +45,6 @@ class ClueWeb12Dataset(Dataset):
 
     def make_dataset(self, image_dir, features_file):
         featureStorage = FeatureStorage(features_file)
-        logger.info("Making dataset with queries: {}".format(featureStorage.get_queries()))
         dataset = []
         train_dataset = []
 
@@ -77,6 +76,7 @@ class ClueWeb12Dataset(Dataset):
                 item = (image, q_id, score, d_id, vec)
                 dataset.append(item)
 
+        logger.info("Added a dataset with {} queries with {} documents".format(len(featureStorage.get_queries()), i))
         # Convert all external ids in idx2posneg to internal ids.
         for qs_idx in self.idx2posneg.keys():
             self.idx2posneg[qs_idx] = [self.ext2int[i] for i in self.idx2posneg[qs_idx] if len(self.idx2posneg[qs_idx]) > 0]
