@@ -11,13 +11,16 @@ The interface can both be used to add new queries, documents and features,
 but also to iterate over the content of a hdf5 file.
 """
 class FeatureStorage():
-    def __init__(self, path):
+    def __init__(self, path, image_dir, query_specific=False, only_with_image=False):
         # self.f = h5py.File(hdf5_path, "a")
         self.letorIterator = LETORIterator(path)
         self.pairs = []
         self.scores = {}
         self.queries = {}
         self.q_docs = {}
+        self.only_with_image = only_with_image
+        self.query_specific = query_specific
+        self.image_dir = image_dir
 
         self.parse()
 
@@ -53,10 +56,22 @@ class FeatureStorage():
         documents = []
         for rel_score in self.queries[query_id]:
             for doc_id in self.queries[query_id][rel_score]:
-                documents.append((rel_score, doc_id))
+                if self._get_image(query_id, doc_id):
+                    documents.append((rel_score, doc_id))
                 # documents = np.concatenate((documents, list(score.keys())))
              
         return documents
+
+    def _get_image(self, q_id, d_id):
+        if self.query_specific:
+            image = os.path.join(self.image_dir, "{}-{}.png".format(q_id, d_id))
+        else:
+            image = os.path.join(self.image_dir, "{}.png".format(d_id))
+
+        if (self.only_with_image and os.path.isfile(image)) or not self.only_with_image:
+            return image
+        else:
+            False
 
 
     """
@@ -68,7 +83,9 @@ class FeatureStorage():
             for rel_score in self.queries[query_id]:
                 for doc_id in self.queries[query_id][rel_score]:
                     vec = self.queries[query_id][rel_score][doc_id]
-                    yield (query_id, rel_score, doc_id, vec)
+                    image = self._get_image(query_id, doc_id)
+                    if image:
+                        yield (query_id, rel_score, doc_id, vec, image)
 
 
     """
@@ -88,7 +105,8 @@ class FeatureStorage():
 
             for scores in self.queries[query_id].keys():
                 for doc_id in self.queries[query_id][scores].keys():
-                    self.scores[query_id].append((doc_id, int(scores)))
+                    if self._get_image(query_id, doc_id):
+                        self.scores[query_id].append((doc_id, int(scores)))
 
             self.scores[query_id] = sorted(self.scores[query_id], key=lambda x: -x[1])
 

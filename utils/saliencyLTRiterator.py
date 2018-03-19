@@ -5,6 +5,7 @@ from __future__ import print_function
 from torch.utils.data import Dataset
 from torchvision.datasets.folder import default_loader 
 from torchvision import transforms
+from .customExceptions import NoImageAvailableException, NoRelDocumentsException
 
 from preprocessing.contextualFeaturesGenerator.utils.featureStorage import FeatureStorage
 
@@ -29,22 +30,26 @@ def is_image_file(filename):
     return any(filename_lower.endswith(ext) for ext in IMG_EXTENSIONS)
 
 class ClueWeb12Dataset(Dataset):
-    def __init__(self, image_dir, features_file, get_images=False):
+    def __init__(self, image_dir, features_file, get_images=False, query_specific=False, only_with_image=False):
         """
         Args:
             img_dir (string): directory containing all images for the ClueWeb12 webpages
             features_file (string): a file containing the features scores for each query document pair.
             scores_file (string): a file containing the scores for each query document pair.
         """
+        self.get_images = get_images
+        self.query_specific = query_specific
+        self.only_with_image = only_with_image
+        self.image_dir = image_dir
+
         self.make_dataset(image_dir, features_file)
         self.img_transform = transforms.Compose([transforms.Resize((64,64), interpolation=2), 
                                                  transforms.ToTensor()])
-        self.get_images = get_images
         # self.img_transform = transforms.Compose([transforms.Resize((224,224), interpolation=2), 
                                                  # transforms.ToTensor()])
 
     def make_dataset(self, image_dir, features_file):
-        featureStorage = FeatureStorage(features_file)
+        featureStorage = FeatureStorage(features_file, image_dir, self.query_specific, self.only_with_image)
         dataset = []
         train_dataset = []
 
@@ -54,7 +59,7 @@ class ClueWeb12Dataset(Dataset):
         self.idx2posneg = {}
         i = 0
         # Create a dataset with all query-document pairs
-        for q_id, score, d_id, vec in featureStorage.get_all_entries():
+        for q_id, score, d_id, vec, image in featureStorage.get_all_entries():
             # Make the query-score index.
             qs_idx = "{}:{}".format(q_id, score)
 
@@ -66,13 +71,12 @@ class ClueWeb12Dataset(Dataset):
                 posnegs = self._get_alt_scores_docs(featureStorage, q_id, score)
                 self.idx2posneg[qs_idx] = posnegs
 
-            # TODO how to use this for both train and test
-
+            # Check whether any documents were found with a different relevant score 
+            # and if we filter all documents without an images whether the images exists.
             if len(self.idx2posneg[qs_idx]) > 0:
                 self.ext2int[query_doc_idx] = i
                 i += 1
                 # Create the dataset entry
-                image = os.path.join(image_dir, d_id)
                 item = (image, q_id, score, d_id, vec)
                 dataset.append(item)
 
@@ -109,8 +113,7 @@ class ClueWeb12Dataset(Dataset):
         # Get the id for the query-score pair
         qs_idx = "{}:{}".format(q_id, score)
 
-        # Sample a second document with a different score for the same query.
-        posneg_idx = random.randint(0, len(self.idx2posneg[qs_idx]))
+        posneg_idx = random.randint(1, len(self.idx2posneg[qs_idx]))
         posneg_idx = self.idx2posneg[qs_idx][posneg_idx-1]
 
         # print(self.dataset[idx][2], self.dataset[posneg_idx][2])
@@ -122,11 +125,11 @@ class ClueWeb12Dataset(Dataset):
             n_image, _, n_score, _, n_vec = self.dataset[idx]
 
         # Load the postive and negative input image
-        # p_image = self.img_transform(default_loader(p_image))
+        # p_vecimage = self.img_transform(default_loader(p_image))
         # n_image = self.img_transform(default_loader(n_image))
         if self.get_images:
-            p_image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
-            n_image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
+            p_image = self.img_transform(default_loader(p_image))
+            n_image = self.img_transform(default_loader(n_image))
         
         positive_sample = (p_image, p_vec, p_score)
         negative_sample = (n_image, n_vec, n_score)
@@ -138,16 +141,12 @@ class ClueWeb12Dataset(Dataset):
     def get_document(self, doc_id, query_id):
         query_doc_idx = "{}:{}".format(query_id, doc_id)
 
-
         if query_doc_idx not in self.ext2int:
-            raise Exception("document not in index, probably no relevant documents were found")
+            print(query_doc_idx)
+            raise NoRelDocumentsException("document not in index, probably no relevant documents were found")
 
-        # image, _, score, _, vec = self.dataset[self.ext2int[query_doc_idx]]
-        image, q_id, score, d_id, vec = self.dataset[self.ext2int[query_doc_idx]]
-
-        # if d_id is not doc_id:
-            # print("here is something really wrong")
+        image, _, score, _, vec = self.dataset[self.ext2int[query_doc_idx]]
 
         if self.get_images:
-            image = self.img_transform(default_loader("/media/bram/f515bed4-df9a-4d30-b4fb-9a835e61d233/backup-8-oktober-2017/AI-master/Human-Saliency-on-Snapshots-in-Web-Relevance/preprocessing/highlightGenerator/storage/snapshots/clueweb12-0100tw-31-09279.png"))
+            image = self.img_transform(default_loader(image))
         return (image, vec, score)

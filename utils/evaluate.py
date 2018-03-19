@@ -3,11 +3,14 @@ import numpy as np
 import time
 from preprocessing.contextualFeaturesGenerator.utils.featureStorage import FeatureStorage
 from torch.autograd import Variable
+from .customExceptions import NoImageAvailableException, NoRelDocumentsException
+
 
 import logging 
 import time
 
 logger = logging.getLogger('Evaluate')
+
 """
 This class can be used to easily evaluate a LTR model in various 
 stages of the training process.
@@ -15,12 +18,12 @@ stages of the training process.
 Evaluation measures are taken from https://gist.github.com/bwhite/3726239
 """
 class Evaluate():
-    def __init__(self, hdf5_path, dataset, images, prefix):
-        self.storage = FeatureStorage(hdf5_path)
+    def __init__(self, path, dataset, load_images, prefix):
         self.dataset = dataset
+        self.storage = FeatureStorage(path, dataset.image_dir, dataset.query_specific, dataset.only_with_image)
         self.prepare_eval_data()
         self.use_gpu = torch.cuda.is_available()
-        self.images = images
+        self.load_images = load_images
         self.prefix = prefix
 
     """
@@ -44,10 +47,14 @@ class Evaluate():
             scores["p@5"] = self.precision_at_k(predictions, 5)
             scores["p@10"] = self.precision_at_k(predictions, 10)
             scores["map"] = self.average_precision(predictions)
-        except Exception as e:
+
+        except NoRelDocumentsException as e:
             logger.warning("query {} gave an exception: {}".format(query_id, e))
             self.failed += 1
             return {}
+        except Exception as e:
+            logger.error("Throwing the error from loading a documet in query {}...".format(query_id))
+            raise e
 
 
         return scores
@@ -59,15 +66,25 @@ class Evaluate():
         predictions = []
         batch_vec = []
         batch_score = []
+        images = []
         for doc, score in self.queries[query_id]:
-            image, vec, rel_score = self.dataset.get_document(doc, query_id)
+            try:
+                image, vec, rel_score = self.dataset.get_document(doc, query_id)
+                # print(image)
+                # print(type(image))
+                batch_vec.append(vec)
+                batch_score.append(score)
+                images.append(image)
 
-            batch_vec.append(vec)
-            batch_score.append(score)
+                if score is not rel_score:
+                    logger.error(query_id, doc, score, rel_score, vec)
+                    raise Exception("Somehow the relevance score in the dataset and feature storage are different.")
+            except NoImageAvailableException as e:
+                logger.debug("Document {} in query {} does not have an image and is excluded from evaluation. ".format(doc, query_id))
+            except IOError as e:
+                logger.error("Document {} in query {} gave an exception while loading, file is probabily corrupt. ".format(doc, query_id))
+                raise e
 
-            if score is not rel_score:
-                logger.error(query_id, doc, score, rel_score, vec)
-                raise Exception("Somehow the relevance score in the dataset and feature storage are different.")
 
         batch_vec = np.vstack( batch_vec )
 
@@ -78,17 +95,15 @@ class Evaluate():
             batch_vec = Variable(torch.from_numpy(batch_vec).float())
 
         # TODO check whether this can be done in batches
-        if not self.images:
-            image = None
+        if self.load_images:
+            images = torch.stack(images)
 
-        # batch_pred = model.forward(batch_vec).data.numpy()
-        batch_pred = model.forward(image, batch_vec).data.cpu().numpy()
-        # batch_pred = tmp
+        batch_pred = model.forward(images, batch_vec).data.cpu().numpy()
 
         logger.debug('Made predictions, {} seconds since start'.format(time.time() - start))
 
         predictions = [(pred[0], score) for pred, score in zip(batch_pred, batch_score)]
-        # print(predictions)
+
         # Sort predictions and replace with relevance scores.
         logger.debug('test log')
 
@@ -111,7 +126,7 @@ class Evaluate():
 
     def _print_scores(self, scores):
         n = len(self.queries.keys()) - self.failed
-        for key in scores.keys():
+        for key in sorted(list(scores.keys())):
             logger.info("{}_{} {}".format(self.prefix, key, scores[key]/n))
 
     def _log_scores(self, scores, tf_logger, epoch):

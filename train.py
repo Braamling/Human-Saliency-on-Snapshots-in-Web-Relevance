@@ -27,15 +27,16 @@ This method prepares the dataloaders for training and returns a training/validat
 """
 def prepare_dataloaders():
     # Get the train/test datasets
-    train_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.train_file, FLAGS.images)
-    test_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.test_file, FLAGS.images)
-    
+    train_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.train_file, FLAGS.load_images,
+                                     FLAGS.query_specific, FLAGS.only_with_image)
+    test_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.test_file, FLAGS.load_images,
+                                    FLAGS.query_specific, FLAGS.only_with_image)
     # Prepare the loaders
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
-                                                  shuffle=True, num_workers=4)
+                                                  shuffle=True, num_workers=10)
     # Initiate the Evaluation classes
-    trainEval = Evaluate(FLAGS.train_file, train_dataset, FLAGS.images, "train")
-    testEval = Evaluate(FLAGS.test_file, test_dataset, FLAGS.images, "test")
+    trainEval = Evaluate(FLAGS.train_file, train_dataset, FLAGS.load_images, "train")
+    testEval = Evaluate(FLAGS.test_file, test_dataset, FLAGS.load_images, "test")
 
     return dataloader, trainEval, testEval
 
@@ -73,7 +74,7 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
                 p_static_features = Variable(data[0][1].float())
                 n_static_features = Variable(data[1][1].float())
 
-            if not FLAGS.images:
+            if not FLAGS.load_images:
                 data[0][0] = data[1][0] = None
 
             positive = model.forward(data[0][0], p_static_features)
@@ -99,9 +100,9 @@ Prepare the model with the correct weights and format the the configured use.
 def prepare_model(use_scheduler=True):
     use_gpu = torch.cuda.is_available()
 
-    if FLAGS.model is "ViP":
+    if FLAGS.model == "ViP":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(4, 10, FLAGS.batch_size))
-    elif FLAGS.model is "features_only":
+    elif FLAGS.model == "features_only":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
@@ -118,6 +119,8 @@ def prepare_model(use_scheduler=True):
 
 
 def train():
+    torch.manual_seed(42)
+
     model, optimizer, scheduler, use_gpu = prepare_model()
 
     logger.info(model)
@@ -134,12 +137,12 @@ if __name__ == '__main__':
                         help='The location of the salicon heatmaps data for training.')
     parser.add_argument('--test_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/clueweb12_web_trec/Fold1/test.txt',
                         help='The location of the salicon heatmaps data for training.')
-    parser.add_argument('--image_path', type=str, default='storage/salicon/images/',
+    parser.add_argument('--image_path', type=str, default='storage/images/snapshots/',
                         help='The location of the salicon images for training.')
 
     parser.add_argument('--batch_size', type=int, default=3,
                         help='The batch size used for training.')
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=20,
                         help='The amount of epochs used to train.')
     parser.add_argument('--description', type=str, default='example_run',
                         help='The description of the run, for logging, output and weights naming.')
@@ -149,8 +152,12 @@ if __name__ == '__main__':
                         help='The amount of context features')
     parser.add_argument('--model', type=str, default="features_only",
                         help='chose the model to train, (features_only, ViP)')
-    parser.add_argument('--images', type=str, default="False",
-                        help='set whether the images should be included for training.')
+    parser.add_argument('--load_images', type=str, default="True",
+                        help='set whether the images should be loaded during training and evaluation.')
+    parser.add_argument('--only_with_image', type=str, default="True",
+                        help='set whether all documents without images should be excluded from the dataset')
+    parser.add_argument('--query_specific', type=str, default="False",
+                        help='set whether the images are query specific (ie. using query specific highlights)')
     parser.add_argument('--log_dir', type=str, default='storage/logs/{}',
                         help='The location to place the tensorboard logs.')
 
@@ -161,7 +168,9 @@ if __name__ == '__main__':
 
     FLAGS, unparsed = parser.parse_known_args()
 
-    FLAGS.images = FLAGS.images is "True"
+    FLAGS.load_images = FLAGS.load_images == "True"
+    FLAGS.only_with_image = FLAGS.only_with_image == "True"
+    FLAGS.query_specific = FLAGS.query_specific == "True"
 
     logger.info(FLAGS)
 
