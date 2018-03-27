@@ -10,8 +10,10 @@ from models.models import LTR_features, LTR_score, ViP_features
 from utils.saliencyLTRiterator import ClueWeb12Dataset
 from utils.evaluate import Evaluate
 
-import tensorboard_logger as tf_logger
+import tensorboard_logger as tfl
 import logging
+import copy
+import os
 
 FORMAT = '%(name)s: [%(levelname)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
@@ -25,38 +27,58 @@ def pair_hinge_loss(positive, negative):
 """
 This method prepares the dataloaders for training and returns a training/validation dataloader.
 """
-def prepare_dataloaders():
+def prepare_dataloaders(train_file, test_file, vali_file):
     # Get the train/test datasets
-    train_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.train_file, FLAGS.load_images,
+    train_dataset = ClueWeb12Dataset(FLAGS.image_path, train_file, FLAGS.load_images,
                                      FLAGS.query_specific, FLAGS.only_with_image)
-    test_dataset = ClueWeb12Dataset(FLAGS.image_path, FLAGS.test_file, FLAGS.load_images,
+    test_dataset = ClueWeb12Dataset(FLAGS.image_path, test_file, FLAGS.load_images,
                                     FLAGS.query_specific, FLAGS.only_with_image)
+    vali_dataset = ClueWeb12Dataset(FLAGS.image_path, vali_file, FLAGS.load_images,
+                                    FLAGS.query_specific, FLAGS.only_with_image)
+
     # Prepare the loaders
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
                                                   shuffle=True, num_workers=10)
     # Initiate the Evaluation classes
-    trainEval = Evaluate(FLAGS.train_file, train_dataset, FLAGS.load_images, "train")
-    testEval = Evaluate(FLAGS.test_file, test_dataset, FLAGS.load_images, "test")
+    trainEval = Evaluate(train_file, train_dataset, FLAGS.load_images, "train")
+    testEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "test")
+    valiEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "validation")
 
-    return dataloader, trainEval, testEval
-
-def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, num_epochs=25):
-    dataloader, trainEval, testEval = dataloaders
+    return dataloader, trainEval, testEval, valiEval
 
 
-    tf_logger.configure(FLAGS.log_dir.format(FLAGS.description))
+"""
+The fold iterator provides files to train, test and validate on for all folds and sessions.
+To generator yields a test, train and validate file path that should be used for the current model.
+"""
+def fold_iterator():
+    for fold in range(1, FLAGS.folds+1):
+        for session in range(FLAGS.sessions_per_fold):
+            fold_path = os.path.join(FLAGS.content_feature_dir, "Fold{}".format(fold))
+            test = os.path.join(fold_path, "test.txt")
+            train = os.path.join(fold_path, "train.txt")
+            vali = os.path.join(fold_path, "vali.txt")
+            yield test, train, vali
+
+
+
+def train_model(model, criterion, dataloader, trainEval, testEval,
+                use_gpu, optimizer, scheduler, description, num_epochs=25):
     
+    tf_logger = tfl.Logger(FLAGS.log_dir.format(description))
 
     # Set model to training mode
-    # model.model.train(True)  # Set model to training mode
-    
+    model.train(False)  
+    best_model = copy.deepcopy(model)
+    train_scores = trainEval.eval(model, tf_logger, 0)
+    test_scores = testEval.eval(model, tf_logger, 0)
+    best_test_score = test_scores
+
     for epoch in range(num_epochs):
         logger.info('Epoch {}/{}'.format(epoch, num_epochs - 1))
         logger.info('-' * 10)
 
-        model.train(False)  
-        trainEval.eval(model, tf_logger, epoch)
-        testEval.eval(model, tf_logger, epoch)
+         
         model.train(True)  
         # Each epoch has a training and validation phase
         if scheduler is not None:
@@ -83,16 +105,24 @@ def train_model(model, criterion, dataloaders, use_gpu, optimizer, scheduler, nu
             # Compute the loss
             loss = criterion(positive, negative)
 
-            running_loss += loss.data[0] * p_static_features.size(0)
+            running_loss += loss.data[0] # * p_static_features.size(0)
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
+        model.train(False) 
+        train_scores = trainEval.eval(model, tf_logger, epoch)
+        test_scores = testEval.eval(model, tf_logger, epoch)
+        if best_test_score[FLAGS.optimize_on] < test_scores[FLAGS.optimize_on]:
+            logger.debug("Improved the current best score.")
+            best_test_score = test_scores
+            best_model = copy.deepcopy(model)
+
         tf_logger.log_value('train_loss', running_loss, epoch)
         logger.info('Train_loss: {}'.format(running_loss))
 
-    return model
+    return best_test_score, model
 
 """
 Prepare the model with the correct weights and format the the configured use.
@@ -101,7 +131,7 @@ def prepare_model(use_scheduler=True):
     use_gpu = torch.cuda.is_available()
 
     if FLAGS.model == "ViP":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(4, 10, FLAGS.batch_size))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(16, 10, FLAGS.batch_size))
     elif FLAGS.model == "features_only":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
     else:
@@ -119,24 +149,49 @@ def prepare_model(use_scheduler=True):
 
 
 def train():
-    torch.manual_seed(42)
+    test_scores = {}
+    vali_scores = {}
+    for i, (test, train, vali) in enumerate(fold_iterator(), 1):
+        # Prepare all model components and initalize parameters.
+        model, optimizer, scheduler, use_gpu = prepare_model()
 
-    model, optimizer, scheduler, use_gpu = prepare_model()
+        # Create a dataloader for training and three evaluation classes.
+        dataloader, trainEval, testEval, valiEval = prepare_dataloaders(test, train, vali)
 
-    logger.info(model)
+        if i == 1:
+            logger.info(model)
 
-    dataloaders = prepare_dataloaders()
+        description = FLAGS.description + "_" + str(i)
+        test_score, model = train_model(model, pair_hinge_loss, dataloader, trainEval, testEval,
+                                        use_gpu, optimizer, scheduler, description, num_epochs=FLAGS.epochs)
 
-    train_model(model, pair_hinge_loss, dataloaders, use_gpu, optimizer, scheduler, num_epochs=FLAGS.epochs)
+        # Add and store the newly added scores.
+        vali_score = valiEval.eval(model)
+        test_scores = testEval.add_scores(test_scores, test_score)
+        vali_scores = testEval.add_scores(vali_scores, vali_score)
+        testEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, description, test_score)
+        valiEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, description, vali_score)
+
+    # Average the test and validation scores.
+    test_scores = testEval.avg_scores(test_scores, i)
+    vali_scores = valiEval.avg_scores(vali_scores, i)
+
+    logger.info("Finished, printing best results now.")
+    testEval.print_scores(test_scores)
+    valiEval.print_scores(vali_scores)
+    testEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, FLAGS.description + "_test_final", test_scores)
+    valiEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, FLAGS.description + "_vali_final", vali_scores)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--train_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/clueweb12_web_trec/Fold1/train.txt',
-                        help='The location of the salicon heatmaps data for training.')
-    parser.add_argument('--test_file', type=str, default='preprocessing/contextualFeaturesGenerator/storage/clueweb12_web_trec/Fold1/test.txt',
-                        help='The location of the salicon heatmaps data for training.')
+    parser.add_argument('--content_feature_dir', type=str, default='storage/clueweb12_web_trec/',
+                        help='The location of all the folds with train, test and validation files.')
+    parser.add_argument('--folds', type=int, default=5,
+                        help='The amounts of folds to train on.')
+    parser.add_argument('--sessions_per_fold', type=int, default=5,
+                        help='The amount of training sessions to average per fold.')
     parser.add_argument('--image_path', type=str, default='storage/images/snapshots/',
                         help='The location of the salicon images for training.')
 
@@ -160,6 +215,10 @@ if __name__ == '__main__':
                         help='set whether the images are query specific (ie. using query specific highlights)')
     parser.add_argument('--log_dir', type=str, default='storage/logs/{}',
                         help='The location to place the tensorboard logs.')
+    parser.add_argument('--optimized_scores_path', type=str, default='storage/logs/optimized_scores',
+                        help='The location to store the scores that were optimized.')
+    parser.add_argument('--optimize_on', type=str, default='ndcg@5',
+                        help='Give the measure to optimize the model on (ndcg@1, ndcg@5, ndcg@10, p@1, p@5, p@10, map).')
 
     parser.add_argument('--dropout', type=float, default=.1,
                         help='The dropout to use in the classification layer.')

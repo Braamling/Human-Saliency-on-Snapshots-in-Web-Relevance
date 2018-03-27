@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import torch
 from torch.utils.data import Dataset
 from torchvision.datasets.folder import default_loader 
 from torchvision import transforms
@@ -44,6 +45,7 @@ class ClueWeb12Dataset(Dataset):
 
         self.make_dataset(image_dir, features_file)
         self.img_transform = transforms.Compose([transforms.Resize((64,64), interpolation=2), 
+                                                 transforms.Grayscale(),
                                                  transforms.ToTensor()])
         # self.img_transform = transforms.Compose([transforms.Resize((224,224), interpolation=2), 
                                                  # transforms.ToTensor()])
@@ -131,8 +133,15 @@ class ClueWeb12Dataset(Dataset):
             p_image = self.img_transform(default_loader(p_image))
             n_image = self.img_transform(default_loader(n_image))
         
+
+        # The model will filter out the vector, but an empty vector is not supported by pytorch.
+        if len(n_vec) is 0:
+            p_vec = -1
+            n_vec = -1
+        
         positive_sample = (p_image, p_vec, p_score)
         negative_sample = (n_image, n_vec, n_score)
+
         return positive_sample, negative_sample
 
     """
@@ -146,6 +155,10 @@ class ClueWeb12Dataset(Dataset):
             raise NoRelDocumentsException("document not in index, probably no relevant documents were found")
 
         image, _, score, _, vec = self.dataset[self.ext2int[query_doc_idx]]
+
+        # The model will filter out the vector, but an empty vector is not supported by pytorch.
+        if len(vec) is 0:
+            vec = -1
 
         if self.get_images:
             image = self.img_transform(default_loader(image))

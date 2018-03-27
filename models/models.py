@@ -35,6 +35,7 @@ class LTR_score(nn.Module):
     def __init__(self, static_feature_size, dropout, hidden_size, feature_model=None):
         super(LTR_score, self).__init__()
         self.feature_model = feature_model
+        self.static_feature_size = static_feature_size
         if feature_model is None:
             x_in = static_feature_size
         else:
@@ -48,10 +49,13 @@ class LTR_score(nn.Module):
     def forward(self, image, static_features):
         if self.feature_model is not None:
             image = self.feature_model(image)
-            if static_features.dim() == 1:
-                static_features = static_features.unsqueeze(0)
+            if self.static_feature_size == 0:
+                features = image
+            else:
+                if static_features.dim() == 1:
+                    static_features = static_features.unsqueeze(0)
 
-            features = torch.cat((image, static_features), 1)
+                features = torch.cat((image, static_features), 1)
         else:
             features = static_features
 
@@ -74,15 +78,15 @@ class ViP_features(nn.Module):
         self.feature_size = feature_size
         self.region_height = region_height
         self.local_perception_layer = nn.Sequential(
-            nn.Conv2d(3, 8, kernel_size=2),
+            nn.Conv2d(1, 8, kernel_size=2, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(8, 16, kernel_size=5),
+            nn.Conv2d(8, 16, kernel_size=2, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
 
-        self.hidden_dim = 50 
-        self.lstm = nn.LSTM(208, self.hidden_dim)
+        self.hidden_dim = 10 
+        self.lstm = nn.LSTM(256, self.hidden_dim)
         self.reldecision = nn.Linear(self.hidden_dim, self.feature_size)
 
     def init_hidden(self, batch_size):
@@ -100,8 +104,8 @@ class ViP_features(nn.Module):
     def apply_lstm(self, x):
         for i, layer in enumerate(x):
             # Create correct dimensions
-            if layer.dim() == 3:
-                layer = layer.unsqueeze(0)
+            # if layer.dim() == 3:
+            #     layer = layer.unsqueeze(0)
 
             if self.use_gpu:
                 layer = Variable(layer.cuda())
@@ -113,7 +117,7 @@ class ViP_features(nn.Module):
                 hidden = self.init_hidden(batch_size)
 
             layer = self.local_perception_layer(layer)
-            out, hidden = self.lstm(layer.view(1, -1, 208), hidden)
+            out, hidden = self.lstm(layer.view(1, -1, 256), hidden)
 
         return out.squeeze(0)
 

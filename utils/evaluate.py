@@ -70,8 +70,7 @@ class Evaluate():
         for doc, score in self.queries[query_id]:
             try:
                 image, vec, rel_score = self.dataset.get_document(doc, query_id)
-                # print(image)
-                # print(type(image))
+
                 batch_vec.append(vec)
                 batch_score.append(score)
                 images.append(image)
@@ -88,6 +87,7 @@ class Evaluate():
 
         batch_vec = np.vstack( batch_vec )
 
+
         logger.debug('Batch ready, {} seconds since start'.format(time.time() - start))
         if self.use_gpu:
             batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
@@ -99,6 +99,7 @@ class Evaluate():
             images = torch.stack(images)
 
         batch_pred = model.forward(images, batch_vec).data.cpu().numpy()
+        batch_pred_2 = model.forward(images, batch_vec).data.cpu().numpy()
 
         logger.debug('Made predictions, {} seconds since start'.format(time.time() - start))
 
@@ -116,7 +117,7 @@ class Evaluate():
         logger.debug('Sorted predictions, {} seconds since start'.format(time.time() - start))
         return predictions
 
-    def _add_scores(self, scores, to_add_scores):
+    def add_scores(self, scores, to_add_scores):
         for key in to_add_scores.keys():
             if key not in scores:
                 scores[key] = 0
@@ -124,25 +125,46 @@ class Evaluate():
 
         return scores
 
-    def _print_scores(self, scores):
-        n = len(self.queries.keys()) - self.failed
+    def avg_scores(self, scores, n):
+        for key in scores.keys():
+            scores[key] = scores[key] / n
+
+        return scores
+
+    def print_scores(self, scores):
         for key in sorted(list(scores.keys())):
-            logger.info("{}_{} {}".format(self.prefix, key, scores[key]/n))
+            logger.info("{}_{} {}".format(self.prefix, key, scores[key]))
+
+    """
+    Append a dict of scores to file. 
+
+    Path: Full path to the file to be stored
+    Description: Prefix for run identification to the scores that will be appended 
+    Scores: Dict with score name as key and score value as value.
+    """
+    def store_scores(self, path, description, scores):
+        with open(path, "a") as f:
+            scores = " ".join(["{0}:{1:.4f}".format(k, scores[k]) for k in sorted(list(scores.keys()))])
+            f.write("{} {}\n".format(description, scores))
 
     def _log_scores(self, scores, tf_logger, epoch):
-        n = len(self.queries.keys())
         for key in scores.keys():
-            tf_logger.log_value('{}_{}'.format(self.prefix, key), scores[key]/n, epoch)
+            tf_logger.log_value('{}_{}'.format(self.prefix, key), scores[key], epoch)
         
     def eval(self, model, tf_logger=None, epoch=None):
         self.failed = 0 
         scores = {}
         for q_id in self.queries.keys():
-            self._add_scores(scores, self._eval_query(q_id, model))
+            self.add_scores(scores, self._eval_query(q_id, model))
 
-        self._print_scores(scores)
+        n = len(self.queries.keys()) - self.failed
+        scores = self.avg_scores(scores, n)
+
+        self.print_scores(scores)
         if tf_logger is not None:
             self._log_scores(scores, tf_logger, epoch)
+
+        return scores
 
 
 
