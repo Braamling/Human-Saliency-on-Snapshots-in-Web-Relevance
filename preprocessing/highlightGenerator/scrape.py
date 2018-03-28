@@ -81,7 +81,7 @@ def check_wayback_avail(url, date):
     return False, ""
 
 def get_clueweb12_url(clueweb_id):
-    return "http://boston.lti.cs.cmu.edu/Services/clueweb12_render/renderpage.cgi?id={}".format(clueweb_id)
+    return "amsterdam-rijke:render4Amsterdam!@http://boston.lti.cs.cmu.edu/Services/clueweb12_render/renderpage.cgi?id={}".format(clueweb_id)
 
 """ 
 Create a dict with all query id's and their corresponding queries.

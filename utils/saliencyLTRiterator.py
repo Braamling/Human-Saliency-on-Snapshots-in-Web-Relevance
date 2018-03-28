@@ -31,7 +31,7 @@ def is_image_file(filename):
     return any(filename_lower.endswith(ext) for ext in IMG_EXTENSIONS)
 
 class ClueWeb12Dataset(Dataset):
-    def __init__(self, image_dir, features_file, get_images=False, query_specific=False, only_with_image=False):
+    def __init__(self, image_dir, features_file, get_images=False, query_specific=False, only_with_image=False, size=(64,64), grayscale=True):
         """
         Args:
             img_dir (string): directory containing all images for the ClueWeb12 webpages
@@ -44,11 +44,13 @@ class ClueWeb12Dataset(Dataset):
         self.image_dir = image_dir
 
         self.make_dataset(image_dir, features_file)
-        self.img_transform = transforms.Compose([transforms.Resize((64,64), interpolation=2), 
-                                                 transforms.Grayscale(),
-                                                 transforms.ToTensor()])
-        # self.img_transform = transforms.Compose([transforms.Resize((224,224), interpolation=2), 
-                                                 # transforms.ToTensor()])
+        if grayscale:
+            self.img_transform = transforms.Compose([transforms.Resize(size, interpolation=2), 
+                                                     transforms.Grayscale(),
+                                                     transforms.ToTensor()])
+        else:
+            self.img_transform = transforms.Compose([transforms.Resize(size, interpolation=2), 
+                                                     transforms.ToTensor()])
 
     def make_dataset(self, image_dir, features_file):
         featureStorage = FeatureStorage(features_file, image_dir, self.query_specific, self.only_with_image)

@@ -18,14 +18,14 @@ stages of the training process.
 Evaluation measures are taken from https://gist.github.com/bwhite/3726239
 """
 class Evaluate():
-    def __init__(self, path, dataset, load_images, prefix):
+    def __init__(self, path, dataset, load_images, prefix, batch_size=None):
         self.dataset = dataset
         self.storage = FeatureStorage(path, dataset.image_dir, dataset.query_specific, dataset.only_with_image)
         self.prepare_eval_data()
         self.use_gpu = torch.cuda.is_available()
         self.load_images = load_images
         self.prefix = prefix
-
+        self.batch_size = batch_size
     """
     Get all the ranked queries and their scores. 
     """
@@ -37,7 +37,7 @@ class Evaluate():
 
     def _eval_query(self, query_id, model):
         try:
-            predictions = self._get_scores(query_id, model)
+            predictions, ranked_docs = self._get_scores(query_id, model)
     
             scores = {}
             scores["ndcg@1"] = self.ndcg_at_k(predictions, 1)
@@ -51,28 +51,24 @@ class Evaluate():
         except NoRelDocumentsException as e:
             logger.warning("query {} gave an exception: {}".format(query_id, e))
             self.failed += 1
-            return {}
+            return {}, ((query_id), [])
         except Exception as e:
             logger.error("Throwing the error from loading a documet in query {}...".format(query_id))
             raise e
 
 
-        return scores
+        return scores, ((query_id), ranked_docs)
 
-    def _get_scores(self, query_id, model):
-        logger.debug('Starting to prepare {} batch to evaluate query {}'.format(self.prefix, query_id))
-        start = time.time()
-
+    def _get_predictions(self, model, doc_ids, scores, query_id):
         predictions = []
         batch_vec = []
         batch_score = []
         images = []
-        for doc, score in self.queries[query_id]:
+        for doc, score in zip(doc_ids, scores):
             try:
                 image, vec, rel_score = self.dataset.get_document(doc, query_id)
 
                 batch_vec.append(vec)
-                batch_score.append(score)
                 images.append(image)
 
                 if score is not rel_score:
@@ -87,24 +83,59 @@ class Evaluate():
 
         batch_vec = np.vstack( batch_vec )
 
-
-        logger.debug('Batch ready, {} seconds since start'.format(time.time() - start))
-        if self.use_gpu:
-            batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
-        else:
-            batch_vec = Variable(torch.from_numpy(batch_vec).float())
-
-        # TODO check whether this can be done in batches
         if self.load_images:
             images = torch.stack(images)
 
+
+        # if self.use_gpu:
+        #     batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
+        #     images = Variable(images.float().cuda())
+        # else:
+        #     batch_vec = Variable(torch.from_numpy(batch_vec).float())
+        #     images = Variable(images.float())
+
+        if self.use_gpu:
+            batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
+            if self.load_images:
+                images = Variable(images.float().cuda())
+        else:
+            batch_vec = Variable(torch.from_numpy(batch_vec).float())
+            if self.load_images:
+                images = Variable(images.float())
+
+        # TODO check whether this can be done in batches
         batch_pred = model.forward(images, batch_vec).data.cpu().numpy()
-        batch_pred_2 = model.forward(images, batch_vec).data.cpu().numpy()
 
-        logger.debug('Made predictions, {} seconds since start'.format(time.time() - start))
+        return list(batch_pred.flatten())
 
-        predictions = [(pred[0], score) for pred, score in zip(batch_pred, batch_score)]
 
+    def _get_scores(self, query_id, model):
+        logger.debug('Starting to prepare {} batch to evaluate query {}'.format(self.prefix, query_id))
+        start = time.time()
+
+        predictions = []
+        scores = []
+        doc_ids = []
+        batch_scores = []
+        batch_doc_ids = []
+        i = 0
+        for doc, score in self.queries[query_id]:
+            if self.batch_size is not None and i >= self.batch_size:
+                predictions += self._get_predictions(model, batch_doc_ids, batch_scores, query_id)
+                i = 0
+                batch_scores = []
+                batch_doc_ids = []
+            else:
+                i += 1
+                scores.append(score)
+                batch_scores.append(score)
+                doc_ids.append(doc)
+                batch_doc_ids.append(doc)
+
+        if i > 0:
+            predictions += self._get_predictions(model, batch_doc_ids, batch_scores, query_id)
+
+        predictions = [(pred, score, doc_ids) for pred, score, doc_ids in zip(predictions, scores, doc_ids)]
         # Sort predictions and replace with relevance scores.
         logger.debug('test log')
 
@@ -112,10 +143,10 @@ class Evaluate():
         # in random order.
         np.random.shuffle(predictions)
         predictions = sorted(predictions, key=lambda x: -x[0])
-        _, predictions = zip(*predictions)
+        _, predictions, doc_ids = zip(*predictions)
 
         logger.debug('Sorted predictions, {} seconds since start'.format(time.time() - start))
-        return predictions
+        return predictions, doc_ids
 
     def add_scores(self, scores, to_add_scores):
         for key in to_add_scores.keys():
@@ -136,6 +167,17 @@ class Evaluate():
             logger.info("{}_{} {}".format(self.prefix, key, scores[key]))
 
     """
+    Print a short summary of the first 5 rankings.
+    """
+    def print_ranking_summary(self, rankings):
+        for i in range(0, min(5, len(rankings))):
+            rank = []
+            for j in range(0, min(10, len(rankings[i][1]))):
+                rank.append(rankings[i][1][j])
+
+            logger.info("{}_ranking ({}): {}".format(self.prefix, rankings[i][0], " ".join(rank)))
+
+    """
     Append a dict of scores to file. 
 
     Path: Full path to the file to be stored
@@ -145,7 +187,7 @@ class Evaluate():
     def store_scores(self, path, description, scores):
         with open(path, "a") as f:
             scores = " ".join(["{0}:{1:.4f}".format(k, scores[k]) for k in sorted(list(scores.keys()))])
-            f.write("{} {}\n".format(description, scores))
+            f.write("{}-{} {}\n".format(self.prefix, description, scores))
 
     def _log_scores(self, scores, tf_logger, epoch):
         for key in scores.keys():
@@ -154,13 +196,17 @@ class Evaluate():
     def eval(self, model, tf_logger=None, epoch=None):
         self.failed = 0 
         scores = {}
+        rankings = []
         for q_id in self.queries.keys():
-            self.add_scores(scores, self._eval_query(q_id, model))
+            eval_scores, ranking = self._eval_query(q_id, model)
+            self.add_scores(scores, eval_scores)
+            rankings.append(ranking)
 
         n = len(self.queries.keys()) - self.failed
         scores = self.avg_scores(scores, n)
 
         self.print_scores(scores)
+        self.print_ranking_summary(rankings)
         if tf_logger is not None:
             self._log_scores(scores, tf_logger, epoch)
 

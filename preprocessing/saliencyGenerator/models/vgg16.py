@@ -29,6 +29,7 @@ class VGG(nn.Module):
             nn.Dropout(),
             nn.Linear(4096, num_classes),
         )
+        # TMP: For usage in ViP 
         if init_weights:
             self._initialize_weights()
 

@@ -6,6 +6,7 @@ import torch.optim as optim
 import numpy as np
 import argparse
 from models.models import LTR_features, LTR_score, ViP_features
+from models.vgg16 import vgg16
 
 from utils.saliencyLTRiterator import ClueWeb12Dataset
 from utils.evaluate import Evaluate
@@ -30,19 +31,19 @@ This method prepares the dataloaders for training and returns a training/validat
 def prepare_dataloaders(train_file, test_file, vali_file):
     # Get the train/test datasets
     train_dataset = ClueWeb12Dataset(FLAGS.image_path, train_file, FLAGS.load_images,
-                                     FLAGS.query_specific, FLAGS.only_with_image)
+                                     FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale)
     test_dataset = ClueWeb12Dataset(FLAGS.image_path, test_file, FLAGS.load_images,
-                                    FLAGS.query_specific, FLAGS.only_with_image)
+                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale)
     vali_dataset = ClueWeb12Dataset(FLAGS.image_path, vali_file, FLAGS.load_images,
-                                    FLAGS.query_specific, FLAGS.only_with_image)
+                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale)
 
     # Prepare the loaders
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
                                                   shuffle=True, num_workers=10)
     # Initiate the Evaluation classes
-    trainEval = Evaluate(train_file, train_dataset, FLAGS.load_images, "train")
-    testEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "test")
-    valiEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "validation")
+    trainEval = Evaluate(train_file, train_dataset, FLAGS.load_images, "train", FLAGS.batch_size)
+    testEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "test", FLAGS.batch_size)
+    valiEval = Evaluate(vali_file, vali_dataset, FLAGS.load_images, "validation", FLAGS.batch_size)
 
     return dataloader, trainEval, testEval, valiEval
 
@@ -58,7 +59,7 @@ def fold_iterator():
             test = os.path.join(fold_path, "test.txt")
             train = os.path.join(fold_path, "train.txt")
             vali = os.path.join(fold_path, "vali.txt")
-            yield test, train, vali
+            yield train, test, vali
 
 
 
@@ -92,15 +93,21 @@ def train_model(model, criterion, dataloader, trainEval, testEval,
             if use_gpu:
                 p_static_features = Variable(data[0][1].float().cuda())
                 n_static_features = Variable(data[1][1].float().cuda())
+                if FLAGS.load_images:
+                    p_image = Variable(data[0][0].float().cuda())
+                    n_image = Variable(data[1][0].float().cuda())
             else:
                 p_static_features = Variable(data[0][1].float())
                 n_static_features = Variable(data[1][1].float())
+                if FLAGS.load_images:
+                    p_image = Variable(data[0][0].float())
+                    n_image = Variable(data[1][0].float())
 
             if not FLAGS.load_images:
-                data[0][0] = data[1][0] = None
+                p_image = n_image = None
 
-            positive = model.forward(data[0][0], p_static_features)
-            negative = model.forward(data[1][0], n_static_features)
+            positive = model.forward(p_image, p_static_features)
+            negative = model.forward(n_image, n_static_features)
 
             # Compute the loss
             loss = criterion(positive, negative)
@@ -132,6 +139,10 @@ def prepare_model(use_scheduler=True):
 
     if FLAGS.model == "ViP":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(16, 10, FLAGS.batch_size))
+    elif FLAGS.model == "vgg16":
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, vgg16(pretrained=True, state_dict=None, output_size=500))
+        for param in model.feature_model.features.parameters():
+            param.requires_grad = False
     elif FLAGS.model == "features_only":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
     else:
@@ -140,7 +151,7 @@ def prepare_model(use_scheduler=True):
     if use_gpu:
         model = model.cuda()
 
-    optimizer = optim.Adam(model.parameters(), lr=FLAGS.learning_rate, weight_decay=1e-5)
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=FLAGS.learning_rate, weight_decay=1e-5)
 
     if use_scheduler:
         scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
@@ -151,12 +162,12 @@ def prepare_model(use_scheduler=True):
 def train():
     test_scores = {}
     vali_scores = {}
-    for i, (test, train, vali) in enumerate(fold_iterator(), 1):
+    for i, (train, test, vali) in enumerate(fold_iterator(), 1):
         # Prepare all model components and initalize parameters.
         model, optimizer, scheduler, use_gpu = prepare_model()
 
         # Create a dataloader for training and three evaluation classes.
-        dataloader, trainEval, testEval, valiEval = prepare_dataloaders(test, train, vali)
+        dataloader, trainEval, testEval, valiEval = prepare_dataloaders(train, test, vali)
 
         if i == 1:
             logger.info(model)
@@ -168,7 +179,7 @@ def train():
         # Add and store the newly added scores.
         vali_score = valiEval.eval(model)
         test_scores = testEval.add_scores(test_scores, test_score)
-        vali_scores = testEval.add_scores(vali_scores, vali_score)
+        vali_scores = valiEval.add_scores(vali_scores, vali_score)
         testEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, description, test_score)
         valiEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, description, vali_score)
 
@@ -179,8 +190,8 @@ def train():
     logger.info("Finished, printing best results now.")
     testEval.print_scores(test_scores)
     valiEval.print_scores(vali_scores)
-    testEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, FLAGS.description + "_test_final", test_scores)
-    valiEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, FLAGS.description + "_vali_final", vali_scores)
+    testEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, FLAGS.description + "_final", test_scores)
+    valiEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, FLAGS.description + "_final", vali_scores)
 
 
 if __name__ == '__main__':
@@ -219,6 +230,8 @@ if __name__ == '__main__':
                         help='The location to store the scores that were optimized.')
     parser.add_argument('--optimize_on', type=str, default='ndcg@5',
                         help='Give the measure to optimize the model on (ndcg@1, ndcg@5, ndcg@10, p@1, p@5, p@10, map).')
+    parser.add_argument('--grayscale', type=str, default='False',
+                        help='Flag whether to convert the images to grayscale.')
 
     parser.add_argument('--dropout', type=float, default=.1,
                         help='The dropout to use in the classification layer.')
@@ -230,6 +243,12 @@ if __name__ == '__main__':
     FLAGS.load_images = FLAGS.load_images == "True"
     FLAGS.only_with_image = FLAGS.only_with_image == "True"
     FLAGS.query_specific = FLAGS.query_specific == "True"
+    FLAGS.grayscale = FLAGS.grayscale == "True"
+
+    if FLAGS.model == "vgg16":
+        FLAGS.size = (224,224)
+    else:
+        FLAGS.size = (64,64)
 
     logger.info(FLAGS)
 

@@ -108,9 +108,9 @@ class ViP_features(nn.Module):
             #     layer = layer.unsqueeze(0)
 
             if self.use_gpu:
-                layer = Variable(layer.cuda())
+                layer = layer.cuda()
             else:
-                layer = Variable(layer)
+                layer = layer
             
             if i is 0:
                 batch_size = layer.size()[0]
