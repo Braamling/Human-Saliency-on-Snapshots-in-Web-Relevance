@@ -44,7 +44,10 @@ class Highlighter():
         #self.driver = webdriver.PhantomJS();
         # self.driver.set_window_position(0, 0)
         # we remove 74 pixels at the top.
-        self.driver.set_window_size(1366, 1366 + 74) 
+        height = 1366
+        if wayback:
+            height += 74
+        self.driver.set_window_size(1366, height) 
         print(self.driver.get_window_size(windowHandle='current'))
         self.driver.get(webpage)
 

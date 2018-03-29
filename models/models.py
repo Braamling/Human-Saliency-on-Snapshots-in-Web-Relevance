@@ -62,7 +62,7 @@ class LTR_score(nn.Module):
         x = self.hidden(features)
         x = self.relu(x)
         total_units = x.size(0) * x.size(1)
-        if torch.nonzero(x).size(0) / float(total_units) < 0.35:
+        if torch.nonzero(x).size(0) / float(total_units) < 0.20:
             logger.warning("dead relu's, only {0:.2f} of units are alive".format(torch.nonzero(x).size(0) / float(total_units)))
             
         x = self.dropout(x)

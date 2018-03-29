@@ -18,7 +18,7 @@ query_id: query id used for storing snapshots
 doc_id: document id to use for storing snapshots
 """
 def create_snapshots(highlighter, url, query, query_id, doc_id):
-    highlighter.prepare(url, wayback=True)
+    highlighter.prepare(url, wayback=FLAGS.remove_wayback_banner)
     append_log(highlighter.get_final_url(), query_id, doc_id)
     highlighter.store_snapshot("storage/snapshots/{}.png".format(doc_id))
     highlighter.set_highlights(query)
@@ -81,7 +81,7 @@ def check_wayback_avail(url, date):
     return False, ""
 
 def get_clueweb12_url(clueweb_id):
-    return "amsterdam-rijke:render4Amsterdam!@http://boston.lti.cs.cmu.edu/Services/clueweb12_render/renderpage.cgi?id={}".format(clueweb_id)
+    return "http://amsterdam-rijke:render4Amsterdam!@boston.lti.cs.cmu.edu/Services/clueweb12_render/renderpage.cgi?id={}".format(clueweb_id)
 
 """ 
 Create a dict with all query id's and their corresponding queries.
@@ -113,7 +113,7 @@ def scrape_query_file(query, highlighter):
         if not os.path.isfile("storage/masks/{}-{}.png".format(FLAGS.query, doc_id)):
             try:
                 start = time.time()
-                if FLAGS.get_wayback:
+                if FLAGS.get_wayback_url:
                     url = get_web_link(url, FLAGS.date)
                 create_snapshots(highlighter, url, query, FLAGS.query, doc_id)
             except Exception as e:
@@ -137,8 +137,11 @@ def scrape_document_file(file, queries, highlighter):
             if not os.path.isfile("storage/masks/{}-{}.png".format(query_id, doc_id)):
                 try:
                     start = time.time()
-                    if FLAGS.get_wayback is "True":
+                    if FLAGS.get_wayback_url:
                         url = get_web_link(url, FLAGS.date)
+                    elif FLAGS.get_render_service:
+                        url = get_clueweb12_url(doc_id)
+                    print(url)
                     create_snapshots(highlighter, url, query, query_id, doc_id)
                 except Exception as e:
                     highlighter.close(driver=False)
@@ -167,13 +170,20 @@ if __name__ == '__main__':
                         help='The query id to retrieve.')
     parser.add_argument('--date', type=str, default='20120202',
                         help='The date (YYYYMMDD) to aim for while scraping.')
-    parser.add_argument('--get_wayback', type=str, default="False",
+    parser.add_argument('--get_wayback_url', type=str, default="False",
                         help='Select whether the url should be looked up in the wayback machine.')
+    parser.add_argument('--get_render_service', type=str, default="False",
+                        help='Select whether the url should be looked up in the ClueWeb12 online rendering service.')
+    parser.add_argument('--remove_wayback_banner', type=str, default="True",
+                        help='Select whether the wayback banner should be removed before taking a screenshot.')
     parser.add_argument('--input_file', type=str,
                         help='Select whether the url should be looked up in the wayback machine.')
     parser.add_argument('--log_file', type=str, default="scrape_logs",
                         help='This file is used to store logs during scraping.')
 
     FLAGS, unparsed = parser.parse_known_args()
-    FLAGS.get_wayback = FLAGS.get_wayback is "True"
+    FLAGS.get_wayback_url = FLAGS.get_wayback_url == "True"
+    FLAGS.get_render_service = FLAGS.get_render_service == "True"
+    FLAGS.remove_wayback_banner = FLAGS.remove_wayback_banner == "True"
+    print(FLAGS)
     main()

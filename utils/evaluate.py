@@ -38,6 +38,9 @@ class Evaluate():
     def _eval_query(self, query_id, model):
         try:
             predictions, ranked_docs = self._get_scores(query_id, model)
+
+            # Make sure all negative values are put to 0.
+            # predictions[predictions < 0] = 0
     
             scores = {}
             scores["ndcg@1"] = self.ndcg_at_k(predictions, 1)
