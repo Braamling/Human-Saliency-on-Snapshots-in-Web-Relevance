@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import pandas as pd
 import time
 from preprocessing.contextualFeaturesGenerator.utils.featureStorage import FeatureStorage
 from torch.autograd import Variable
@@ -35,32 +36,35 @@ class Evaluate():
         for q_id in self.query_ids:
             self.queries[q_id] = self.storage.get_scores(q_id)
 
-    def _eval_query(self, query_id, model):
+    def _eval_query(self, query_id, model, get_df):
         try:
             predictions, ranked_docs = self._get_scores(query_id, model)
 
             # Make sure all negative values are put to 0.
-            # predictions[predictions < 0] = 0
-    
+            eval_predictions = np.asarray(predictions)
+            eval_predictions[eval_predictions < 0] = 0
+
             scores = {}
-            scores["ndcg@1"] = self.ndcg_at_k(predictions, 1)
-            scores["ndcg@5"] = self.ndcg_at_k(predictions, 5)
-            scores["ndcg@10"] = self.ndcg_at_k(predictions, 10)
-            scores["p@1"] = self.precision_at_k(predictions, 1)
-            scores["p@5"] = self.precision_at_k(predictions, 5)
-            scores["p@10"] = self.precision_at_k(predictions, 10)
-            scores["map"] = self.average_precision(predictions)
+            scores["ndcg@1"] = self.ndcg_at_k(eval_predictions, 1)
+            scores["ndcg@5"] = self.ndcg_at_k(eval_predictions, 5)
+            scores["ndcg@10"] = self.ndcg_at_k(eval_predictions, 10)
+            scores["p@1"] = self.precision_at_k(eval_predictions, 1)
+            scores["p@5"] = self.precision_at_k(eval_predictions, 5)
+            scores["p@10"] = self.precision_at_k(eval_predictions, 10)
+            scores["map"] = self.average_precision(eval_predictions)
+
+            if get_df:
+                self.add_to_df(query_id, ranked_docs, predictions)
 
         except NoRelDocumentsException as e:
             logger.warning("query {} gave an exception: {}".format(query_id, e))
             self.failed += 1
-            return {}, ((query_id), [])
+            return {}
         except Exception as e:
             logger.error("Throwing the error from loading a documet in query {}...".format(query_id))
             raise e
 
-
-        return scores, ((query_id), ranked_docs)
+        return scores
 
     def _get_predictions(self, model, doc_ids, scores, query_id):
         predictions = []
@@ -88,14 +92,6 @@ class Evaluate():
 
         if self.load_images:
             images = torch.stack(images)
-
-
-        # if self.use_gpu:
-        #     batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
-        #     images = Variable(images.float().cuda())
-        # else:
-        #     batch_vec = Variable(torch.from_numpy(batch_vec).float())
-        #     images = Variable(images.float())
 
         if self.use_gpu:
             batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
@@ -170,15 +166,15 @@ class Evaluate():
             logger.info("{}_{} {}".format(self.prefix, key, scores[key]))
 
     """
-    Print a short summary of the first 5 rankings.
+    #Deprecated. Print a short summary of the first 5 rankings.
     """
-    def print_ranking_summary(self, rankings):
-        for i in range(0, min(5, len(rankings))):
-            rank = []
-            for j in range(0, min(10, len(rankings[i][1]))):
-                rank.append(rankings[i][1][j])
+    # def print_ranking_summary(self, rankings):
+    #     for i in range(0, min(5, len(rankings))):
+    #         rank = []
+    #         for j in range(0, min(10, len(rankings[i][1]))):
+    #             rank.append(rankings[i][1][j])
 
-            logger.info("{}_ranking ({}): {}".format(self.prefix, rankings[i][0], " ".join(rank)))
+    #         logger.info("{}_ranking ({}): {}".format(self.prefix, rankings[i][0], " ".join(rank)))
 
     """
     Append a dict of scores to file. 
@@ -195,27 +191,35 @@ class Evaluate():
     def _log_scores(self, scores, tf_logger, epoch):
         for key in scores.keys():
             tf_logger.log_value('{}_{}'.format(self.prefix, key), scores[key], epoch)
+
+    def add_to_df(self, query_id, docs, scores):
+        df = pd.DataFrame(np.asarray([docs, scores]).T, columns=[query_id, str(query_id) + "_s"])
+        if self.ranking_df is None:
+            self.ranking_df = df
+        else:
+            self.ranking_df = pd.concat([self.ranking_df, df], axis=1)
+
         
-    def eval(self, model, tf_logger=None, epoch=None):
+    def eval(self, model, tf_logger=None, epoch=None, get_df=False):
         self.failed = 0 
         scores = {}
-        rankings = []
+        self.ranking_df = None
         for q_id in self.queries.keys():
-            eval_scores, ranking = self._eval_query(q_id, model)
+            eval_scores = self._eval_query(q_id, model, get_df)
             self.add_scores(scores, eval_scores)
-            rankings.append(ranking)
 
         n = len(self.queries.keys()) - self.failed
         scores = self.avg_scores(scores, n)
 
         self.print_scores(scores)
-        self.print_ranking_summary(rankings)
+        # self.print_ranking_summary(rankings)
         if tf_logger is not None:
             self._log_scores(scores, tf_logger, epoch)
 
+        if get_df:
+            return scores, self.ranking_df
+
         return scores
-
-
 
     # TODO REWRITE YOURSELF
     def dcg_at_k(self, r, k, method=0):

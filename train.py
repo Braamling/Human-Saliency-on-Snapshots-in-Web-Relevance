@@ -2,11 +2,13 @@ import torch
 from torch.autograd import Variable
 import torch.nn as nn
 from torch.optim import lr_scheduler
+import pandas as pd
 import torch.optim as optim
 import numpy as np
 import argparse
 from models.models import LTR_features, LTR_score, ViP_features
 from models.vgg16 import vgg16
+from models.resnet import resnet152
 
 from utils.saliencyLTRiterator import ClueWeb12Dataset
 from utils.evaluate import Evaluate
@@ -140,8 +142,12 @@ def prepare_model(use_scheduler=True):
     if FLAGS.model == "ViP":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(16, 10, FLAGS.batch_size))
     elif FLAGS.model == "vgg16":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, vgg16(pretrained=True, state_dict=None, output_size=500))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, vgg16(pretrained=True, state_dict=None, output_size=30))
         for param in model.feature_model.features.parameters():
+            param.requires_grad = False
+    elif FLAGS.model == "resnet152":
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=30))
+        for param in list(model.feature_model.parameters())[:-1]:
             param.requires_grad = False
     elif FLAGS.model == "features_only":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
@@ -177,11 +183,18 @@ def train():
                                         use_gpu, optimizer, scheduler, description, num_epochs=FLAGS.epochs)
 
         # Add and store the newly added scores.
-        vali_score = valiEval.eval(model)
+        vali_score, rank_df = valiEval.eval(model, get_df=True)
+        
+        # Store the results to an excel sheet.
+        # writer = pd.ExcelWriter("{}_{}_{}.xlsx".format(FLAGS.optimized_scores_path, description, vali_score[FLAGS.optimize_on]))
+        rank_df.to_pickle("{}_{}.pkl".format(FLAGS.optimized_scores_path, description))
+        # writer.save()
+
+        # Store the scores to list.
         test_scores = testEval.add_scores(test_scores, test_score)
         vali_scores = valiEval.add_scores(vali_scores, vali_score)
-        testEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, description, test_score)
-        valiEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, description, vali_score)
+        testEval.store_scores(FLAGS.optimized_scores_path + FLAGS.description, description, test_score)
+        valiEval.store_scores(FLAGS.optimized_scores_path + FLAGS.description, description, vali_score)
 
     # Average the test and validation scores.
     test_scores = testEval.avg_scores(test_scores, i)
@@ -190,8 +203,8 @@ def train():
     logger.info("Finished, printing best results now.")
     testEval.print_scores(test_scores)
     valiEval.print_scores(vali_scores)
-    testEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, FLAGS.description + "_final", test_scores)
-    valiEval.store_scores(FLAGS.optimized_scores_path + "_" + FLAGS.description, FLAGS.description + "_final", vali_scores)
+    testEval.store_scores(FLAGS.optimized_scores_path + FLAGS.description, FLAGS.description + "_final", test_scores)
+    valiEval.store_scores(FLAGS.optimized_scores_path + FLAGS.description, FLAGS.description + "_final", vali_scores)
 
 
 if __name__ == '__main__':
@@ -208,7 +221,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--batch_size', type=int, default=3,
                         help='The batch size used for training.')
-    parser.add_argument('--epochs', type=int, default=20,
+    parser.add_argument('--epochs', type=int, default=10,
                         help='The amount of epochs used to train.')
     parser.add_argument('--description', type=str, default='example_run',
                         help='The description of the run, for logging, output and weights naming.')
@@ -226,7 +239,7 @@ if __name__ == '__main__':
                         help='set whether the images are query specific (ie. using query specific highlights)')
     parser.add_argument('--log_dir', type=str, default='storage/logs/{}',
                         help='The location to place the tensorboard logs.')
-    parser.add_argument('--optimized_scores_path', type=str, default='storage/logs/optimized_scores',
+    parser.add_argument('--optimized_scores_path', type=str, default='storage/logs/',
                         help='The location to store the scores that were optimized.')
     parser.add_argument('--optimize_on', type=str, default='ndcg@5',
                         help='Give the measure to optimize the model on (ndcg@1, ndcg@5, ndcg@10, p@1, p@5, p@10, map).')
@@ -245,7 +258,7 @@ if __name__ == '__main__':
     FLAGS.query_specific = FLAGS.query_specific == "True"
     FLAGS.grayscale = FLAGS.grayscale == "True"
 
-    if FLAGS.model == "vgg16":
+    if FLAGS.model == "vgg16" or FLAGS.model == "resnet152" :
         FLAGS.size = (224,224)
     else:
         FLAGS.size = (64,64)

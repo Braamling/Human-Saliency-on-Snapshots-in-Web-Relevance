@@ -49,8 +49,13 @@ class ClueWeb12Dataset(Dataset):
                                                      transforms.Grayscale(),
                                                      transforms.ToTensor()])
         else:
+            # Normalize the input images for torchvision pretrained models:
+            # http://pytorch.org/docs/master/torchvision/models.html
+            normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                             std=[0.229, 0.224, 0.225])
             self.img_transform = transforms.Compose([transforms.Resize(size, interpolation=2), 
-                                                     transforms.ToTensor()])
+                                                     transforms.ToTensor(),
+                                                     normalize])
 
     def make_dataset(self, image_dir, features_file):
         featureStorage = FeatureStorage(features_file, image_dir, self.query_specific, self.only_with_image)
