@@ -34,7 +34,6 @@ def normalize_features(source_path, target_path):
     with open(target_path, "w") as f:
         for query in queries:
             features = np.asarray(queries[query][2])
-            # norm_features = np.log(features + 1e-7)
             norm_features = normalize(features, axis=0)
             for i, (doc_id, rel_score) in enumerate(zip(queries[query][0], queries[query][1])):
                 start = "{} qid:{}".format(rel_score, query)
