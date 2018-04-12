@@ -6,11 +6,12 @@ import pandas as pd
 import torch.optim as optim
 import numpy as np
 import argparse
-from models.models import LTR_features, LTR_score, ViP_features
+from models.scorer import LTR_score
 from models.vgg16 import vgg16
 from models.resnet import resnet152
+from models.vip import ViP_features
 
-from utils.saliencyLTRiterator import ClueWeb12Dataset
+from utils.cluewebDataset import ClueWeb12Dataset
 from utils.evaluate import Evaluate
 
 import tensorboard_logger as tfl
