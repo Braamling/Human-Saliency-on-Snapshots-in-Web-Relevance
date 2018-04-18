@@ -1,7 +1,28 @@
 
+\begin{table*}[t]
+\begin{center}
+\begin{tabular}{llllllll}
+\multicolumn{8}{c}{MQ2007 46 features vs 11 features}                                     \\
+           & P@1    & P@5    & P@10   & NDCG@1 & NDCG@5 & NDCG@10 & MAP    \\ \hline
+RankBoost - 46  & 0.453 & 0.404 & 0.371 & 0.391 & 0.403 & 0.430  & 0.457 \\
+RankBoost - 11 & 0.448 & 0.400 & 0.372 & 0.381  & 0.401  & 0.431   & 0.453 \\ \hline
+AdaRank - 46  & 0.420 & 0.402 & 0.360 & 0.367 & 0.403 & 0.424  & 0.449 \\
+AdaRank - 11  & 0.385 & 0.391 & 0.287 & 0.364  & 0.396  & 0.394   & 0.386 \\ \hline
+LambdaMart - 46 & 0.452 & 0.418 & 0.384 & 0.405 & 0.411 & 0.444  & 0.463 \\
+LambdaMart - 11 & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
+\hline
+\\
+\end{tabular}
+\\
+\captionof{table}{A benchmark comparison between the MQ2007 query set using all 46 LETOR features and the 11 LETOR features that are used in \datasetname.}\label{tab:11vs46}
+\end{center}
+\end{table*}
+
+
 
 \section{Introduction}
 Over the years, various research demonstrated the impact of web design on how user's find content on the web\cite{nielsen1999designing}\cite{nielsen2006f}\cite{pernice2017f}.  Although web design has become a 34 billion dollar industry in the US alone according to \citet{ibisdesign}, modern search engines are still focused on using content features (e.g., BM25, pagerank and clickthrough ratio) to determine web relevance. 
+
 % Although these design principles have been widely adopted in the field of web design, modern search engines are still focused on using content features for document relevance. 
 % According to \citet{ibisdesign}, the US web design industry alone had an annual revenue of approximately 34 billion dollar in 2017. 
 
@@ -10,31 +31,38 @@ However, the .GOV2 collection that is used for rendering webpages is limited by 
 
 In this work, we propose \datasetname, a dataset that allows the LTR research community to investigate various methods of using Visual Features in web relevance. \datasetname is a combination of queries \& content features from TREC Web 2013 \& 2014 and screenshots from ClueWeb12 documents. 
 
-Using \datasetname we showed that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset. Moreover, we demonstrated that by applying transfer learning from a pre-trained image recognition model we were able to make a significant improvement in retrieval performance. 
+Using \datasetname we showed that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset. Moreover, we demonstrate the following two methods that can be used to extract visual features from web screenshots: i) Transfer learning from a pre-trained image recognition model and \cite{2014decaf}  ii) by creating a synthetic saliency heatmap from the webpage screenshot \cite{shen2014webpage}\cite{shan2017two}, which were both able to make a significant improvement in retrieval performance. 
 
 The main contribution of this work are:
 \begin{enumerate}  
-\item A demonstration of the abilities of visual features in LTR.
 \item An out-of-the-box dataset for visual LTR research.
+\item A demonstration of the abilities of visual features in LTR.
 \item A baseline for future visual LTR research.
 \end{enumerate}
 
 Section \ref{sec:dataset} describes the collection process that was used to construct \datasetname. In section \ref{sec:experiments} we reproduce the work of \citet{fan2017learning}, demonstrate various feature extraction methods on \datasetname and set a baseline for future visual LTR research.  
-
-
-% \begin{itemize}[noitemsep]
-% \item Can we construct a dataset that can be used for experiments on visual features for Learning To Rank.
-% \end{itemize}
-
 \section{Related work}\label{sec:relatedwork}
-The work of \citet{nielsen1999designing} argues that when the design has not been well performed, a user searching for information is easily diverted to a competitors website. More recent work by \citet{nielsen2006f} and \citet{pernice2017f} use eye tracking equipment to demonstrate how different design patterns influences the search patterns of various users.
+The work of \citet{nielsen1999designing} argues that design is a determining factor in a user searching for information diverting to a competitors website. 
 
+Many user experience researchers have utilized eye tracking equipment that measures fixation points and a saliency heatmap of a user scanning a website. These results can be used to judge the quality of a webpage. For example, \citet{nielsen2006f} and \citet{pernice2017f} use this method to demonstrate how different design patterns influences the search patterns of various users and \citet{lindgaard2006attention} found that users have a stable judgment of website visual appeal within 50ms. 
+
+A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work like \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art salieny heatmaps. In this work, we use similar saliency heatmaps as an indicator of web page quality. 
+
+\citet{donahue2014decaf} show that the features learned on large-scale supervised data can be transferred to different tasks and labels. Transferring the feature extraction weights to a new task is a common solution to cope with relatively small datasets. Most query sets used for LTR are relatively small (~30,000 documents) compared to a dataset as ImageNet (1 million images), which indicates that transfer learning methods can be of use. 
+
+% Write something on how saliency can be used for evualuating webpages
+
+% TODO: describe more related work.
+% TODO: Show some work on visual features in web design
+% TODO: 
 
 \section{Dataset}\label{sec:dataset}
 In this section, we explain the collection process of the \datasetname dataset. Subsection \ref{sec:trecclue} contains more information about the underlying TREC WEB query sets and ClueWeb12 document collection. Details on how the content features are calculated using Apache Spark is discussed in subsection \ref{sec:contentfeature}. The collection of screenshot from the ClueWeb12 collection using the Wayback Machine and ClueWeb12 Online rendering service is explained in subsection \ref{sec:screenshotsec}. Finally, subsection \ref{sec:datasetsum} gives an overview of the structure in which the full collection is presented.
 
 \subsection{TREC Web \& ClueWeb12 }\label{sec:trecclue}
-\datasetname uses query sets TREC Web 2013~\cite{collins2013trec} \& 2014~\cite{collins2015trec}. Table \ref{tab:webstats} contains a detailed description of the amount of queries and relevance labels in both TREC web query sets.
+\datasetname uses the query sets TREC Web 2013~\cite{collins2013trec} \& 2014~\cite{collins2015trec} with graded relevance judgements. Table \ref{tab:webstats} has a breakdown of the total documents, queries and different relevance labels in both query sets. 
+
+The judgments in the query sets have been created using documents from the  ClueWeb12\footnote{\url{https://lemurproject.org/clueweb12/}} collection, which is an unfiltered and highly diverse collection of web pages scraped in the first half of 2012. The total collection contains well over 700 million documents that are crawled using the typical crawling settings of Heritrix archival crawler project\footnote{https://webarchive.jira.com/wiki/spaces/Heritrix/overview} from archive.org.  
 
 \begin{center}
   \begin{tabular}{ l | c | c | c }
@@ -53,39 +81,9 @@ In this section, we explain the collection process of the \datasetname dataset. 
   \captionof{table}{Document and relevance labels in TREC web 2013 \& 2014.} \label{tab:webstats} 
 \end{center}
 
-Both TREC web query sets have been judged on documents from the  ClueWeb12\footnote{\url{https://lemurproject.org/clueweb12/}} collection, which is an unfiltered and highly diverse collection of web pages scraped in the first half of 2012. The total collection contains well over 700 million documents that are crawled using the typical crawling settings of Heritrix archival crawler project\footnote{https://webarchive.jira.com/wiki/spaces/Heritrix/overview} from archive.org.  
-
-
-\begin{table*}[t]
-\begin{center}
-\begin{tabular}{llllllll}
-\multicolumn{8}{c}{MQ2007 46 features}                                     \\
-           & P@1    & P@5    & P@10   & NDCG@1 & NDCG@5 & NDCG@10 & MAP    \\ \hline
-RankBoost  & 0.453 & 0.404 & 0.371 & 0.391 & 0.403 & 0.430  & 0.457 \\
-AdaRank    & 0.420 & 0.402 & 0.360 & 0.367 & 0.403 & 0.424  & 0.449 \\
-LambdaMart & 0.452 & 0.418 & 0.384 & 0.405 & 0.411 & 0.444  & 0.463 \\
-\hline
-\\
-\end{tabular}
-\\
-\begin{tabular}{llllllll}
-\multicolumn{8}{c}{MQ2007 11 features}                                 \\
-           & P@1   & P@5   & P@10  & NDCG@1 & NDCG@5 & NDCG@10 & MAP   \\ \hline
-RankBoost  & 0.448 & 0.400 & 0.372 & 0.381  & 0.401  & 0.431   & 0.453 \\
-AdaRank    & 0.385 & 0.391 & 0.287 & 0.364  & 0.396  & 0.394   & 0.386 \\
-LambdaMart & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
-\hline
-\\
-\end{tabular}
-\captionof{table}{A benchmark comparison between the MQ2007 query set using all 46 LETOR features and the 11 LETOR features that are used in \datasetname.}\label{tab:11vs46}
-\end{center}
-\end{table*}
-
-
-
 % Insert WEB & CLUEWEB statistics.
 \subsection{Content features} \label{sec:contentfeature}
-The content features were collected in a full pass over the complete ClueWeb12 with Apache Spark using 116 Hadoop worker nodes with 3 executor cores and 21gb memory each. A HTML parser (jsoup\footnote{https://jsoup.org/}) was used to create separate items for the title and content from the raw HTML. Because the HTML structure of some of the larger documents could not be parsed by jsoup, all documents with more than one million terms were ignored. Using the Apache Spark 2.2.1 implementation of TF and IDF, a sparse vector was obtained for each item in each document.  On top of the IR features, PageRank scores from the ClueWeb12 \textit{Related Data} section\footnote{https://lemurproject.org/clueweb12/related-data.php} were added to each document as well. A full overview of all computed content features can be found in table \ref{tab:setdescription}. Finally, the following modifications based on the features from LETOR 3.0 \cite{qin2010letor} were made to stabilize training.
+In LTR, documents are ranked based on various content features. We computed these content features by doing a full pass over the complete ClueWeb12 using Apache Spark. This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21gb memory each. during this process an HTML parser (jsoup\footnote{https://jsoup.org/}) extracted the title and contentfrom the raw HTML. Because the HTML structure of some of the larger documents could not be parsed efficiently by jsoup, all documents with more than one million tokens were ignored. Using the Apache Spark 2.2.1 implementation of TF and IDF, a sparse vector was obtained for each item in each document.  On top of the IR features, PageRank scores from the ClueWeb12 \textit{Related Data} section\footnote{https://lemurproject.org/clueweb12/related-data.php} were added to each document as well. 11 features are computed in total, of which a full overview can be found in table \ref{tab:setdescription}. Finally, the following modifications based on the features from LETOR 3.0 \cite{qin2010letor} were made to stabilize training.
 \begin{enumerate}  
 % \item IDF is calculates as follows: 
 % $$IDF(q, D) = \sum_{t_i \in q} IDF(t_i, D) = \sum_{t_i \in t} \log \frac{|D| + 1}{DF(t_i) + 1}$$
@@ -134,10 +132,12 @@ RankBoost             & 0,460 & 0,432 & 0,420 & 0,184  & 0,212  & 0,233   & 0,42
 AdaRank               & 0,310 & 0,376 & 0,335 & 0,135  & 0,133  & 0,150   & 0,344 \\
 LambdaMart            & 0,370 & 0,480 & 0,477 & 0,145  & 0,238  & 0,247   & 0,438 \\ \hline
 ViP baseline          & 0,348 & 0,371 & 0,385 & 0,186  & 0,221  & 0,241   & 0,414 \\ \hline
-ViP masks             & 0,346 & 0,391 & 0,399 & 0,186  & 0,232  & 0,251   & 0,419 \\
+%ViP masks             & 0,346 & 0,391 & 0,399 & 0,186  & 0,232  & 0,251   & 0,419 \\
 ViP highlights        & 0,394 & 0,404 & 0,424 & 0,220  & 0,242  & 0,264   & 0,422 \\
 ViP snapshots         & 0,354 & 0,364 & 0,387 & 0,196  & 0,218  & 0,242   & 0,420 \\ \hline
-VGG-16 snapshots      & 0,514 & 0,488 & 0,484 & 0,292  & 0,307  & 0,324   & 0,442 \\ \hline
+VGG-16 snapshots      & 0,514 & 0,488 & 0,484 & 0,292  & 0,307  & 0,324   & 0,442 \\ 
+VGG-16 highlights     & 0,560 & 0,547 & 0,520 & 0,323  & 0,337  & 0,346   & 0,456 \\ \hline
+VGG-16 saliency       & 0.554 & 0.478 & 0.453 & 0.310  & 0.296  & 0.302   & 0.422 \\
 \end{tabular}
 \centering
 \captionof{table}{Results after 5 iterations on all 5 folds of \datasetname. ViP is the model by \citet{fan2017learning}, the baseline uses only content features and VGG-16 is the pre-trained feature extractor.}
@@ -147,7 +147,7 @@ VGG-16 snapshots      & 0,514 & 0,488 & 0,484 & 0,292  & 0,307  & 0,324   & 0,44
 
 
 \subsubsection{Collection}
-Although each entry in the ClueWeb12 collection contains the full HTML, many pages lack the required styling and images files in order to render the full page. Instead, we used the Wayback Machine\footnote{http://archive.org/web/} from Archive.org which offers various archived versions of webpages since 2005. Other than the archive in ClueWeb12, the Wayback Machine also offers styling and images for each webpage. Scraping was performed on the available entry on Wayback that is closest to the original scrape data. A screenshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework. 
+Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack the required styling and images files in order to render the full page. Instead, the pages are rendered using the Wayback Machine\footnote{http://archive.org/web/} from Archive.org which offers various archived versions of webpages with styling and images since 2005. Scraping was performed on the available entry on Wayback that is closest to the original scrape data. A screenshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework. 
 For reproduction of the work from \citet{fan2017learning}, two separate datasets of images are available containing screenshots with red highlighted query words and the query word locations as a black mask on a white background. 
 
 \begin{figure}[h]
@@ -166,16 +166,16 @@ For reproduction of the work from \citet{fan2017learning}, two separate datasets
 \end{figure}
 
 \subsubsection{Filtering}\label{sec:datasetsum}
-As the Wayback Machine does not contain an archived version of each document in the ClueWeb12 collection, some filtering was required in order to increase the overall quality of the screenshots. The following criteria were used in order to get a screenshot for each document.
+As the Wayback Machine does not contain an archived or working version of each document in the ClueWeb12 collection, a filtering process was introduced to produce the highest possible quality screenshots. Using the following criteria, a screenshot was selected for each document. 
 \begin{enumerate}    
 \item Each document was requested from the Wayback Machine separately. 
 \item Documents that were not on the Wayback Machine, timed out, threw a JavaScript error or resulted in a .PNG screenshot smaller than 100kb are rendered using the ClueWeb12 online rendering service.
-\item A manual selection was made between all documents that were in both sets: The Wayback version was used if this contained styling and the content was the same as the rendering service. Otherwise, the rendering service version was used.
+\item A manual selection was made between all documents that were in both sets: The Wayback version was used if it contained styling and the content was the same as the rendering service. Otherwise, the rendering service version was used.
 \end{enumerate}
 
 \begin{table}[h]
   \begin{tabular}{ l | c | c  }
-    score & Wayback Machine & ClueWeb12 \\
+    Score & Wayback Machine & ClueWeb12 \\
     \hline
     Total & 22825 & 6081 \\
     Nav grade (4) & 33 & 5 \\
@@ -189,10 +189,11 @@ As the Wayback Machine does not contain an archived version of each document in 
   \captionof{table}{The amount of documents with a screenshot from the Wayback Machine and from ClueWeb12, including their relevance score. (Note: This table is not up to date)} \label{tab:countsources} 
 \end{table}
 
+% TODO: This is not true, ~500 document were not rendered in both datasets and should be specified here.
 At the end of the process, each judged document has a corresponding screenshot from either the Wayback Machine or ClueWeb12 rendering service. Table \ref{tab:countsources} shows how the different sources are divided.
 
 \subsection{Final collection}
-All results mentioned in the previous subsections are delivered in three components. The TREC WEB queries and content features are combined into three LETOR formatted files with the raw, logged and query normalized values. The query normalized files is separated in 5 fold-partitions containing 20 queries each. Each of the 5 folds contains a training file from three fold-partitions with the other two fold-partitions being the test and training files. A separate file containing the quality scores can be used to filter which documents to use for training. Each screenshot is stored as a .PNG and can be identified by their corresponding ClueWeb12 name. 
+The process mentioned in the previous subsections result in a set of files containing the content features and a directory with screenshots. The content features are stored in LETOR formatted files containing the raw, logged and query normalized values. The query normalized values was randomly split per query into 5 equal fold-partitions. 5 folds containing 3 fold-partitions for training and the remaining 2 for validation and testing are also created. Each screenshot is stored as a .PNG which can be identified by its corresponding ClueWeb12 document id. A separate file contains an entry for each screenshot indicating whether the screenshots was created using the wayback machine or online rendering service. 
 
 \begin{figure*}[t]
 \centering
@@ -201,29 +202,37 @@ All results mentioned in the previous subsections are delivered in three compone
 \end{figure*}
 
 \section{Experimental Setup}\label{sec:experiments}
-In this section, we discuss the experiments performed on \datasetname. 
+In this section, we discuss the experiments performed on \datasetname. The experiments are set out to demonstrate of the abilities of visual features in LTR and set a baseline for future visual LTR research.
 %All PyTorch experiments were performed on a GTX 1080 Ti with 11gb of RAM. Preproccessing was performed on a Thinkpad X250 with an Intel i5-5300U CPU and 16gb of ram. 
 
 
 \subsection{Benchmarking content features}
-The quality and performance of the computed content features are benchmarked against the MQ2007 query set using content features from LETOR 4.0. The implementations of RankBoost, AdaRank and LambdaMart from RankLib\footnote{https://sourceforge.net/p/lemur/wiki/RankLib/} with their default settings were used for the experiments. Table \ref{tab:11vs46} shows the difference in performance between the MQ2007 LETOR 4.0 features, our WEB track features and MQ2007 using the same 11 features used for the WEB track. Each entry has been separately trained and optimized in 5 folds on the corresponding evaluation method. 
+In LTR research, the amount and type of content features used for training varies widely per dataset and study. To give a sense of performance of the 11 computed content features in this study, we compare a set of known LTR algorithms using the content features in LETOR 4.0 on the 2007 million query TREC set. This query set has a total of 46 content features containing all 11 features from table \ref{tab:setdescription}. The experiment run the RankLib\footnote{https://sourceforge.net/p/lemur/wiki/RankLib/} implementations of RankBoost, AdaRank and LambdaMart on both 46 and 11 content features using their default settings. Table \ref{tab:11vs46} shows the difference in performance for all algorithms. Each entry has been separately trained and optimized in 5 folds on the corresponding evaluation method. 
 
 \subsection{Visual feature models}
-In order to work with the visual features, we use a base structure by \citet{fan2017learning} where the model is split into a visual feature extraction and scoring component. The visual feature extraction component takes image $x_{img}$ as an input and outputs visual feature vector $x_{v}$. This feature vector concatenated with content feature vector $x_{c}$ is used as input to the scoring component. In our case the scoring component is a simple fully connected layer with a hidden size of $10$ with dropout of $.1$. The combined models are trained end-to-end using pairwise hinge loss with $l_2$ regularization. 
+Similarly as the work of \citet{fan2017learning}, we want to use a combination of visual and content features for training. This is achieved by separating the base model in to a visual feature extraction and scoring component. The visual feature extraction component takes image $x_{img}$ as an input and outputs visual feature vector $x_{v}$. This feature vector is concatenated with content feature vector $x_{c}$ and used as input to the scoring component. In our case the scoring component is a simple single fully connected layer with a hidden size of $10$ with dropout of $.1$. The combined models are trained end-to-end using pairwise hinge loss with $l_2$ regularization. 
 
 For the experiments, we used various feature extraction models and image inputs which are both described below.
 
 
 \subsubsection{ViP visual features}
-As a baseline, we implemented the visual feature extractor proposed by \citet{fan2017learning} in PyTorch. In this model, the input image is gray-scaled and segmented into $4x16$ slices which are processed separately through a shallow convolutional network. This output is then passed top to bottom through a LSTM which results in the final visual feature vector. The full dimensions can be found in figure \ref{fig:ViPfeat}.
+As a baseline, we implemented the visual feature extractor proposed by \citet{fan2017learning} in PyTorch. In this model, the input image $x_{img}$ is gray-scaled, normalized and segmented into $4x16$ slice, which are processed separately through a shallow convolutional network. This output is then passed top to bottom through a LSTM which results in a visual feature vector $x_{v}$. The full dimensions can be found in figure \ref{fig:ViPfeat}.
 
 \subsubsection{VGG-16 visual features}
-Because \datasetname has a relatively low amount of image to train on, we use an on ImageNet pretrained VGG-16 \cite{simonyan2014very} as visual feature extractor. The last fully connected layer is replaced by a layer with an output of size $30$, with weights initialized  During training, we update the weights in all fully connected layer and keep the convolutional layers fixed. Other than the ViP feature extractor, VGG-16 uses a $224x224$ image with three color channels as input. 
+Because \datasetname has a relatively low amount of screenshots, we use a ImageNet pretrained VGG-16 \cite{simonyan2014very} model as visual feature extractor. Because this convolutional filters are fairly generic for inputs and tasks, we can use these to create our visual features. During training we optimize the fully connected layer, of which the last one has been replaced by a reinitialized layer with an output of size $30$.  Other than the ViP feature extractor, VGG-16 uses a $224x224$ image with three color channels as input. 
 
-\subsubsection{Image inputs}
-In this work we use three types of image inputs during training. 
-% TODO: Write something amount how the three image input are constructed and relevant
+\subsubsection{Saliency heatmap input}
+Using our own implementation of \citet{shan2017two} we generated synthetic saliency heatmaps for each of the images in the \datasetname dataset. The resulting images have a dimension of $64x64$. The images are linearly scaled to $224x244$ and used as an input to the VGG-16 feature extraction component. 
 
 \section{Results}
+% Write something about statistical significance.
+% Write something about why highlights is better than snapshots.
+% Write how saliency yields different results.
+
+
+\section{Discussion}
+% Write something about the masks.
+% Write something about how different types of saliency extraction can improve the results.
+
 \section{Acknowledgements}
 The Spark experiments in this work were carried out on the Dutch national e-infrastructure with the support of SURF Cooperative. Thanks to the Amsterdam Robotics Lab for using their computational resources. Thanks to Jamie Callan and his team for providing access to the online services for ClueWeb12. 
