@@ -45,13 +45,13 @@ class Evaluate():
             eval_predictions[eval_predictions < 0] = 0
 
             scores = {}
-            scores["ndcg@1"] = self.ndcg_at_k(eval_predictions, 1)
-            scores["ndcg@5"] = self.ndcg_at_k(eval_predictions, 5)
-            scores["ndcg@10"] = self.ndcg_at_k(eval_predictions, 10)
-            scores["p@1"] = self.precision_at_k(eval_predictions, 1)
-            scores["p@5"] = self.precision_at_k(eval_predictions, 5)
-            scores["p@10"] = self.precision_at_k(eval_predictions, 10)
-            scores["map"] = self.average_precision(eval_predictions)
+            scores["ndcg@1"] = Evaluate.ndcg_at_k(eval_predictions, 1)
+            scores["ndcg@5"] = Evaluate.ndcg_at_k(eval_predictions, 5)
+            scores["ndcg@10"] = Evaluate.ndcg_at_k(eval_predictions, 10)
+            scores["p@1"] = Evaluate.precision_at_k(eval_predictions, 1)
+            scores["p@5"] = Evaluate.precision_at_k(eval_predictions, 5)
+            scores["p@10"] = Evaluate.precision_at_k(eval_predictions, 10)
+            scores["map"] = Evaluate.average_precision(eval_predictions)
 
             if get_df:
                 self.add_to_df(query_id, ranked_docs, predictions)
@@ -222,7 +222,8 @@ class Evaluate():
         return scores
 
     # TODO REWRITE YOURSELF
-    def dcg_at_k(self, r, k, method=0):
+    @staticmethod
+    def dcg_at_k(r, k, method=0):
         r = np.asfarray(r)[:k]
         if r.size:
             if method == 0:
@@ -234,13 +235,15 @@ class Evaluate():
         return 0.
 
     # TODO REWRITE YOURSELF
-    def ndcg_at_k(self, r, k, method=0):
-        dcg_max = self.dcg_at_k(sorted(r, reverse=True), k, method)
+    @staticmethod
+    def ndcg_at_k(r, k, method=0):
+        dcg_max = Evaluate.dcg_at_k(sorted(r, reverse=True), k, method)
         if not dcg_max:
             return 0.
-        return self.dcg_at_k(r, k, method) / dcg_max
+        return Evaluate.dcg_at_k(r, k, method) / dcg_max
 
-    def precision_at_k(self, r, k):
+    @staticmethod
+    def precision_at_k(r, k):
         """Score is precision @ k
         Relevance is binary (nonzero is relevant).
         >>> r = [0, 0, 1]
@@ -268,7 +271,8 @@ class Evaluate():
             raise ValueError('Relevance score length < k')
         return np.mean(r)
 
-    def average_precision(self, r):
+    @staticmethod
+    def average_precision(r):
         """Score is average precision (area under PR curve)
         Relevance is binary (nonzero is relevant).
         >>> r = [1, 1, 0, 1, 0, 1, 0, 0, 0, 1]
@@ -284,7 +288,7 @@ class Evaluate():
             Average precision
         """
         r = np.asarray(r) > 0
-        out = [self.precision_at_k(r, k + 1) for k in range(r.size) if r[k]]
+        out = [Evaluate.precision_at_k(r, k + 1) for k in range(r.size) if r[k]]
         if not out:
             return 0.
         return np.mean(out)

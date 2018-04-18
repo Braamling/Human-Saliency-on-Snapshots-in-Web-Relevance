@@ -128,15 +128,16 @@ Id & Description    \\ \hline
 \begin{tabular}{llllllll}
 \multicolumn{8}{c}{Clueweb12 11 features}                                    \\ 
                       & P@1   & P@5   & P@10  & NDCG@1 & NDCG@5 & NDCG@10 & MAP   \\ \hline
-RankBoost             & 0,460 & 0,432 & 0,420 & 0,184  & 0,212  & 0,233   & 0,426 \\
-AdaRank               & 0,310 & 0,376 & 0,335 & 0,135  & 0,133  & 0,150   & 0,344 \\
-LambdaMart            & 0,370 & 0,480 & 0,477 & 0,145  & 0,238  & 0,247   & 0,438 \\ \hline
-ViP baseline          & 0,348 & 0,371 & 0,385 & 0,186  & 0,221  & 0,241   & 0,414 \\ \hline
-%ViP masks             & 0,346 & 0,391 & 0,399 & 0,186  & 0,232  & 0,251   & 0,419 \\
-ViP highlights        & 0,394 & 0,404 & 0,424 & 0,220  & 0,242  & 0,264   & 0,422 \\
-ViP snapshots         & 0,354 & 0,364 & 0,387 & 0,196  & 0,218  & 0,242   & 0,420 \\ \hline
-VGG-16 snapshots      & 0,514 & 0,488 & 0,484 & 0,292  & 0,307  & 0,324   & 0,442 \\ 
-VGG-16 highlights     & 0,560 & 0,547 & 0,520 & 0,323  & 0,337  & 0,346   & 0,456 \\ \hline
+BM25                  & 0.300 & 0.319 & 0.316 & 0.153  & 0.197  & 0.188   & 0.350 \\ \hline
+RankBoost             & 0.460 & 0.432 & 0.420 & 0.184  & 0.212  & 0.233   & 0.426 \\
+AdaRank               & 0.310 & 0.376 & 0.335 & 0.135  & 0.133  & 0.150   & 0.344 \\
+LambdaMart            & 0.370 & 0.480 & 0.477 & 0.145  & 0.238  & 0.247   & 0.438 \\ \hline
+ViP baseline          & 0.348 & 0.371 & 0.385 & 0.186  & 0.221  & 0.241   & 0.414 \\ \hline
+%ViP masks             & 0.346 & 0.391 & 0.399 & 0.186  & 0.232  & 0.251   & 0.419 \\
+ViP highlights        & 0.394 & 0.404 & 0.424 & 0.220  & 0.242  & 0.264   & 0.422 \\
+ViP snapshots         & 0.354 & 0.364 & 0.387 & 0.196  & 0.218  & 0.242   & 0.420 \\ \hline
+VGG-16 snapshots      & 0.514 & 0.488 & 0.484 & 0.292  & 0.307  & 0.324   & 0.442 \\ 
+VGG-16 highlights     & 0.560 & 0.547 & 0.520 & 0.323  & 0.337  & 0.346   & 0.456 \\ \hline
 VGG-16 saliency       & 0.554 & 0.478 & 0.453 & 0.310  & 0.296  & 0.302   & 0.422 \\
 \end{tabular}
 \centering
@@ -162,14 +163,14 @@ For reproduction of the work from \citet{fan2017learning}, two separate datasets
 \subfloat{\includegraphics[width = 1in]{images/3-mask.png}} &
 \subfloat{\includegraphics[width = 1in]{images/3-highlights.png}}\\
 \end{tabular}
-\caption{Examples of the vanilla screenshot, mask and red highlighted screenshot from left to right respectively}
+\caption{Examples of the vanilla screenshot, mask and red highlighted screenshot from left to right respectively}\label{fig:exampleshots}
 \end{figure}
 
 \subsubsection{Filtering}\label{sec:datasetsum}
 As the Wayback Machine does not contain an archived or working version of each document in the ClueWeb12 collection, a filtering process was introduced to produce the highest possible quality screenshots. Using the following criteria, a screenshot was selected for each document. 
 \begin{enumerate}    
 \item Each document was requested from the Wayback Machine separately. 
-\item Documents that were not on the Wayback Machine, timed out, threw a JavaScript error or resulted in a .PNG screenshot smaller than 100kb are rendered using the ClueWeb12 online rendering service.
+\item Documents that were not on the Wayback Machine, timed out, threw a JavaScript error or resulted in a .PNG screenshot smaller than 100kb are marked as broken. These documents are rendered again with the ClueWeb12 html using the online rendering service provided by the creators of ClueWeb12.
 \item A manual selection was made between all documents that were in both sets: The Wayback version was used if it contained styling and the content was the same as the rendering service. Otherwise, the rendering service version was used.
 \end{enumerate}
 
@@ -222,7 +223,7 @@ As a baseline, we implemented the visual feature extractor proposed by \citet{fa
 Because \datasetname has a relatively low amount of screenshots, we use a ImageNet pretrained VGG-16 \cite{simonyan2014very} model as visual feature extractor. Because this convolutional filters are fairly generic for inputs and tasks, we can use these to create our visual features. During training we optimize the fully connected layer, of which the last one has been replaced by a reinitialized layer with an output of size $30$.  Other than the ViP feature extractor, VGG-16 uses a $224x224$ image with three color channels as input. 
 
 \subsubsection{Saliency heatmap input}
-Using our own implementation of \citet{shan2017two} we generated synthetic saliency heatmaps for each of the images in the \datasetname dataset. The resulting images have a dimension of $64x64$. The images are linearly scaled to $224x244$ and used as an input to the VGG-16 feature extraction component. 
+Using our own implementation of \citet{shan2017two} we generated synthetic saliency heatmaps for each of the images in the \datasetname dataset. The resulting images have a dimension of $64x64$. The images are linearly scaled to $224x244$ and used as an input to the VGG-16 feature extraction component. Figure \ref{fig:exampleshots} shows a set of example saliency heatmaps with it corresponding screenshot. 
 
 \section{Results}
 % Write something about statistical significance.

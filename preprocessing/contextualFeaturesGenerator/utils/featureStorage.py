@@ -4,11 +4,11 @@ import os.path
 from .LETORIterator import LETORIterator
 
 """
-This class acts as an interface for the hdf5 storage containing all 
+This class acts as an interface for the LETOR storage containing all 
 query-document pairs with their contextual features and judgment scores.
 
 The interface can both be used to add new queries, documents and features, 
-but also to iterate over the content of a hdf5 file.
+but also to iterate over the content of a LETOR file.
 """
 class FeatureStorage():
     def __init__(self, path, image_dir, query_specific=False, only_with_image=False):
@@ -107,6 +107,23 @@ class FeatureStorage():
                 for doc_id in self.queries[query_id][scores].keys():
                     if self._get_image(query_id, doc_id):
                         self.scores[query_id].append((doc_id, int(scores)))
+
+            self.scores[query_id] = sorted(self.scores[query_id], key=lambda x: -x[1])
+
+        return self.scores[query_id]
+
+    """
+    Get a sorted list of tuples (scores, feature_val) for a specific query
+    """
+    def get_ranked_scores(self, query_id, feature_id):
+        if query_id not in self.scores:
+            self.scores[query_id] = []
+
+            for rel_score in self.queries[query_id].keys():
+                for doc_id in self.queries[query_id][rel_score].keys():
+                    if self._get_image(query_id, doc_id):
+                        rank_score = float(self.queries[query_id][rel_score][doc_id][feature_id])
+                        self.scores[query_id].append((rel_score, rank_score))
 
             self.scores[query_id] = sorted(self.scores[query_id], key=lambda x: -x[1])
 
