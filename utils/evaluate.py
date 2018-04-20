@@ -40,18 +40,7 @@ class Evaluate():
         try:
             predictions, ranked_docs = self._get_scores(query_id, model)
 
-            # Make sure all negative values are put to 0.
-            eval_predictions = np.asarray(predictions)
-            eval_predictions[eval_predictions < 0] = 0
-
-            scores = {}
-            scores["ndcg@1"] = Evaluate.ndcg_at_k(eval_predictions, 1)
-            scores["ndcg@5"] = Evaluate.ndcg_at_k(eval_predictions, 5)
-            scores["ndcg@10"] = Evaluate.ndcg_at_k(eval_predictions, 10)
-            scores["p@1"] = Evaluate.precision_at_k(eval_predictions, 1)
-            scores["p@5"] = Evaluate.precision_at_k(eval_predictions, 5)
-            scores["p@10"] = Evaluate.precision_at_k(eval_predictions, 10)
-            scores["map"] = Evaluate.average_precision(eval_predictions)
+            scores = Evaluate.compute_scores(predictions)
 
             if get_df:
                 self.add_to_df(query_id, ranked_docs, predictions)
@@ -221,7 +210,23 @@ class Evaluate():
 
         return scores
 
-    # TODO REWRITE YOURSELF
+    @staticmethod
+    def compute_scores(predictions):
+        # Make sure all negative values are put to 0.
+        eval_predictions = np.asarray(predictions)
+        eval_predictions[eval_predictions < 0] = 0
+
+        scores = {}
+        scores["ndcg@1"] = Evaluate.ndcg_at_k(eval_predictions, 1)
+        scores["ndcg@5"] = Evaluate.ndcg_at_k(eval_predictions, 5)
+        scores["ndcg@10"] = Evaluate.ndcg_at_k(eval_predictions, 10)
+        scores["p@1"] = Evaluate.precision_at_k(eval_predictions, 1)
+        scores["p@5"] = Evaluate.precision_at_k(eval_predictions, 5)
+        scores["p@10"] = Evaluate.precision_at_k(eval_predictions, 10)
+        scores["map"] = Evaluate.average_precision(eval_predictions)
+
+        return scores
+
     @staticmethod
     def dcg_at_k(r, k, method=0):
         r = np.asfarray(r)[:k]
@@ -234,7 +239,6 @@ class Evaluate():
                 raise ValueError('method must be 0 or 1.')
         return 0.
 
-    # TODO REWRITE YOURSELF
     @staticmethod
     def ndcg_at_k(r, k, method=0):
         dcg_max = Evaluate.dcg_at_k(sorted(r, reverse=True), k, method)
