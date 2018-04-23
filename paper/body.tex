@@ -21,17 +21,14 @@ LambdaMart - 11 & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
 
 
 \section{Introduction}
-Over the years, various research demonstrated the impact of web design on how user's find content on the web\cite{nielsen1999designing}\cite{nielsen2006f}\cite{pernice2017f}.  Although web design has become a 34 billion dollar industry in the US alone according to \citet{ibisdesign}, modern search engines are still focused on using content features (e.g., BM25, pagerank and clickthrough ratio) to determine web relevance. 
+Over the years, various research demonstrated the impact of web design on how user's find content on the web\cite{nielsen1999designing}\cite{nielsen2006f}\cite{pernice2017f}\cite{wang2014eye}.  Although web design has become a 34 billion dollar industry in the US alone according to \citet{ibisdesign}, modern search engines are still focused on using content features (e.g., BM25, pagerank and clickthrough ratio) to determine web relevance. 
 
-% Although these design principles have been widely adopted in the field of web design, modern search engines are still focused on using content features for document relevance. 
-% According to \citet{ibisdesign}, the US web design industry alone had an annual revenue of approximately 34 billion dollar in 2017. 
+Recently \citet{fan2017learning} introduced ViP, a learning to rank (LTR) model that uses a combination of both visual and content features. Visual features are represented as screenshots created by rendering the available web pages. The authors demonstrate that adding these screenshots significantly improve LTR performance. The indication that the visual representation of a web page can have a significant improvement on web search, leverages a new field in LTR research. 
+However, the .GOV2 collection that is used for rendering web pages is limited by the fact that: i) it solely contains pages within the .gov domain from 2002, ii) images are not included, iii) styling is relatively simple. Considering these limitations, further visual LTR research should use a more diverse out-of-the-box retrieval dataset with judgments, content features and screenshots. 
 
-Recently \citet{fan2017learning} introduced ViP, a learning to rank (LTR) model that uses a combination of both visual and content features. Visual features are represented as screenshots created by rendering the available webpages. The authors demonstrate that adding these screenshots significantly improve LTR performance. The indication that the visual representation of a web page can have a significant improvement on web search, leverages a new field in LTR research. 
-However, the .GOV2 collection that is used for rendering webpages is limited by the fact that: i) it solely contains pages within the .gov domain from 2002, ii) images are not included, iii) styling is relatively simple. Considering these limitations, further visual LTR research should use a more diverse out-of-the-box retrieval dataset with judgments, content features and screenshots. 
+In this work, we propose \datasetname, a dataset that allows the LTR research community to investigate various methods of using visual features in web relevance. \datasetname is a combination of queries \& content features from TREC Web 2013 \& 2014 and screenshots from ClueWeb12 documents. 
 
-In this work, we propose \datasetname, a dataset that allows the LTR research community to investigate various methods of using Visual Features in web relevance. \datasetname is a combination of queries \& content features from TREC Web 2013 \& 2014 and screenshots from ClueWeb12 documents. 
-
-Using \datasetname we showed that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset. Moreover, we demonstrate the following two methods that can be used to extract visual features from web screenshots: i) Transfer learning from a pre-trained image recognition model and \cite{2014decaf}  ii) by creating a synthetic saliency heatmap from the webpage screenshot \cite{shen2014webpage}\cite{shan2017two}, which were both able to make a significant improvement in retrieval performance. 
+Using \datasetname we showed that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset. Moreover, we demonstrate the following two methods that can be used to extract visual features from web screenshots: i) Transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf}\cite{simonyan2014very} and ii) by creating a synthetic saliency heatmap from the web page screenshot~\cite{shen2014webpage}\cite{shan2017two}, which were both able to make a significant improvement in retrieval performance. 
 
 The main contribution of this work are:
 \begin{enumerate}  
@@ -44,13 +41,15 @@ Section \ref{sec:dataset} describes the collection process that was used to cons
 \section{Related work}\label{sec:relatedwork}
 The work of \citet{nielsen1999designing} argues that design is a determining factor in a user searching for information diverting to a competitors website. 
 
-Many user experience researchers have utilized eye tracking equipment that measures fixation points and a saliency heatmap of a user scanning a website. These results can be used to judge the quality of a webpage. For example, \citet{nielsen2006f} and \citet{pernice2017f} use this method to demonstrate how different design patterns influences the search patterns of various users and \citet{lindgaard2006attention} found that users have a stable judgment of website visual appeal within 50ms. 
+Many user experience researchers have utilized eye tracking equipment that measures fixation points to create a saliency heatmap of a user scanning a website. These results can be used to judge the quality of a web page. For example, \citet{nielsen2006f} and \citet{pernice2017f} use this method to demonstrate how different design patterns influences the search patterns of various users. Both studies that placing the content in certain shapes (i.e. an F-shape) increase the usability of a web page. Another eye tracking example is the work of \citet{wang2014eye}, which has a focus on web page complexity. The authors show that more complex websites have larger fixations areas, which increases the likelihood that the attention of a user is distracted. Finally, \citet{lindgaard2006attention} showed that users are able to construct a stable judgment of a web page's visual appeal within 50ms. 
 
-A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work like \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art salieny heatmaps. In this work, we use similar saliency heatmaps as an indicator of web page quality. 
+A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work like \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art salieny heatmaps. 
 
-\citet{donahue2014decaf} show that the features learned on large-scale supervised data can be transferred to different tasks and labels. Transferring the feature extraction weights to a new task is a common solution to cope with relatively small datasets. Most query sets used for LTR are relatively small (~30,000 documents) compared to a dataset as ImageNet (1 million images), which indicates that transfer learning methods can be of use. 
+The work of \citet{fan2017learning} shows that by using a screenshot of a web page as additional features for LTR can significantly increase the retrieval performance. The authors feed the screenshots through a neural network that attempts to model the previously mentioned F-shape and then concatenated with more traditional content features. The model (ViP) is then trained end-to-end by using a pairwise loss. In this work, we create a more generic approach by using synthetic generated saliency heatmaps. These heatmaps are used as an input to a convolution network in order to create features that can be used as an indicator of a web page communication effectiveness and usability. 
 
-% Write something on how saliency can be used for evualuating webpages
+\citet{donahue2014decaf} show that the features learned on large-scale supervised data can be transferred to different tasks and labels. Transferring the feature extraction weights to a new task is a common solution to cope with relatively small datasets. Most query sets used for LTR are relatively small (~30,000 documents) compared to a dataset as ImageNet (1 million images), which indicates that transfer learning methods can be of use. In this work we use a pretrained image classifier and fine tune it's final layers on a LTR tasks. 
+
+% Write something on how saliency can be used for evualuating web pages
 
 % TODO: describe more related work.
 % TODO: Show some work on visual features in web design
@@ -129,13 +128,13 @@ Id & Description    \\ \hline
 \multicolumn{8}{c}{Clueweb12 11 features}                                    \\ 
                       & P@1   & P@5   & P@10  & NDCG@1 & NDCG@5 & NDCG@10 & MAP   \\ \hline
 BM25                  & 0.300 & 0.319 & 0.316 & 0.153  & 0.197  & 0.188   & 0.350 \\ \hline
-RankBoost             & 0.460 & 0.432 & 0.420 & 0.184  & 0.212  & 0.233   & 0.426 \\
-AdaRank               & 0.310 & 0.376 & 0.335 & 0.135  & 0.133  & 0.150   & 0.344 \\
-LambdaMart            & 0.370 & 0.480 & 0.477 & 0.145  & 0.238  & 0.247   & 0.438 \\ \hline
-ViP baseline          & 0.348 & 0.371 & 0.385 & 0.186  & 0.221  & 0.241   & 0.414 \\ \hline
+RankBoost             & 0.420 & 0.432 & 0.441 & 0.244  & 0.270  & 0.285   & 0.423 \\
+AdaRank               & 0.260 & 0.362 & 0.377 & 0.132  & 0.203  & 0.228   & 0.383 \\
+LambdaMart            & 0.440 & 0.442 & 0.467 & 0.243  & 0.268  & 0.294   & 0.434 \\ \hline
+ViP baseline          & 0.338 & 0.359 & 0.370 & 0.189  & 0.215  & 0.233   & 0.415 \\ \hline
 %ViP masks             & 0.346 & 0.391 & 0.399 & 0.186  & 0.232  & 0.251   & 0.419 \\
-ViP highlights        & 0.394 & 0.404 & 0.424 & 0.220  & 0.242  & 0.264   & 0.422 \\
-ViP snapshots         & 0.354 & 0.364 & 0.387 & 0.196  & 0.218  & 0.242   & 0.420 \\ \hline
+ViP highlights        & 0.418 & 0.409 & 0.416 & 0.239  & 0.253  & 0.269   & 0.422 \\
+ViP snapshots         & 0.392 & 0.389 & 0.398 & 0.217  & 0.238  & 0.254   & 0.421 \\ \hline
 VGG-16 snapshots      & 0.514 & 0.488 & 0.484 & 0.292  & 0.307  & 0.324   & 0.442 \\ 
 VGG-16 highlights     & 0.560 & 0.547 & 0.520 & 0.323  & 0.337  & 0.346   & 0.456 \\ \hline
 VGG-16 saliency       & 0.554 & 0.478 & 0.453 & 0.310  & 0.296  & 0.302   & 0.422 \\
@@ -148,7 +147,7 @@ VGG-16 saliency       & 0.554 & 0.478 & 0.453 & 0.310  & 0.296  & 0.302   & 0.42
 
 
 \subsubsection{Collection}
-Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack the required styling and images files in order to render the full page. Instead, the pages are rendered using the Wayback Machine\footnote{http://archive.org/web/} from Archive.org which offers various archived versions of webpages with styling and images since 2005. Scraping was performed on the available entry on Wayback that is closest to the original scrape data. A screenshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework. 
+Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack the required styling and images files in order to render the full page. Instead, the pages are rendered using the Wayback Machine\footnote{http://archive.org/web/} from Archive.org which offers various archived versions of web pages with styling and images since 2005. Scraping was performed on the available entry on Wayback that is closest to the original scrape data. A screenshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework. 
 For reproduction of the work from \citet{fan2017learning}, two separate datasets of images are available containing screenshots with red highlighted query words and the query word locations as a black mask on a white background. 
 
 \begin{figure}[h]
@@ -163,7 +162,7 @@ For reproduction of the work from \citet{fan2017learning}, two separate datasets
 \subfloat{\includegraphics[width = 1in]{images/3-highlights.png}} &
 \subfloat{\includegraphics[width = 1in]{images/3-saliency.png}} \\
 \end{tabular}
-\caption{Examples of the vanilla screenshot, saliency heatmap and red highlighted screenshot from left to right respectively}\label{fig:exampleshots}
+\caption{Examples of the vanilla screenshot, red highlighted screenshot and saliency heatmap from left to right respectively}\label{fig:exampleshots}
 \end{figure}
 
 \subsubsection{Filtering}\label{sec:datasetsum}
