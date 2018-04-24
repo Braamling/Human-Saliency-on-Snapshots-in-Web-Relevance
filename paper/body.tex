@@ -1,4 +1,4 @@
-% !TEX root = main.tex
+% !TEX root = cikm2018-visual-ltr.tex
 
 \begin{table*}[t]
 \begin{center}
@@ -20,25 +20,6 @@ LambdaMart - 11 & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
 \end{table*}
 
 
-
-\section{Introduction}
-Over the years, various research demonstrated the impact of web design on how users find content on the web~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.  Although web design has become a 34 billion dollar industry in the US alone according to \citet{ibisdesign}, modern search engines are still focused on using content features (e.g., BM25, PageRank, etc.) to determine web relevance \todo{refs?}. 
-
-Recently \citet{fan2017learning} introduced ViP, a \ac{LTR} model that uses a combination of both visual and content features. Visual features are represented as screenshots created by rendering the available web pages. The authors demonstrate that adding these screenshots significantly improve \ac{LTR} performance. The indication that the visual representation of a web page can have a significant improvement on web search, leverages a new field in \ac{LTR} research. 
-However, the rendered web pages used in the study come from the .GOV2 collection. This collection is limited in the sense that: i) it solely contains pages within the .gov domain in 2002, ii) images are not included and iii) styling is relatively simple. Considering these limitations, further visual \ac{LTR} research needs a dataset created from a more diverse document collections, which can be used out-of-the-box together with prepared judgments, content features and screenshots. 
-
-In this work, we propose \datasetname, a dataset that allows the \ac{LTR} research community to investigate various methods of using visual features in web relevance. \datasetname is a combination of queries and content features from TREC Web 2013 \& 2014 together with screenshots from ClueWeb12 documents. 
-
-Using \datasetname we showed that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset. Moreover, we demonstrate the following two methods that can be used to extract visual features from web screenshots: i) using transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf}\cite{simonyan2014very} and ii) by creating a synthetic saliency heatmap from the web page screenshot~\cite{shen2014webpage}\cite{shan2017two}, which were both able to make a significant improvement in retrieval performance. 
-
-The main contribution of this work are:
-\begin{enumerate}  
-\item An out-of-the-box dataset for visual \ac{LTR} research.
-\item A demonstration of the abilities of visual features in \ac{LTR}.
-\item A baseline for future visual \ac{LTR} research.
-\end{enumerate}
-
-Section \ref{sec:dataset} describes the collection process that was used to construct \datasetname. In section \ref{sec:experiments} we reproduce the work of \citet{fan2017learning}, demonstrate various feature extraction methods on \datasetname and set a baseline for future visual \ac{LTR} research.  
 \section{Related work}\label{sec:relatedwork}
 The work of \citet{nielsen1999designing} argues that design is a determining factor in a user diverting to a competitors website while searching for information.
 
