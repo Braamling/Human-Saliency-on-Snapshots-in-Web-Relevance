@@ -1,5 +1,5 @@
 %%%% Proceedings format for most of ACM conferences (with the exceptions listed below) and all ICPS volumes.
-\documentclass[sigconf]{acmart} % swap for making a draft
+\documentclass[sigconf,anonymous]{acmart} % swap for making a draft
 % \documentclass[sigconf, authordraft]{acmart}
 
 %%%% As of March 2017, [siggraph] is no longer used. Please use sigconf (above) for SIGGRAPH conferences.
@@ -15,10 +15,11 @@
 
 \usepackage{booktabs} % For formal tables
 \usepackage{subfig}
-\usepackage{enumitem}
+%\usepackage{enumitem}
 \usepackage{graphicx}
 
 \usepackage{acronym}
+\usepackage{paralist}
 
 % Copyright
 %\setcopyright{none}
@@ -32,7 +33,6 @@
 %\setcopyright{usgovmixed}
 %\setcopyright{cagov}
 %\setcopyright{cagovmixed}
-
 
 % DOI
 % \acmDOI{10.475/123_4}
@@ -51,7 +51,7 @@
 
 \begin{document}
 \newcommand{\datasetname}{\textit{PLACEHOLDER} }
-\title{Learning to Rank with Visual Features}
+\title{Learning to Rank with Visual Features \todo{think about the title to distinguish from visual LTR}}
 \subtitle{A Dataset and an Improved Method}
 % \titlenote{Produces the permission block, and
 %   copyright information}

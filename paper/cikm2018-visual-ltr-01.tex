@@ -1,4 +1,4 @@
-% !TEX root = cikm2018-visual-ltr
+% !TEX root = cikm2018-visual-ltr.tex
 
 \section{Introduction}
 Over the years, various research demonstrated the impact of web design on how users find content on the web~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.
@@ -11,19 +11,35 @@ The indication that the visual representation of a web page can have a significa
 
 However, there are a few limitations in \cite{fan2017learning}.
 First, the rendered web pages come from the the GOV2 collection~\todo{ref}.\footnote{\url{http://ir.dcs.gla.ac.uk/test_collections/gov2-summary.htm}}
-This collection is limited in the sense that: i) it solely contains pages within the .gov domain in 2002, ii) images are not included and iii) styling is relatively simple. Considering these limitations, further visual \ac{LTR} research needs a dataset created from a more diverse document collections, which can be used out-of-the-box together with prepared judgments, content features and screenshots. 
+This collection is limited in the sense that:
+\begin{inparaenum}[(i)]
+\item it solely contains web pages within the .gov domain crawled in 2002, i.e., somewhat outdated pages with a relatively narrow scope,
+\item original images are not included in the pages contained in the dataset, and
+\item the styling information is not available together with web pages.
+\end{inparaenum}
+We believe that in order to advance research on \ac{LTR} with visual features it is required to have a dataset with more diverse and up-to-date documents and richer visual information (e.g., styling, images, etc).
 
-Second limitation is \todo{a suboptimal / not state-of-the-art image processing method}
+Second limitation is \todo{a suboptimal / not state-of-the-art visual features extraction. Describe this in detail similarly to the above.}
 
-In this work, we propose \datasetname, a dataset that allows the \ac{LTR} research community to investigate various methods of using visual features in web relevance. \datasetname is a combination of queries and content features from TREC Web 2013 \& 2014 together with screenshots from ClueWeb12 documents. 
+In this work, we attempt to address the above limitations.
+First, we propose \datasetname, a dataset that \todo{describe key features of the proposed dataset by unfolding the next sentence into a few sentences}
+\datasetname is a combination of queries and content features from TREC Web 2013 \& 2014 together with screenshots from ClueWeb12 documents. 
+We believe that this dataset allows the \ac{LTR} research community to investigate various methods of using visual features for search and ranking.
+In particular, using \datasetname, we show that the results of the ViP model from \citet{fan2017learning} can be reproduced on a more diverse dataset.
 
-Using \datasetname we showed that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset. Moreover, we demonstrate the following two methods that can be used to extract visual features from web screenshots: i) using transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf}\cite{simonyan2014very} and ii) by creating a synthetic saliency heatmap from the web page screenshot~\cite{shen2014webpage}\cite{shan2017two}, which were both able to make a significant improvement in retrieval performance. 
+Second, \todo{something about the state-of-the-art in visual features}
+In particular, we use the following two state-of-the-art methods to extract visual features from snapshots:
+\begin{inparaenum}[(i)]
+\item transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf,simonyan2014very}, and
+\item generation of synthetic saliency heatmaps from the web page snapshots~\cite{shen2014webpage,shan2017two}.
+\end{inparaenum}
+We show that both methods are able to improve retrieval performance significantly.
 
 The main contribution of this work are:
 \begin{enumerate}  
-\item An out-of-the-box dataset for visual \ac{LTR} research.
-\item A demonstration of the abilities of visual features in \ac{LTR}.
-\item A baseline for future visual \ac{LTR} research.
+\item We propose and publish \datasetname, an out-of-the-box dataset for \ac{LTR} with visual features.
+\item We reproduce the ViP model from \cite{fan2017learning} on the newly proposed dataset.
+\item We improve ViP by \todo{XXX and YYY}.
 \end{enumerate}
 
-Section \ref{sec:dataset} describes the collection process that was used to construct \datasetname. In section \ref{sec:experiments} we reproduce the work of \citet{fan2017learning}, demonstrate various feature extraction methods on \datasetname and set a baseline for future visual \ac{LTR} research.  
+\todo{Revise this if we have space or drop it.} The rest of the paper is organized as follows. Section~\ref{sec:dataset} describes the collection process that was used to construct \datasetname. In Section~\ref{sec:experiments} we reproduce the work of \citet{fan2017learning} and demonstrate various feature extraction methods on \datasetname and set a baseline for future visual \ac{LTR} research.  
