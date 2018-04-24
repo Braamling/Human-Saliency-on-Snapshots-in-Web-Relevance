@@ -17,13 +17,23 @@ This collection is limited in the sense that:
 \item original images are not included in the pages contained in the dataset, and
 \item the styling information is not available together with web pages.
 \end{inparaenum}
-Considering these limitations, further visual \ac{LTR} research needs a dataset created from a more diverse document collections, which can be used out-of-the-box together with prepared judgments, content features and screenshots. 
+We believe that in order to advance research on \ac{LTR} with visual features it is required to have a dataset with more diverse and up-to-date documents and richer visual information (e.g., styling, images, etc).
 
-Second limitation is \todo{a suboptimal / not state-of-the-art image processing method}
+Second limitation is \todo{a suboptimal / not state-of-the-art visual features extraction. Describe this in detail similarly to the above.}
 
-In this work, we propose \datasetname, a dataset that allows the \ac{LTR} research community to investigate various methods of using visual features in web relevance. \datasetname is a combination of queries and content features from TREC Web 2013 \& 2014 together with screenshots from ClueWeb12 documents. 
+In this work, we attempt to address the above limitations.
+First, we propose \datasetname, a dataset that \todo{describe key features of the proposed dataset by unfolding the next sentence into a few sentences}
+\datasetname is a combination of queries and content features from TREC Web 2013 \& 2014 together with screenshots from ClueWeb12 documents. 
+We believe that this dataset allows the \ac{LTR} research community to investigate various methods of using visual features for search and ranking.
+In particular, using \datasetname, we show that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset.
 
-Using \datasetname we showed that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset. Moreover, we demonstrate the following two methods that can be used to extract visual features from web screenshots: i) using transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf}\cite{simonyan2014very} and ii) by creating a synthetic saliency heatmap from the web page screenshot~\cite{shen2014webpage}\cite{shan2017two}, which were both able to make a significant improvement in retrieval performance. 
+Second, \todo{something about the state-of-the-art in visual features}
+In particular, we use the following two state-of-the-art methods to extract visual features from snapshots:
+\begin{inparaenum}[(i)]
+\item transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf,simonyan2014very}, and
+\item generation of synthetic saliency heatmaps from the web page snapshots~\cite{shen2014webpage,shan2017two}.
+\end{inparaenum}
+We show that both methods are able to improve retrieval performance significantly.
 
 The main contribution of this work are:
 \begin{enumerate}  
