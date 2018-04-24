@@ -1,21 +1,11 @@
 from utils.featureStorage import FeatureStorage
-from utils.LETORIterator import LETORIterator
+from utils.LETORIterator import LETORIterator, to_letor
 import argparse
 import glob
 import os
 from sklearn.preprocessing import normalize
 import numpy as np
-
-def to_letor(df, path):
-    with open(path, "w") as f:
-        for row in df.iterrows():
-            start = "{} qid:{}".format(row[1]["relScore"], row[1]["queryID"])
-            score_df = row[1].drop(['queryID', 'docID', 'relScore'])
-            scores = " ".join([str(i) + ":" + '{0:.10f}'.format(x) for i,x in enumerate(score_df)])
-            end = "#docid = {}".format(row[1]["docID"])
-            letor = "{} {} {}\n".format(start, scores, end)
-            f.write(letor)
-        
+       
 
 def normalize_features(source_path, target_path):
     letor_feature_iterator = LETORIterator(source_path)

@@ -1,5 +1,15 @@
 import os.path
 
+def to_letor(df, path):
+    with open(path, "w") as f:
+        for row in df.iterrows():
+            start = "{} qid:{}".format(row[1]["relScore"], row[1]["queryID"])
+            score_df = row[1].drop(['queryID', 'docID', 'relScore'])
+            scores = " ".join([str(i) + ":" + '{0:.10f}'.format(x) for i,x in enumerate(score_df)])
+            end = "#docid = {}".format(row[1]["docID"])
+            letor = "{} {} {}\n".format(start, scores, end)
+            f.write(letor)
+
 class LETORIterator():
 	def __init__(self, path):
 		self.path = path
