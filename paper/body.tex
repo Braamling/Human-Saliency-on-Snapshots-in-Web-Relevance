@@ -1,3 +1,4 @@
+%TEX root = main.tex
 
 \begin{table*}[t]
 \begin{center}
@@ -21,7 +22,7 @@ LambdaMart - 11 & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
 
 
 \section{Introduction}
-Over the years, various research demonstrated the impact of web design on how users find content on the web\cite{nielsen1999designing}\cite{nielsen2006f}\cite{pernice2017f}\cite{wang2014eye}.  Although web design has become a 34 billion dollar industry in the US alone according to \citet{ibisdesign}, modern search engines are still focused on using content features (e.g., BM25, pagerank and clickthrough ratio) to determine web relevance. 
+Over the years, various research demonstrated the impact of web design on how users find content on the web~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.  Although web design has become a 34 billion dollar industry in the US alone according to \citet{ibisdesign}, modern search engines are still focused on using content features (e.g., BM25, pagerank and clickthrough ratio) to determine web relevance. 
 
 Recently \citet{fan2017learning} introduced ViP, a learning to rank (LTR) model that uses a combination of both visual and content features. Visual features are represented as screenshots created by rendering the available web pages. The authors demonstrate that adding these screenshots significantly improve LTR performance. The indication that the visual representation of a web page can have a significant improvement on web search, leverages a new field in LTR research. 
 However, the rendered web pages used in the study come from the .GOV2 collection. This collection is limited in the sense that: i) it solely contains pages within the .gov domain in 2002, ii) images are not included and iii) styling is relatively simple. Considering these limitations, further visual LTR research needs a dataset created from a more diverse document collections, which can be used out-of-the-box together with prepared judgments, content features and screenshots. 
