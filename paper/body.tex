@@ -19,51 +19,6 @@ LambdaMart - 11 & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
 \end{table*}
 
 
-
-%\section{Introduction}
-%Over the years, various research demonstrated the impact of web design on how users find content on the web\cite{nielsen1999designing}\cite{nielsen2006f}\cite{pernice2017f}\cite{wang2014eye}.  Although web design has become a 34 billion dollar industry in the US alone according to \citet{ibisdesign}, modern search engines are still focused on using content features (e.g., BM25, pagerank and clickthrough ratio1) to determine web relevance. 
-%
-%Recently \citet{fan2017learning} introduced ViP, a learning to rank (LTR) model that uses a combination of both visual and content features. Visual features are represented as screenshots created by rendering the available web pages. The authors demonstrate that adding these screenshots significantly improve LTR performance. The indication that the visual representation of a web page can have a significant improvement on web search, leverages a new field in LTR research. 
-%However, the rendered web pages used in the study come from the .GOV2 collection. This collection is limited in the sense that: i) it solely contains pages within the .gov domain in 2002, ii) images are not included and iii) styling is relatively simple. Considering these limitations, further visual LTR research needs a dataset created from a more diverse document collections, which can be used out-of-the-box together with prepared judgments, content features and screenshots. 
-%
-%In this work, we propose \datasetname, a dataset that allows the LTR research community to investigate various methods of using visual features in web relevance. \datasetname is a combination of queries and content features from TREC Web 2013 \& 2014 together with screenshots from ClueWeb12 documents. 
-%
-%Using \datasetname we showed that the results from \citet{fan2017learning} can be reproduced on a more diverse dataset. Moreover, we demonstrate the following two methods that can be used to extract visual features from web screenshots: i) using transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf}\cite{simonyan2014very} and ii) by creating a synthetic saliency heatmap from the web page screenshot~\cite{shen2014webpage}\cite{shan2017two}, which were both able to make a significant improvement in retrieval performance. 
-%
-%The main contribution of this work are:
-%\begin{enumerate}  
-%\item An out-of-the-box dataset for visual LTR research.
-%\item A demonstration of the abilities of visual features in LTR.
-%\item A baseline for future visual LTR research.
-%\end{enumerate}
-%
-%Section \ref{sec:dataset} describes the collection process that was used to construct \datasetname. In section \ref{sec:experiments} we reproduce the work of \citet{fan2017learning}, demonstrate various feature extraction methods on \datasetname and set a baseline for future visual LTR research.  
-
-
-\section{Related work}\label{sec:relatedwork}
-The work in the paper is related to various research on user experience design. In this section we will discuss research on:
-\begin{inparaenum}[(i)]
-\item measuring usability, 
-\item predicting saliency on web pages, and 
-\item visual features in \ac{LTR}.
-\end{inparaenum} 
-
-%The work of \citet{nielsen1999designing} argues that design is a determining factor in a user diverting to a competitors website while searching for information.
-
-Many user experience researchers have utilized eye tracking equipment that measures fixation points in order to create a saliency heatmap of a user scanning a website. These results can be used to judge the quality of a web page. For example, \citet{nielsen2006f} and \citet{pernice2017f} use this method to demonstrate how different design patterns influence the search patterns of various users. Both studies show that by organizing the content in certain shapes (i.e. an F-shape) increase the usability of a web page. Another eye tracking example is the work of \citet{wang2014eye}, which focuses on web page complexity. The authors show that more complex websites have larger fixations areas, which increases the likelihood that the attention of a user is distracted. Finally, \citet{lindgaard2006attention} show that users are able to construct a stable judgment of a web page's visual appeal within 50ms. 
-
-A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 
-
-The work of \citet{fan2017learning} shows that by using a screenshot of a web page to create additional features for LTR can significantly increase the retrieval performance. The authors feed the screenshots through a neural network that attempts to model the previously mentioned F-shape and then concatenates its output with more traditional content features. The model (ViP) is then trained end-to-end by using a pairwise loss. In this work, we create a more generic approach by using synthetic generated saliency heatmaps. These heatmaps are used as an input to a convolution network in order to create features that can be used as an indicator of a web page communication effectiveness and usability. 
-
-%\citet{donahue2014decaf} show that the features learned on large-scale supervised data can be transferred to different tasks and labels. Transferring the feature extraction weights to a new task is a common solution to cope with relatively small datasets. Most query sets used for LTR are relatively small (approximately 30,000 documents) compared to a dataset as ImageNet (1 million images), which indicates that transfer learning methods can be of use. In this work we use a pretrained image classifier and fine-tune its final layers on a LTR task. 
-
-% Write something on how saliency can be used for evualuating web pages
-
-% TODO: describe more related work.
-% TODO: Show some work on visual features in web design
-% TODO: 
-
 \section{Dataset}\label{sec:dataset}
 In this section, we describe the collection process of the \datasetname dataset. Section \ref{sec:trecclue} contains more information about the underlying TREC WEB query sets and ClueWeb12 document collection. Details on how the content features are calculated using Apache Spark are discussed in section \ref{sec:contentfeature}. The collection of screenshot from the ClueWeb12 collection using the Wayback Machine and ClueWeb12 Online rendering service is explained in section \ref{sec:screenshotsec}. Finally, section \ref{sec:datasetsum} gives an overview of the structure in which the full collection is presented.
 

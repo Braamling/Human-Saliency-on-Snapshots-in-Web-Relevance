@@ -1,0 +1,25 @@
+% !TEX root = cikm2018-visual-ltr.tex
+
+\section{Related work}\label{sec:relatedwork}
+The work in the paper is related to various research on user experience design. In this section we will discuss research on:
+\begin{inparaenum}[(i)]
+\item measuring usability, 
+\item predicting saliency on web pages, and 
+\item visual features in \ac{LTR}.
+\end{inparaenum} 
+
+%The work of \citet{nielsen1999designing} argues that design is a determining factor in a user diverting to a competitors website while searching for information.
+
+Many user experience researchers have utilized eye tracking equipment that measures fixation points in order to create a saliency heatmap of a user scanning a website. These results can be used to judge the quality of a web page. For example, \citet{nielsen2006f} and \citet{pernice2017f} use this method to demonstrate how different design patterns influence the search patterns of various users. Both studies show that by organizing the content in certain shapes (i.e. an F-shape) increase the usability of a web page. Another eye tracking example is the work of \citet{wang2014eye}, which focuses on web page complexity. The authors show that more complex websites have larger fixations areas, which increases the likelihood that the attention of a user is distracted. Finally, \citet{lindgaard2006attention} show that users are able to construct a stable judgment of a web page's visual appeal within 50ms. 
+
+A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 
+
+The work of \citet{fan2017learning} shows that by using a screenshot of a web page to create additional features for LTR can significantly increase the retrieval performance. The authors feed the screenshots through a neural network that attempts to model the previously mentioned F-shape and then concatenates its output with more traditional content features. The model (ViP) is then trained end-to-end by using a pairwise loss. In this work, we create a more generic approach by using synthetic generated saliency heatmaps. These heatmaps are used as an input to a convolution network in order to create features that can be used as an indicator of a web page communication effectiveness and usability. 
+
+%\citet{donahue2014decaf} show that the features learned on large-scale supervised data can be transferred to different tasks and labels. Transferring the feature extraction weights to a new task is a common solution to cope with relatively small datasets. Most query sets used for LTR are relatively small (approximately 30,000 documents) compared to a dataset as ImageNet (1 million images), which indicates that transfer learning methods can be of use. In this work we use a pretrained image classifier and fine-tune its final layers on a LTR task. 
+
+% Write something on how saliency can be used for evualuating web pages
+
+% TODO: describe more related work.
+% TODO: Show some work on visual features in web design
+% TODO: 
