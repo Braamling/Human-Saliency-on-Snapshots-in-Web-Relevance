@@ -14,16 +14,12 @@ In this section, we discuss research on
 %\item visual features in \ac{LTR}.
 %\end{inparaenum} 
 
-Using eye-tracking, \citet{nielsen2006f} and \citet{pernice2017f} demonstrate how different design patterns \todo{what do you mean by design patterns?} influence the search patterns \todo{similarly, what do you mean by search patterns?} of various users.
-Both studies show that organizing the content in certain shapes (i.e., an F-shape) increases the usability of a web page. \todo{How is usability related to search patters mentioned above?}
-\citet{wang2014eye} also use eye-tracking to show that more complex websites \todo{complex in what sense?} have larger fixations areas, which increases the likelihood that the attention of a user is distracted.
-Finally, \citet{lindgaard2006attention} show that users are able to construct a stable judgment of a web page's visual appeal within 50ms. \todo{Is this important at all? I would drop the last reference and maybe use one or two others.}
+Using eye-tracking, \citet{nielsen2006f} and \citet{pernice2017f} demonstrate that web page design and content placement influences the ability for users to find the information they are looking for. 
+Both studies show that by organizing the content in certain shapes (i.e., an F-shape), information can be  navigated more efficiently.
+\citet{wang2014eye} show that the size of the fixation areas measured using eye-tracking is larger on web pages with more content, which increases the likelihood that the attention of a user is distracted.
+%Finally, \citet{lindgaard2006attention} show that users are able to construct a stable judgment of a web page's visual appeal within 50ms. \todo{Is this important at all? I would drop the last reference and maybe use one or two others.}
 The above-mentioned studies show the importance of the visual appearance of a web page and its effect on how users perceive pages.
 This means that visual information has to be taken into account when ranking web pages given a user's query.
-
-\todo{How is this relevance to our work apart from the fact that we use the method from \cite{shan2017two}?
-I think this paragraph can be dropped.}
-A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 
 
 \citet{fan2017learning} are the first to approach the above problem.
 The authors use snapshots of web pages to extract visual features for LTR
@@ -31,8 +27,24 @@ and show that such visual features significantly improve retrieval performance.
 \citet{fan2017learning} feed snapshots through a neural network that attempts to model the previously mentioned F-shape.
 The output of this neural network is then concatenated with more traditional content features, such as, e.g., BM25 and PageRank.
 Finally, the proposed model (called ViP) is trained end-to-end by using a pairwise loss.
-\todo{Here, we have to briefly repeat what we have said in the introduction:
-there are two limitations in \cite{fan2017learning} (what limitations?), which we fix in this paper (how do we do that?).}
+%\todo{Here, we have to briefly repeat what we have said in the introduction:
+%there are two limitations in \cite{fan2017learning} (what limitations?), which we fix in this paper (how do we do that?).} 
+The work of \citet{fan2017learning} is limited by: 
+\begin{inparaenum}[(i)]
+\item the GOV2 dataset, which lacks visual diversity, and 
+\item not using state-of-the-art visual extraction methods.
+\end{inparaenum}
+We approach these problems by using a more diverse dataset based on the ClueWeb12 collection and improving the visual extraction methods by:
+\begin{inparaenum}[(i)]
+\item transfering pre-trained weights from a deep convolutional network by \citet{simonyan2014very}, and 
+\item using synthetic saliency heatmaps from \citet{shan2017two} as input images.
+\end{inparaenum}
+
+%\todo{How is this relevance to our work apart from the fact that we use the method from \cite{shan2017two}?
+%I think this paragraph can be dropped.}
+%A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 
+
+
 %In this work, we create a more generic approach by using synthetic generated saliency heatmaps.
 %These heatmaps are used as an input to a convolution network in order to create features that can be used as an indicator of a web page communication effectiveness and usability. 
 
