@@ -1,21 +1,24 @@
+% !TEX root = ./cikm2018-visual-ltr.tex
 
 \begin{table*}[t]
-\begin{center}
-\begin{tabular}{llllllll}
-\multicolumn{8}{c}{MQ2007 46 features vs 11 features}                                     \\
-           & P@1    & P@5    & P@10   & NDCG@1 & NDCG@5 & NDCG@10 & MAP    \\ \hline
+\caption{A benchmark comparison between the MQ2007 query set using all 46 LETOR features and the 11 LETOR features that are used in \datasetname.}
+\label{tab:11vs46}
+\centering
+\begin{tabular}{lccccccc}
+\toprule
+%& \multicolumn{7}{c}{MQ2007 46 features vs 11 features}                                     \\
+           & P@1    & P@5    & P@10   & NDCG@1 & NDCG@5 & NDCG@10 & MAP    \\ 
+\midrule
 RankBoost - 46  & 0.453 & 0.404 & 0.371 & 0.391 & 0.403 & 0.430  & 0.457 \\
-RankBoost - 11 & 0.448 & 0.400 & 0.372 & 0.381  & 0.401  & 0.431   & 0.453 \\ \hline
+RankBoost - 11 & 0.448 & 0.400 & 0.372 & 0.381  & 0.401  & 0.431   & 0.453 \\ 
+\midrule
 AdaRank - 46  & 0.420 & 0.402 & 0.360 & 0.367 & 0.403 & 0.424  & 0.449 \\
-AdaRank - 11  & 0.385 & 0.391 & 0.287 & 0.364  & 0.396  & 0.394   & 0.386 \\ \hline
+AdaRank - 11  & 0.385 & 0.391 & 0.287 & 0.364  & 0.396  & 0.394   & 0.386 \\ 
+\midrule
 LambdaMart - 46 & 0.452 & 0.418 & 0.384 & 0.405 & 0.411 & 0.444  & 0.463 \\
 LambdaMart - 11 & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
-\hline
-\\
+\bottomrule
 \end{tabular}
-\\
-\captionof{table}{A benchmark comparison between the MQ2007 query set using all 46 LETOR features and the 11 LETOR features that are used in \datasetname.}\label{tab:11vs46}
-\end{center}
 \end{table*}
 
 
@@ -25,28 +28,32 @@ In this section, we describe the collection process of the \datasetname dataset.
 \subsection{TREC Web \& ClueWeb12 }\label{sec:trecclue}
 \datasetname uses the query sets TREC Web 2013~\cite{collins2013trec} \& 2014~\cite{collins2015trec} with graded relevance judgements. Table \ref{tab:webstats} shows a breakdown of the total documents, queries and different relevance labels in both query sets. 
 
-The judgments in the query sets have been created using documents from the  ClueWeb12\footnote{\url{https://lemurproject.org/clueweb12/}} collection, which is an unfiltered and highly diverse collection of web pages scraped in the first half of 2012. The total collection contains well over 700 million documents that are crawled using the typical crawling settings of the Heritrix archival crawler project\footnote{https://webarchive.jira.com/wiki/spaces/Heritrix/overview} from archive.org.  
+The judgments in the query sets have been created using documents from the  ClueWeb12\footnote{\url{https://lemurproject.org/clueweb12/}} collection, which is an unfiltered and highly diverse collection of web pages scraped in the first half of 2012. The total collection contains well over 700 million documents that are crawled using the typical crawling settings of the Heritrix archival crawler project\footnote{\url{https://webarchive.jira.com/wiki/spaces/Heritrix/overview}} from archive.org.  
 
-\begin{center}
-  \begin{tabular}{ l | c | c | c }
+\begin{table}
+  \caption{Document and relevance labels in TREC web 2013 \& 2014.
+  \todo{What should add up to what?}} 
+  \label{tab:webstats} 
+  \centering
+  \begin{tabular}{ l  r r }
+  \toprule
     Count/Label & TREC WEB 2013 & TREC WEB 2014 \\
-    \hline
+    \midrule
     Total documents & 14,474 & 14,432 \\
     Queries & 50 & 50 \\
     Nav (4) & 7 & 33 \\
     Key (3) & 179 & 230 \\
-    Hrel (2) & 1154 & 2168 \\
-    Rel (1) & 3044 & 3788 \\
-    Non (0) & 10090 & 8210 \\
+    Hrel (2) & 1,154 & 2,168 \\
+    Rel (1) & 3,044 & 3,788 \\
+    Non (0) & 10,090 & 8,210 \\
     Junk (-2) & 234 & 554 \\
-    \hline
+    \bottomrule
   \end{tabular}
-  \captionof{table}{Document and relevance labels in TREC web 2013 \& 2014.} \label{tab:webstats} 
-\end{center}
+\end{table}
 
 % Insert WEB & CLUEWEB statistics.
 \subsection{Content features} \label{sec:contentfeature}
-In LTR, documents are ranked based on various calculated content features. We computed these content features by doing a full pass over the complete ClueWeb12 using Apache Spark. This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21gb memory each. During this process an HTML parser (\textit{jsoup}\footnote{https://jsoup.org/}) extracted the title and content from the raw HTML. Because the HTML structure in some larger documents could not be parsed efficiently by jsoup, all documents with more than one million tokens were ignored. Using the Apache Spark 2.2.1 implementation of TF and IDF, a sparse vector was obtained for each item in each document.  On top of the IR features, PageRank scores from the ClueWeb12 \textit{Related Data} section\footnote{https://lemurproject.org/clueweb12/related-data.php} were added to each document as well. In total, 11 features are computed of which a full overview can be found in Table \ref{tab:setdescription}. Finally, the following modifications based on the features from LETOR 3.0 \cite{qin2010letor} were made to stabilize training:
+In LTR, documents are ranked based on various calculated content features. We computed these content features by doing a full pass over the complete ClueWeb12 using Apache Spark. This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21gb memory each. During this process an HTML parser (\textit{jsoup}\footnote{\url{https://jsoup.org/}}) extracted the title and content from the raw HTML. Because the HTML structure in some larger documents could not be parsed efficiently by jsoup, all documents with more than one million tokens were ignored. Using the Apache Spark 2.2.1 implementation of TF and IDF, a sparse vector was obtained for each item in each document.  On top of the IR features, PageRank scores from the ClueWeb12 \textit{Related Data} section\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}} were added to each document as well. In total, 11 features are computed of which a full overview can be found in Table \ref{tab:setdescription}. Finally, the following modifications based on the features from LETOR 3.0 \cite{qin2010letor} were made to stabilize training:
 \begin{enumerate}  
 % \item IDF is calculates as follows: 
 % $$IDF(q, D) = \sum_{t_i \in q} IDF(t_i, D) = \sum_{t_i \in t} \log \frac{|D| + 1}{DF(t_i) + 1}$$
@@ -59,21 +66,24 @@ In LTR, documents are ranked based on various calculated content features. We co
 
 
  
-\begin{center}
-\centering
+\begin{table}[h]
+\caption{A description of all content features provided with \datasetname1.}  
+\label{tab:setdescription} 
 \label{my-label}
-\begin{tabular}{ll|ll}
-Id & Description & Id & Description    \\ \hline
-1  & Pagerank  & 7  & Title length     \\
-2  & Content length & 8  & Title TF  \\
-3  & Content TF  & 9  & Title IDF   \\
-4  & Content IDF & 10 & Title TFIDF   \\
-5  & Content TFIDF & 11 & Title BM25  \\
+\centering
+\begin{tabular}{lllrl}
+\toprule
+Id & Description &\qquad & Id & Description    \\ 
+\midrule
+1  & Pagerank  && 7  & Title length     \\
+2  & Content length && 8  & Title TF  \\
+3  & Content TF  && 9  & Title IDF   \\
+4  & Content IDF && 10 & Title TFIDF   \\
+5  & Content TFIDF && 11 & Title BM25  \\
 6  & Content BM25   \\
-   
+\bottomrule
 \end{tabular}
-\captionof{table}{A description of all content features provided with \datasetname1.}  \label{tab:setdescription} 
-\end{center}
+\end{table}
 
 
 
@@ -108,16 +118,26 @@ Id & Description & Id & Description    \\ \hline
 
 
 \begin{table*}[t]
-\begin{center}
+\caption{The table on the left shows a comparison between the different models. ViP is the model by \citet{fan2017learning}, VGG-16 is the transfer learning feature extractor. The table on the right compares the VGG-16 with highlighted images to the baseline measures. A $+$ indicates a significant improvements compared to the ViP baseline, a $-$ means a significant decrease in performance compared to the VGG-16 with highlights in the two tables from left to right respectively. 
+\todo{The two tables should probably be merged.}
+\todo{The use of * is more common than the use of +.}
+\todo{Don't forget to say which test was used.}}
+\label{tab:results}
+\centering
 \begin{tabular}{llllll}
+\toprule
 \multicolumn{6}{c}{Clueweb12 11 features}                                    \\ 
-                      & p@1    & p@10  & ndcg@1  & ndcg@10 & MAP   \\ \hline
-ViP baseline          & 0.338  & 0.370 & 0.189   & 0.233   & 0.415 \\ \hline
-ViP snapshots         & 0.392$^+$ & 0.398$^+$ & 0.217   & 0.254$^+$   & 0.421 \\ \hline
+\midrule
+                      & p@1    & p@10  & ndcg@1  & ndcg@10 & MAP   \\ 
+\midrule
+ViP baseline          & 0.338  & 0.370 & 0.189   & 0.233   & 0.415 \\
+ViP snapshots         & 0.392$^+$ & 0.398$^+$ & 0.217   & 0.254$^+$   & 0.421 \\ 
 ViP highlights        & 0.418$^+$  & 0.416$^+$ & 0.239$^+$   & 0.269$^+$   & 0.422 \\
+\midrule
 VGG snapshots      & 0.514$^+$    & 0.484$^+$ & 0.292$^+$   & 0.324$^+$   & 0.442$^+$ \\ 
-VGG highlights     & 0.560$^+$    & 0.520$^+$ & 0.323$^+$   & 0.346$^+$   & 0.456$^+$ \\ \hline
-VGG saliency       & 0.554$^+$    & 0.453$^+$ & 0.310$^+$   & 0.302$^+$   & 0.422 \\  \\
+VGG highlights     & 0.560$^+$    & 0.520$^+$ & 0.323$^+$   & 0.346$^+$   & 0.456$^+$ \\ 
+VGG saliency       & 0.554$^+$    & 0.453$^+$ & 0.310$^+$   & 0.302$^+$   & 0.422 \\  
+\bottomrule
 \end{tabular}
 \begin{tabular}{llllll}
 \multicolumn{6}{c}{Clueweb12 11 features}                                    \\ 
@@ -130,15 +150,12 @@ VGG highlights        & 0.560  & 0.520 & 0.323   & 0.346   & 0.456 \\
 \\
 \end{tabular}
 \centering
-\captionof{table}{The table on the left shows a comparison between the different models. ViP is the model by \citet{fan2017learning}, VGG-16 is the transfer learning feature extractor. The table on the right compares the VGG-16 with highlighted images to the baseline measures. A $+$ indicates a significant improvements compared to the ViP baseline, a $-$ means a significant decrease in performance compared to the VGG-16 with highlights in the two tables from left to right respectively. }
-\label{tab:results}
-\end{center}
 \end{table*}
 
 
 
 \subsubsection{Collection}
-Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack the required styling and images files in order to render the full page. Instead, the pages are rendered using the Wayback Machine\footnote{http://archive.org/web/} from Archive.org which offers various archived versions of web pages with styling and images since 2005. Scraping was performed on the available entry on the Wayback Machine that is closest to the original scrape data. A screenshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework. 
+Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack the required styling and images files in order to render the full page. Instead, the pages are rendered using the Wayback Machine\footnote{\url{http://archive.org/web/}} from Archive.org which offers various archived versions of web pages with styling and images since 2005. Scraping was performed on the available entry on the Wayback Machine that is closest to the original scrape data. A screenshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework. 
 For reproduction of the work from \citet{fan2017learning}, we created a separate datasets of the same images containing screenshots with red highlighted query words. 
 
 \begin{figure}[h]
@@ -153,7 +170,8 @@ For reproduction of the work from \citet{fan2017learning}, we created a separate
 \subfloat{\includegraphics[width = 1in]{images/3-highlights.png}} &
 \subfloat{\includegraphics[width = 1in]{images/3-saliency.png}} \\
 \end{tabular}
-\caption{Examples of the vanilla screenshot, red highlighted screenshot and saliency heatmap from left to right respectively}\label{fig:exampleshots}
+\caption{Three examples of the vanilla screenshot (left), red highlighted screenshot (center), and saliency heatmap (right).}
+\label{fig:exampleshots}
 \end{figure}
 
 \subsubsection{Filtering}\label{sec:datasetsum}
@@ -165,9 +183,13 @@ As the Wayback Machine does not contain an archived or working version of each d
 \end{enumerate}
 
 \begin{table}[h]
-  \begin{tabular}{ l | c | c  }
+\caption{The number of documents with a screenshot from the Wayback Machine and from ClueWeb12, including their relevance score. (Note: This table is not up to date)} 
+\label{tab:countsources} 
+\centering
+  \begin{tabular}{ l  c  c  }
+  \toprule
     Count/Label & Wayback Machine & ClueWeb12 \\
-    \hline
+    \midrule
     Total & 22825 & 6081 \\
     Nav grade (4) & 33 & 5 \\
     Key grade (3) & 336 & 34 \\
@@ -175,9 +197,8 @@ As the Wayback Machine does not contain an archived or working version of each d
     Rel grade (1) & 5589 & 502 \\
     Non grade (0) & 14119 & 5227 \\
     Junk grade (-2) & 539 & 165 \\
-    \hline
+    \bottomrule
   \end{tabular}
-  \captionof{table}{The amount of documents with a screenshot from the Wayback Machine and from ClueWeb12, including their relevance score. (Note: This table is not up to date)} \label{tab:countsources} 
 \end{table}
 
 % TODO: This is not true, ~500 document were not rendered in both datasets and should be specified here.
@@ -198,7 +219,7 @@ In this section, we discuss the experiments performed on \datasetname. The exper
 
 
 \subsection{Benchmarking content features}
-In LTR research, the amount and type of content features used for training varies widely per dataset and study. To compare performance of the 11 computed content features in this study, we use a set of known LTR algorithms on the million query 2007 TREC set with the LETOR 4.0 content features. This query set has a total of 46 content features containing all 11 features from Table \ref{tab:setdescription}. The experiment runs the RankLib\footnote{https://sourceforge.net/p/lemur/wiki/RankLib/} implementations of RankBoost, AdaRank and LambdaMart on both 46 and 11 content features using their default settings. 
+In LTR research, the amount and type of content features used for training varies widely per dataset and study. To compare performance of the 11 computed content features in this study, we use a set of known LTR algorithms on the million query 2007 TREC set with the LETOR 4.0 content features. This query set has a total of 46 content features containing all 11 features from Table \ref{tab:setdescription}. The experiment runs the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank and LambdaMart on both 46 and 11 content features using their default settings. 
 
 \subsection{Visual feature models}
 Similarly to the work of \citet{fan2017learning}, we want to use a combination of visual and content features for training. This is achieved by separating the base model into a visual feature extraction and scoring component. The visual feature extraction component takes image $x_{img}$ as an input and outputs visual feature vector $x_{v}$. This feature vector is concatenated with content feature vector $x_{c}$ and used as input to the scoring component. In our case, the scoring component is a simple single fully connected layer with a hidden size of $10$ with dropout of $10\%$. The combined models are trained end-to-end using pairwise hinge loss with $L_2$ regularization. 
@@ -209,7 +230,7 @@ For the experiments, we used various feature extraction models and image inputs 
 As a baseline, we implemented the visual feature extractor proposed by \citet{fan2017learning} in PyTorch. In this model, the input image $x_{img}$ is gray-scaled, normalized and segmented into $4\times16$ slice, which are processed separately through a shallow convolutional network. This output is then passed top to bottom through an LSTM which results in a visual feature vector $x_{v}$. The full dimensions can be found in Figure \ref{fig:ViPfeat}.
 
 \subsubsection{VGG-16 visual features}
-Because \datasetname has a relatively low amount of screenshots, we use a ImageNet pretrained VGG-16 \cite{simonyan2014very} model as visual feature extractor. Because these convolutional filters are fairly generic for inputs and tasks, we can reuse them to create visual features for LTR . During training we optimize the fully connected layer, of which the last one has been replaced by a reinitialized layer with an output of size $30$.  Other than the ViP feature extractor, VGG-16 uses a $224\times224$ image with three color channels as input. 
+Because \datasetname{} has a relatively low amount of screenshots, we use a ImageNet pretrained VGG-16 \cite{simonyan2014very} model as visual feature extractor. Because these convolutional filters are fairly generic for inputs and tasks, we can reuse them to create visual features for LTR . During training we optimize the fully connected layer, of which the last one has been replaced by a reinitialized layer with an output of size $30$.  Other than the ViP feature extractor, VGG-16 uses a $224\times224$ image with three color channels as input. 
 
 \subsubsection{Saliency heatmap input}
 Using our own implementation of \citet{shan2017two} we generated synthetic saliency heatmaps for each of the images in the \datasetname dataset. The resulting images have a dimension of $64\times64$. The images are linearly scaled to $224\times244$ and used as an input to the VGG-16 feature extraction component. Figure \ref{fig:exampleshots} shows a set of example saliency heatmaps with its corresponding screenshot. 

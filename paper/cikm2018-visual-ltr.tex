@@ -1,34 +1,12 @@
-%%%% Proceedings format for most of ACM conferences (with the exceptions listed below) and all ICPS volumes.
-\documentclass[sigconf,anonymous]{acmart} % swap for making a draft
-% \documentclass[sigconf, authordraft]{acmart}
+\documentclass[sigconf,anonymous]{acmart} 
 
-%%%% As of March 2017, [siggraph] is no longer used. Please use sigconf (above) for SIGGRAPH conferences.
-
-%%%% Proceedings format for SIGPLAN conferences 
-% \documentclass[sigplan, anonymous, review]{acmart}
-
-%%%% Proceedings format for SIGCHI conferences
-% \documentclass[sigchi, review]{acmart}
-
-%%%% To use the SIGCHI extended abstract template, please visit
-% https://www.overleaf.com/read/zzzfqvkmrfzn
-
-\usepackage{booktabs} % For formal tables
-\usepackage{subfig}
-%\usepackage{enumitem}
-\usepackage{graphicx}
-
-\usepackage{acronym}
-\usepackage{paralist}
+%%%%%
 
 % Copyright
 %\setcopyright{none}
 %\setcopyright{acmcopyright}
 %\setcopyright{acmlicensed}
 \setcopyright{rightsretained}
-\usepackage{hyperref}
-
-
 %\setcopyright{usgov}
 %\setcopyright{usgovmixed}
 %\setcopyright{cagov}
@@ -36,7 +14,6 @@
 
 % DOI
 % \acmDOI{10.475/123_4}
-
 % ISBN
 % \acmISBN{123-4567-24-567/08/06}
 
@@ -44,63 +21,61 @@
 \acmConference[CIKM '18]{CIKM}{October 2018}{Lingotto, Turin, Italy} 
 \acmYear{2018}
 \copyrightyear{2018}
-
 % \acmPrice{15.00}
-
 % \acmSubmissionID{123-A12-B3}
 
-\begin{document}
-\newcommand{\datasetname}{\textit{PLACEHOLDER} }
-\title{Learning to Rank with Visual Features \todo{think about the title to distinguish from visual LTR}}
-\subtitle{A Dataset and an Improved Method}
-% \titlenote{Produces the permission block, and
-%   copyright information}
-% \subtitle{Extended Abstract}
-% \subtitlenote{The full version of the author's guide is available as
-%   \texttt{acmart.pdf} document}
+%%%%%
 
+\settopmatter{printfolios=true}
+\fancyhead{}
+
+\usepackage{hyperref}
+\usepackage{booktabs} % For formal tables
+\usepackage{subfig}
+\usepackage[skip=0pt]{caption}
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{acronym}
+\acrodef{LTR}{learning to rank}
+
+\newcommand{\datasetname}{\textit{OurDataset}}
+
+\title{Learning to Re-Rank Web Search Results based on Visual SERP Features}
+\subtitle{A Dataset and an Improved Method}
 
 \author{Bram van den Akker}
-% \authornote{Author.}
-% \orcid{1234-5678-9012}
+\orcid{}
 \affiliation{%
   \institution{University of Amsterdam}
-  \streetaddress{Science Park 904}
   \city{Amsterdam} 
-%   \state{Ohio} 
-  \postcode{1098XH}
+  \country{The Netherlands}
 }
 \email{bram.vandenakker@student.uva.nl}
 
 \author{Ilya Markov}
-% \authornote{Examiner}
+\orcid{}
 \affiliation{%
   \institution{University of Amsterdam}
-  \streetaddress{Science Park 904}
   \city{Amsterdam} 
-%   \state{Ohio} 
-  \postcode{1098XH}
+  \country{The Netherlands}  
 }
 \email{i.markov@uva.nl}
 
-
-% \author{Maarten de Rijke}
-% % \authornote{Examiner}
-% \affiliation{%
-%   \institution{University of Amsterdam}
-%   \streetaddress{Science Park 904}
-%   \city{Amsterdam} 
-% %   \state{Ohio} 
-%   \postcode{1098XH}
-% }
-% \email{m.derijke@uva.nl}
+\author{Maarten de Rijke}
+\orcid{0000-0002-1086-0202}
+\affiliation{%
+   \institution{University of Amsterdam}
+   \city{Amsterdam} 
+   \country{The Netherlands}
+}
+\email{derijke@uva.nl}
 
 % The default list of authors is too long for headers.
 \renewcommand{\shortauthors}{B. van den Akker et al.}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\im}[1]{\textcolor{blue}{IM: #1}}
 
-\acrodef{LTR}{learning to rank}
+\begin{document}
 
 \begin{abstract}
 % TODO write abstract
