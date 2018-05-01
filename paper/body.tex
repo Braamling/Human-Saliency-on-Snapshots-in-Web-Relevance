@@ -18,8 +18,6 @@ LambdaMart - 46 & 0.452 & 0.418 & 0.384 & 0.405 & 0.411 & 0.444  & 0.463 \\
 LambdaMart - 11 & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
 \bottomrule
 \end{tabular}
-\\
-\captionof{table}{A benchmark comparison between the MQ2007 query set using all 46 LETOR features and the 11 LETOR features that are used in \datasetname.}\label{tab:11vs46}
 \end{table*}
 
 
@@ -35,17 +33,17 @@ The judgments in the query sets have been created using documents from the  Clue
 \begin{table}[h]
   \captionof{table}{A breakdown the relevance judgments for TREC Web and the amount of screenshots that were taken from the Wayback machine and ClueWeb12.} 
   \label{tab:countsources}
-  \begin{tabular}{ l | c | c  c  c }
+  \begin{tabular}{ l | r | r  r  r }
   \toprule
     Count/Label & TREC Web & Wayback & ClueWeb12 & No image\\
     \midrule
-    Total & 28906 & 23,249 & 5,392 & 265 \\
+    Total & 28,906 & 23,249 & 5,392 & 265 \\
     Nav grade (4) & 40 & 36 & 4 & 0\\
     Key grade (3) & 409 & 347 & 62 & 0\\
-    Hrel grade (2) & 3,322 & 2,222 & 295 & 17 \\
+    Hrel grade (2) & 2,534 & 2,222 & 295 & 17 \\
     Rel grade (1) & 6,832 & 5,679 & 1,123 & 30\\
-    Non grade (0) & 18,300 & 14,395 & 3,701 & 205 \\
-    Junk grade (-2) & 788 & 570 & 207 & 13\\
+    Non grade (0) & 18,301 & 14,395 & 3,701 & 205 \\
+    Junk grade (-2) & 790 & 570 & 207 & 13\\
     \bottomrule
   \end{tabular} 
 \end{table}
@@ -91,16 +89,14 @@ In LTR, documents are ranked based on various calculated content features. We co
 \begin{table}[h]
 \centering
 \captionof{table}{A description of all content features provided with \datasetname.}  \label{tab:setdescription} 
-\begin{tabular}{lllrl}
+\begin{tabular}{lllrllrl}
 \toprule
-Id & Description &\qquad & Id & Description    \\ 
+Id & Description &\qquad & Id & Description &\qquad & Id & Description    \\ 
 \midrule
-1  & Pagerank  && 7  & Title length     \\
-2  & Content length && 8  & Title TF  \\
-3  & Content TF  && 9  & Title IDF   \\
-4  & Content IDF && 10 & Title TFIDF   \\
-5  & Content TFIDF && 11 & Title BM25  \\
-6  & Content BM25   \\
+1  & Pagerank  && 5  & Content TFIDF  && 9  & Title IDF   \\
+2  & Content length && 6  & Content BM25   && 10 & Title TFIDF   \\
+3  & Content TF  && 7  & Title length && 11 & Title BM25  \\
+4  & Content IDF && 8  & Title TF  && & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -137,47 +133,45 @@ Id & Description &\qquad & Id & Description    \\
 
 
 
-\begin{table*}[t]
-\caption{The table on the left shows a comparison between the different models. ViP is the model by \citet{fan2017learning}, VGG-16 is the transfer learning feature extractor. The table on the right compares the VGG-16 with highlighted images to the baseline measures. A $*$ indicates a significant improvements compared to the ViP baseline, a $-$ means a significant decrease in performance compared to the VGG-16 with highlights in the two tables from left to right respectively. 
-\todo{The two tables should probably be merged.}
-%\todo{The use of * is more common than the use of +.}
-\todo{Don't forget to say which test was used.}}
-\label{tab:results}
+\begin{table}[t]
+\caption{Comparison between the different visual \ac{LTR} methods. $\dagger$ indicates a significant improvement on the ViP baseline and $\ddagger$ indicates an improvement to the ViP baseline and highlights.}
+\label{tab:visresults}
 \centering
 \begin{tabular}{llllll}
 \toprule
-\multicolumn{6}{c}{Clueweb12 11 features}                                    \\ 
-\midrule
                       & p@1    & p@10  & ndcg@1  & ndcg@10 & MAP   \\ 
 \midrule
 ViP baseline          & 0.338  & 0.370 & 0.189   & 0.233   & 0.415 \\ 
 \midrule
-ViP snapshots         & 0.392$^*$ & 0.398$^*$ & 0.217   & 0.254$^*$   & 0.421 \\ 
-ViP highlights        & 0.418$^*$  & 0.416$^*$ & 0.239$^*$   & 0.269$^*$   & 0.422 \\
+ViP snapshots         & 0.392$^\dagger$ & 0.398$^\dagger$ & 0.217   & 0.254$^\dagger$   & 0.421 \\ 
+ViP highlights        & 0.418$^\dagger$  & 0.416$^\dagger$ & 0.239$^\dagger$   & 0.269$^\dagger$   & 0.422 \\
 \midrule
-VGG snapshots      & 0.514$^*$    & 0.484$^*$ & 0.292$^*$   & 0.324$^*$   & 0.442$^*$ \\ 
-VGG highlights     & 0.560$^*$    & 0.520$^*$ & 0.323$^*$   & 0.346$^*$   & 0.456$^*$ \\ 
+VGG-16 snapshots      & 0.514$^\ddagger$    & 0.484$^\ddagger$ & 0.292$^\ddagger$   & 0.324$^\ddagger$   & 0.442$^\ddagger$ \\ 
+VGG-16 highlights     & 0.560$^\ddagger$    & 0.520$^\ddagger$ & 0.323$^\ddagger$   & 0.346$^\ddagger$   & 0.456$^\ddagger$ \\ 
 \midrule
-VGG saliency       & 0.554$^*$    & 0.453$^*$ & 0.310$^*$   & 0.302$^*$   & 0.422 \\ 
+VGG-16 saliency       & 0.554$^\ddagger$    & 0.453$^\ddagger$ & 0.310$^\ddagger$   & 0.302$^\ddagger$   & 0.422 \\ 
 \bottomrule
 \end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Comparison of the VGG-16 model using highlights compared to several baselines. $*$ indicates a significant difference compared to the VGG-16 model. }
+
+\label{tab:baseresults}
 \begin{tabular}{llllll}
 \toprule
-\multicolumn{6}{c}{Clueweb12 11 features}                                    \\ 
-\midrule
                       & p@1    & p@10  & ndcg@1  & ndcg@10 & MAP   \\
 \midrule
-BM25                  & 0.300  & 0.316 & 0.153   & 0.188   & 0.350 \\ 
+BM25                  & 0.300$^*$  & 0.316$^*$ & 0.153$^*$   & 0.188$^*$   & 0.350$^*$ \\ 
 \midrule
-RankBoost             & 0.450  & 0.444 & 0.258   & 0.288   & 0.427 \\
-AdaRank               & 0.290  & 0.357 & 0.149   & 0.227   & 0.398 \\
-LambdaMart            & 0.470  & 0.420 & 0.256   & 0.275   & 0.418 \\ 
+RankBoost             & 0.450  & 0.444 & 0.258   & 0.288$^*$    & 0.427 \\
+AdaRank               & 0.290$^*$   & 0.357$^*$  & 0.149$^*$    & 0.227$^*$    & 0.398 \\
+LambdaMart            & 0.470  & 0.420$^*$ & 0.256   & 0.275$^*$    & 0.418 \\ 
 \midrule
-VGG highlights        & 0.560  & 0.520 & 0.323   & 0.346   & 0.456 \\ 
+VGG-16 highlights        & 0.560  & 0.520 & 0.323   & 0.346   & 0.456 \\ 
 \bottomrule
-\\
 \end{tabular}
-\end{table*}
+\end{table}
 
 
 
@@ -205,10 +199,10 @@ As the Wayback Machine does not contain an archived or working version of each d
 \begin{enumerate}    
 \item Each document was requested from the Wayback Machine separately. 
 \item Documents that were not on the Wayback Machine, timed out, threw a JavaScript error or resulted in a .PNG screenshot smaller than 100kb are marked as broken. These documents are rendered again with the ClueWeb12 html using the online rendering service provided by the creators of ClueWeb12.
-\item A manual selection was made between all documents that were in both sets: The Wayback version was used if it contained styling and if the content was the same as the rendering service. Otherwise, the rendering service version was used.
+\item A manual selection was made between all documents that were in both sets: The Wayback version was used if it contained styling and if the content was the same as the rendering service. Otherwise, the rendering service version was used. 
+\item In total, 265 documents were discarded because of issues during rendering.
 \end{enumerate}
 
-% TODO: This is not true, ~500 document were not rendered in both datasets and should be specified here.
 At the end of the process, each judged document has a corresponding screenshot from either the Wayback Machine or ClueWeb12 rendering service. Table \ref{tab:countsources} shows how the different sources are divided.
 
 \subsection{Final collection}
@@ -249,23 +243,29 @@ In LTR research, the amount and type of content features used for training varie
 The experiment with visual features were run five times for each of the five folds. Each run was performed using the Adam optimizer with a batch size of 100 using a learning rate of $0.0001$ and $0.00005$ for the ViP and VGG-16 models respectively. Finally, the runs for each fold were averaged and combined to create one measurement for each of the 100 queries in the dataset. 
 
 \section{Results}
-In this section, we experiment with the benchmark and various visual extraction methods discussed in section \ref{sec:experiments}. 
+In this section, we show the results of the benchmark experiments and visual extraction methods discussed in section \ref{sec:experiments}. 
 
-The results of the benchmark experiments are shown in Table \ref{tab:11vs46}. Each model was trained by optimizing the $P@5$ using the validation set. The results show that reducing the amount of features doesn't have a significant impact on the performance on the majority of measurements. 
+The results of the benchmark experiments are shown in Table \ref{tab:11vs46}. Each model was trained by optimizing the $P@5$ using the validation set. The results show that using the features from \datasetname compared to the feature from LETOR has a minor impact on performance.  
 
-The various results using \datasetname are displayed in Table \ref{tab:results}. The table on the left shows the results of using the visual ranking methods, with the \textit{ViP baseline} only using content features. Based on a paired tailed student t-test, a $^*$ indicates a significant improve compared the ViP baseline, for each of the VGG models this also indicates an significant improvement compared to the VGG highlights. These results clearly show that using a more powerful feature extractor can significantly improve \ac{LTR} performance. The table on the right shows the results of the VGG-16 highlights compared to BM25, RankBoost, AdaRank and Lambdamart. \todo{What to do with the insignificance of RankBoost?}
+Table \ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. A two tailed paired t-test was used for significance. 
+Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
+We see that in terms of significance the results are similar to the work of \citet{fan2017learning}, where the screenshots with highlights yield better performance than using the vanilla screenshots. The $\ddagger$ indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted screenshots. The results clearly show that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance.
+
+Table \ref{tab:baseresults} compares the results of the VGG-16 model using highlighted screenshots with BM25, RankBoost, AdaRank and Lambdamart. The baselines with a significant difference from the VGG-16 model have been marked with a $*$. Although VGG-16 produces higher average results than the baseline methods, it is not possible to proof the statistical significance for some RankBoost and LambdaMart results. These results suggest that combining the visual features using more sophisticated ranking method could further improve \ac{LTR} performance using \datasetname. 
 
 
-% Write something about statistical significance.
-% Write something about why highlights is better than snapshots.
-% Write how saliency yields different results.
+
+%
+%The various results using \datasetname are displayed in Table \ref{tab:results}. The table on the left shows the results of using the visual ranking methods, with the \textit{ViP baseline} only using content features. Based on a paired tailed student t-test, a $^*$ indicates a significant improve compared the ViP baseline, for each of the VGG models this also indicates an significant improvement compared to the VGG highlights. These results clearly show that using a more powerful feature extractor can significantly improve \ac{LTR} performance. The table on the right shows the results of the VGG-16 highlights compared to BM25, RankBoost, AdaRank and Lambdamart. \todo{What to do with the insignificance of RankBoost?}
 
 
-\section{Discussion}
-In this paper, we introduced \datasetname, an out-of-the-box dataset for research on both content and visual web page\ac{LTR}. The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only content features. Future work could improve these visual extraction methods and combine it with other well-known \ac{LTR} models. Future research could also give more qualitative insights on the performance improvements. 
 
-% Write something about the masks.
-% Write something about how different types of saliency extraction can improve the results.
+
+\section{Conclusion}
+In this paper, we introduced \datasetname, an out-of-the-box dataset for research on both content and visual web page\ac{LTR}. The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only content features. 
+
+\todo{should we keep the following lines in?} During this study we also explored using the highlights separate from the screenshots, which did not results worth mentioning. However, the dataset with separate highlights is available upon request. 
+Future work should explore other visual extraction methods and combinations with other well-known \ac{LTR} models. More qualitative work on visual features could provide proof useful for improving visual \ac{LTR} even further and potentially give new insights in good web design patterns. 
 
 \section{Acknowledgements}
 The Spark experiments in this work were carried out on the Dutch national e-infrastructure with the support of SURF Cooperative. Thanks to the Amsterdam Robotics Lab for using their computational resources. Thanks to Jamie Callan and his team for providing access to the online services for ClueWeb12. 
