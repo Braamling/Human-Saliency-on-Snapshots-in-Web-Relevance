@@ -22,10 +22,10 @@ LambdaMart - 11 & 0.448 & 0.412 & 0.380 & 0.397  & 0.411  & 0.443   & 0.455 \\
 
 
 \section{Dataset}\label{sec:dataset}
-In this section, we describe the collection process of the \datasetname dataset. Section \ref{sec:trecclue} contains more information about the underlying TREC WEB query sets and ClueWeb12 document collection. Details on how the content features are calculated using Apache Spark are discussed in section \ref{sec:contentfeature}. The collection of screenshot from the ClueWeb12 collection using the Wayback Machine and ClueWeb12 Online rendering service is explained in section \ref{sec:screenshotsec}. Finally, section \ref{sec:datasetsum} gives an overview of the structure in which the full collection is presented.
+In this section, we describe the collection process of the \datasetname~dataset. Section \ref{sec:trecclue} contains more information about the underlying TREC WEB query sets and ClueWeb12 document collection. Details on how the content features are calculated using Apache Spark are discussed in section \ref{sec:contentfeature}. The collection of screenshot from the ClueWeb12 collection using the Wayback Machine and ClueWeb12 Online rendering service is explained in section \ref{sec:screenshotsec}. Finally, section \ref{sec:datasetsum} gives an overview of the structure in which the full collection is presented.
 
 \subsection{TREC Web \& ClueWeb12 }\label{sec:trecclue}
-\datasetname uses the query sets TREC Web 2013~\cite{collins2013trec} \& 2014~\cite{collins2015trec} with graded relevance judgements. Table \ref{tab:countsources} shows a breakdown of the total documents, queries and different relevance labels of the combined sets. 
+\datasetname~uses the query sets TREC Web 2013~\cite{collins2013trec} \& 2014~\cite{collins2015trec} with graded relevance judgements. Table \ref{tab:countsources} shows a breakdown of the total documents, queries and different relevance labels of the combined sets. 
 
 The judgments in the query sets have been created using documents from the  ClueWeb12\footnote{\url{https://lemurproject.org/clueweb12/}} collection, which is an unfiltered and highly diverse collection of web pages scraped in the first half of 2012. The total collection contains well over 700 million documents that are crawled using the typical crawling settings of the Heritrix archival crawler project\footnote{\url{https://webarchive.jira.com/wiki/spaces/Heritrix/overview}} from archive.org.  
 
@@ -226,10 +226,10 @@ For the experiments, we used various feature extraction models and image inputs 
 As a baseline, we implemented the visual feature extractor proposed by \citet{fan2017learning} in PyTorch. In this model, the input image $x_{img}$ is gray-scaled, normalized and segmented into $4\times16$ slice, which are processed separately through a shallow convolutional network. This output is then passed top to bottom through an LSTM which results in a visual feature vector $x_{v}$. The full dimensions can be found in Figure \ref{fig:ViPfeat}.
 
 \subsubsection{VGG-16 visual features}
-Because \datasetname has a relatively low amount of screenshots, we use a ImageNet pretrained VGG-16 \cite{simonyan2014very} model as visual feature extractor. Because these convolutional filters are fairly generic for inputs and tasks, we can reuse them to create visual features for LTR . During training we optimize the fully connected layer, of which the last one has been replaced by a reinitialized layer with an output of size $30$.  Other than the ViP feature extractor, VGG-16 uses a $224\times224$ image with three color channels as input. 
+Because \datasetname~has a relatively low amount of screenshots, we use a ImageNet pretrained VGG-16 \cite{simonyan2014very} model as visual feature extractor. Because these convolutional filters are fairly generic for inputs and tasks, we can reuse them to create visual features for LTR . During training we optimize the fully connected layer, of which the last one has been replaced by a reinitialized layer with an output of size $30$.  Other than the ViP feature extractor, VGG-16 uses a $224\times224$ image with three color channels as input. 
 
 \subsubsection{Saliency heatmap input}
-Using our own implementation of \citet{shan2017two} we generated synthetic saliency heatmaps for each of the images in the \datasetname dataset. The resulting images have a dimension of $64\times64$. The images are linearly scaled to $224\times244$ and used as an input to the VGG-16 feature extraction component. Figure \ref{fig:exampleshots} shows a set of example saliency heatmaps with its corresponding screenshot. 
+Using our own implementation of \citet{shan2017two} we generated synthetic saliency heatmaps for each of the images in the \datasetname~dataset. The resulting images have a dimension of $64\times64$. The images are linearly scaled to $224\times244$ and used as an input to the VGG-16 feature extraction component. Figure \ref{fig:exampleshots} shows a set of example saliency heatmaps with its corresponding screenshot. 
 
 \section{Experimental Setup}\label{sec:experiments}
 In this section, we discuss the setup of the experiments performed on \datasetname. The experiments are set out to demonstrate the abilities of visual features in LTR and set a baseline for future visual LTR research.
@@ -243,11 +243,11 @@ In LTR research, the amount and type of content features used for training varie
 The experiment with visual features were run five times for each of the five folds. Each run was performed using the Adam optimizer with a batch size of 100 using a learning rate of $0.0001$ and $0.00005$ for the ViP and VGG-16 models respectively. Finally, the runs for each fold were averaged and combined to create one measurement for each of the 100 queries in the dataset. 
 
 \section{Results}
-In this section, we show the results of the benchmark experiments and visual extraction methods discussed in section \ref{sec:experiments}. 
+In this section, we show the results of the benchmark experiments and visual extraction methods discussed in section \ref{sec:experiments}. Significance has been determined using a two tailed paired t-test (p-value $\leq 0.05$). 
 
-The results of the benchmark experiments are shown in Table \ref{tab:11vs46}. Each model was trained by optimizing the $P@5$ using the validation set. The results show that using the features from \datasetname compared to the feature from LETOR has a minor impact on performance.  
+Table \ref{tab:11vs46} shows the results of the benchmark experiments. Each model was trained by optimizing the $P@5$ using the validation set. The results show that using the features from \datasetname~compared to the feature from LETOR has a minor impact on \ac{LTR} performance.  
 
-Table \ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. A two tailed paired t-test was used for significance. 
+Table \ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. 
 Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
 We see that in terms of significance the results are similar to the work of \citet{fan2017learning}, where the screenshots with highlights yield better performance than using the vanilla screenshots. The $\ddagger$ indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted screenshots. The results clearly show that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance.
 
