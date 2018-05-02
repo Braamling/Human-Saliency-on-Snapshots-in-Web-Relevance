@@ -20,9 +20,7 @@ object FitModels {
     val spark: SparkSession = SparkSession.builder.getOrCreate
     val sc = spark.sparkContext
 
-//    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/0012wb/0012wb-99.warc.gz"
     val path = "/data/private/clueweb12/Disk[0-4]*/*/*/*.warc.gz"
-//    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/0012wb/*.warc.gz"
     val docIDs = sc.textFile("all_ids").collect().toSet
 
       // Read all Warc records that have a TREC-ID.
@@ -54,7 +52,6 @@ object FitModels {
       .setStages(Array(contentTokenizer, titleTokenizer, contentVectorizerModel, titleVectorizerModel, ContentIdfModel, TitleIdfModel))
 
     val model = pipeline.fit(warcDf)
-//    val model = PipelineModel.read.load("pipeline-model.parquet")
 
     var output = model.transform(warcDf)
 
@@ -63,12 +60,10 @@ object FitModels {
     // Calculate meanDocumentLength
     output = output.withColumn("contentSize", size(output("contentWords")))
     output = output.withColumn("titleSize", size(output("titleWords")))
-//    output.select(Seq("contentSize", "titleSize").map(mean(_)): _*).show()
     val meanDocumentLength = output.select(Seq("contentSize", "titleSize").map(mean(_)): _*)
 
     meanDocumentLength.withColumnRenamed("avg(contentSize)", "avgContentSize").
       withColumnRenamed("avg(titleSize)", "avgTitleSize").write.mode(SaveMode.Overwrite).save("meanDocument-2.parquet")
 
-    // Store the tf and idf model for later usage.
   }
 }
