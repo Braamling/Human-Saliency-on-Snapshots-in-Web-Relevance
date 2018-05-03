@@ -6,7 +6,7 @@ Over the years, various research demonstrated that web design is a determining f
 Although web design has become a 34 billion dollar industry in the US alone according to \citet{ibisdesign}, modern search engines are still focused on using content features (e.g., BM25, PageRank, etc.) to determine web relevance \todo{refs?}. 
 
 Recently \citet{fan2017learning} introduced ViP, a \ac{LTR} model that uses a combination of both visual and content features.
-Visual features are calculated from screenshots, which are in turn created by rendering web pages.
+Visual features are calculated from snapshots, which are in turn created by rendering web pages.
 The authors demonstrate that adding these visual features significantly improve the \ac{LTR} performance.
 The indication that the visual representation of a web page can have a significant impact on web search leverages a new field in \ac{LTR} research.
 
@@ -30,16 +30,17 @@ A second limitation is the method used to extract visual features in the ViP arc
 % \todo{a suboptimal / not state-of-the-art visual features extraction. Describe this in detail similarly to the above.}
 
 In this work, we attempt to address the above limitations.
-First, we propose \datasetname, a dataset that contains rich and highly diverse screenshots from the ClueWeb12 collection. The screenshots are taken from the judged documents in the TREC Web 2013 \& 2014 query sets. For each of the documents, we calculated content features that can be used for \ac{LTR}.
+First, we propose \datasetname, a dataset that contains rich and highly diverse snapshots from the ClueWeb12 collection.\todo{footnote} The snapshots are acquired for judged documents in the TREC Web 2013 \& 2014 query sets.\todo{footnote} For each document, we also calculate content features, such as BM25 and TF-IDF, that can be used for \ac{LTR}.
 %\todo{describe key features of the proposed dataset by unfolding the next sentence into a few sentences}
+%
+%We believe that this dataset allows the \ac{LTR} research community to investigate various methods of using visual features for search and ranking.
+Using \datasetname, we show that the results of the ViP model from \citet{fan2017learning} can be reproduced on a more diverse dataset.
+The proposed dataset is made publicly available.\footnote{URL removed for review.}
 
-We believe that this dataset allows the \ac{LTR} research community to investigate various methods of using visual features for search and ranking.
-In particular, using \datasetname, we show that the results of the ViP model from \citet{fan2017learning} can be reproduced on a more diverse dataset.
-
-Second, we use the following two state-of-the-art methods to extract visual features from screenshots:
+Second, we use the following two state-of-the-art methods to extract visual features from snapshots:
 \begin{inparaenum}[(i)]
 \item transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf,simonyan2014very}, and
-\item generation of synthetic saliency heatmaps from the web page screenshots~\cite{shen2014webpage,shan2017two}.
+\item generation of synthetic saliency heatmaps from the web page snapshots~\cite{shen2014webpage,shan2017two}.
 \end{inparaenum}
 We show that both methods are able to improve retrieval performance significantly.
 
