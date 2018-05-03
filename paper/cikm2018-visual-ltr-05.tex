@@ -1,0 +1,33 @@
+% !TEX root = cikm2018-visual-ltr.tex
+
+\section{Experimental Setup}\label{sec:experiments}
+In this section, we discuss the setup of the experiments performed on \datasetname. The experiments are set out to demonstrate the abilities of visual features in LTR and set a baseline for future visual LTR research.
+%All PyTorch experiments were performed on a GTX 1080 Ti with 11gb of RAM. Preproccessing was performed on a Thinkpad X250 with an Intel i5-5300U CPU and 16gb of ram. 
+
+
+\subsection{Benchmarking content features}
+In LTR research, the amount and type of content features used for training varies widely per dataset and study. To compare performance of the 11 computed content features in this study, we use a set of known LTR algorithms on the million query 2007 TREC set with the LETOR 4.0 content features. This query set has a total of 46 content features containing all 11 features from Table \ref{tab:setdescription}. The experiment runs the RankLib\footnote{https://sourceforge.net/p/lemur/wiki/RankLib/} implementations of RankBoost, AdaRank and LambdaMart on both 46 and 11 content features using their default settings. 
+
+\subsection{Visual experiments}
+The experiment with visual features were run five times for each of the five folds. Each run was performed using the Adam optimizer with a batch size of 100 using a learning rate of $0.0001$ and $0.00005$ for the ViP and VGG-16 models respectively. Finally, the runs for each fold were averaged and combined to create one measurement for each of the 100 queries in the dataset. 
+
+\begin{table}[h]
+\caption{A benchmark comparison between the MQ2007 query set using all 46 LETOR features and the 11 LETOR features that are used in \datasetname.}
+\label{tab:11vs46}
+\centering
+\begin{tabular}{lccccc}
+\toprule
+%& \multicolumn{7}{c}{MQ2007 46 features vs 11 features}                                     \\
+           & p@1  & p@10   & ndcg@1 & ndcg@10 & map \\ 
+\midrule
+RankBoost - 46 & 0.453 & 0.371 & 0.391 & 0.430  & 0.457 \\
+RankBoost - 11 & 0.448 & 0.372 & 0.381  & 0.431   & 0.453 \\
+\midrule
+AdaRank - 46  & 0.420 & 0.360 & 0.367 & 0.424  & 0.449 \\
+AdaRank - 11  & 0.385 & 0.287 & 0.364  & 0.394   & 0.386 \\ 
+\midrule
+LambdaMart - 46 & 0.452 & 0.384 & 0.405 & 0.444  & 0.463 \\
+LambdaMart - 11 & 0.448 & 0.380 & 0.397  & 0.443   & 0.455 \\
+\bottomrule
+\end{tabular}
+\end{table}

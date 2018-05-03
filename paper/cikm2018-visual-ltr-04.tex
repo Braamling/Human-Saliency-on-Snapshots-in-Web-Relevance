@@ -1,0 +1,19 @@
+% !TEX root = cikm2018-visual-ltr.tex
+
+\section{Visual ranking methods}
+In this section we discuss the improved visual \ac{LTR} methods that have been used with \datasetname.
+
+\subsection{Visual feature models}
+Similarly to the work of \citet{fan2017learning}, we use a combination of visual and content features for training. This is achieved by separating the base model into a visual feature extraction and scoring component. The visual feature extraction component takes image $x_{img}$ as an input and outputs visual feature vector $x_{v}$. This feature vector is concatenated with content feature vector $x_{c}$ and used as input to the scoring component. In our case, the scoring component is a single fully connected layer with a hidden size of $10$ with dropout set to $10\%$. The combined models are trained end-to-end using pairwise hinge loss with $L_2$ regularization. 
+
+For the experiments, we used various feature extraction models which are described below.
+
+\subsubsection{ViP visual features}
+As a baseline, we implemented the visual feature extractor proposed by \citet{fan2017learning} in PyTorch. In this model, the input image $x_{img}$ is gray-scaled, normalized and horizontally segmented into $4\times16$ slices, which are processed separately through a shallow convolutional network. This output is then passed top to bottom through an LSTM which results in a visual feature vector $x_{v}$. 
+%The full dimensions can be found in Figure \ref{fig:ViPfeat}.
+
+\subsubsection{VGG-16 visual features}
+Because \datasetname~has a relatively low amount of screenshots, we use a ImageNet pretrained VGG-16 \cite{simonyan2014very} model as visual feature extractor. Because these convolutional filters are fairly generic for inputs and tasks, we can reuse them to create visual features for LTR . During training we only optimize the fully connected layers, of which the last one has been replaced by a reinitialized layer with an output of size $30$.  Other than the ViP feature extractor, VGG-16 uses a $224\times224$ image with three color channels as input. 
+
+\subsubsection{Saliency heatmap input}
+Using our own implementation of \citet{shan2017two} we generated synthetic saliency heatmaps for each of the images in the \datasetname~dataset. The resulting images have a dimension of $64\times64$. The images are linearly scaled to $224\times244$ and used as an input to the VGG-16 feature extraction component. Figure \ref{fig:exampleshots} shows a set of example saliency heatmaps with its corresponding screenshot. 

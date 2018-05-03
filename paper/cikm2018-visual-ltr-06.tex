@@ -1,0 +1,53 @@
+% !TEX root = cikm2018-visual-ltr.tex
+
+\begin{table}[h]
+\caption{Comparison between the different visual \ac{LTR} methods. $\dagger$ indicates a significant improvement on the ViP baseline and $\ddagger$ indicates an improvement to the ViP baseline and highlights.}
+\label{tab:visresults}
+\centering
+\begin{tabular}{llllll}
+\toprule
+                      & p@1    & p@10  & ndcg@1  & ndcg@10 & MAP   \\ 
+\midrule
+ViP baseline          & 0.338  & 0.370 & 0.189   & 0.233   & 0.415 \\ 
+\midrule
+ViP snapshots         & 0.392$^\dagger$ & 0.398$^\dagger$ & 0.217   & 0.254$^\dagger$   & 0.421 \\ 
+ViP highlights        & 0.418$^\dagger$  & 0.416$^\dagger$ & 0.239$^\dagger$   & 0.269$^\dagger$   & 0.422 \\
+\midrule
+VGG snapshots      & 0.514$^\ddagger$    & 0.484$^\ddagger$ & 0.292$^\ddagger$   & 0.324$^\ddagger$   & 0.442$^\ddagger$ \\ 
+VGG highlights     & 0.560$^\ddagger$    & 0.520$^\ddagger$ & 0.323$^\ddagger$   & 0.346$^\ddagger$   & 0.456$^\ddagger$ \\ 
+\midrule
+VGG saliency       & 0.554$^\ddagger$    & 0.453$^\ddagger$ & 0.310$^\ddagger$   & 0.302$^\ddagger$   & 0.422 \\ 
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\caption{Comparison of the VGG-16 model using highlights compared to several baselines. $*$ indicates a significant difference compared to the VGG-16 model. }
+
+\label{tab:baseresults}
+\begin{tabular}{llllll}
+\toprule
+                      & p@1    & p@10  & ndcg@1  & ndcg@10 & MAP   \\
+\midrule
+BM25                  & 0.300$^*$  & 0.316$^*$ & 0.153$^*$   & 0.188$^*$   & 0.350$^*$ \\ 
+\midrule
+RankBoost             & 0.450  & 0.444 & 0.258   & 0.288$^*$    & 0.427 \\
+AdaRank               & 0.290$^*$   & 0.357$^*$  & 0.149$^*$    & 0.227$^*$    & 0.398 \\
+LambdaMart            & 0.470  & 0.420$^*$ & 0.256   & 0.275$^*$    & 0.418 \\ 
+\midrule
+VGG highlights        & 0.560  & 0.520 & 0.323   & 0.346   & 0.456 \\ 
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{Results}
+In this section, we show the results of the benchmark experiments and visual extraction methods discussed in section \ref{sec:experiments}. Significance has been determined using a two tailed paired t-test (p-value $\leq 0.05$). 
+
+Table \ref{tab:11vs46} shows the results of the benchmark experiments. Each model was trained by optimizing the $P@5$ on the validation set. The results show that using the features from \datasetname~compared to the feature from LETOR has a minor impact on \ac{LTR} performance.  
+
+Table \ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. 
+Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
+We see that in terms of significance the results are similar to the work of \citet{fan2017learning}, where the screenshots with highlights yield better performance than using the vanilla screenshots. The $\ddagger$ indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted screenshots. The results clearly show that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance.
+
+Table \ref{tab:baseresults} compares the results of the VGG-16 model using highlighted screenshots with BM25, RankBoost, AdaRank and Lambdamart. The baselines with a significant difference from the VGG-16 model have been marked with a $*$. Although VGG-16 produces higher average results than the baseline methods, it is not possible to proof the statistical significance for some RankBoost and LambdaMart results. These results suggest that combining the visual features using more sophisticated ranking method could further improve \ac{LTR} performance using \datasetname. 
