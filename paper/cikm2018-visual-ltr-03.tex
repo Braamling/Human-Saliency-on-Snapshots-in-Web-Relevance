@@ -1,7 +1,7 @@
 % !TEX root = cikm2018-visual-ltr.tex
 
 \section{Dataset}\label{sec:dataset}
-In this section, we describe the \datasetname~data\-set. Section~\ref{sec:trecclue} contains information about the underlying ClueWeb12 collection and TREC Web Track topics. Section~\ref{sec:screenshotsec} explains how the snapshots for ClueWeb12 were acquired using the Wayback Machine\footnote{\url{TODO}} and ClueWeb12 Online rendering service.\footnote{\url{TODO}} Section~\ref{sec:contentfeature} discusses the details on how content features, such as BM25 and TF-IDF, are calculated using Apache Spark.\footnote{\url{TODO}} Finally, Section~\ref{sec:finalcollection} gives an overview of the structure in which the \datasetname dataset is presented.
+In this section, we describe the \datasetname~data\-set. Section~\ref{sec:trecclue} contains information about the underlying ClueWeb12 collection and TREC Web Track topics. Section~\ref{sec:screenshotsec} explains how the snapshots for ClueWeb12 were acquired using the Wayback Machine\footnote{\url{http://archive.org/web/}} and ClueWeb12 Online rendering service.\footnote{\url{TODO}} Section~\ref{sec:contentfeature} discusses the details on how content features, such as BM25 and TF-IDF, are calculated using Apache Spark.\footnote{\url{TODO}} Finally, Section~\ref{sec:finalcollection} gives an overview of the structure in which the \datasetname dataset is presented.
 
 \subsection{ClueWeb12 \& TREC Web Track}\label{sec:trecclue}
 ClueWeb12 is a highly diverse collection of web pages scraped in the first half of 2012.
@@ -11,8 +11,9 @@ The total collection contains over 700 million documents that are crawled using 
 
 \datasetname~uses the topics from the TREC Web Tracks 2013 \& 2014~\cite{collins2013trec,collins2015trec} as queries.
 \todo{Again, why do we use these query sets?}
-Table~\ref{tab:countsources} shows a breakdown of the total number of documents, queries and different relevance labels of the combined sets of 2013 and 2014.
-\todo{Is there anything special about this table and numbers that we can mention here?}
+\todo{How many queries do we have there? How many judged documents per query?}
+In total, 28,906 pages from ClueWeb12 have judgements in the TREC Web Track 2013 \& 2014.
+Table~\ref{tab:countsources} shows the breakdown of the total number of documents and different relevance labels in the combined set of topics from 2013 and 2014.
 
 \begin{table}[h]
   \captionof{table}{A breakdown of the relevance judgments for the TREC Web Track and the amount of snapshots taken from the Wayback machine and ClueWeb12 rendering service.} 
@@ -81,8 +82,13 @@ Table~\ref{tab:countsources} shows a breakdown of the total number of documents,
 
 
 \subsubsection{Acquisition}
-Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack the required styling and images files in order to render the full page. Instead, the pages are rendered using the Wayback Machine\footnote{\url{http://archive.org/web/}} from Archive.org which offers various archived versions of web pages with styling and images since 2005. Scraping was performed on the available entry on the Wayback Machine that is closest to the original scrape date. A snapshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium\footnote{\url{http://selenium-python.readthedocs.io/}} testing framework. 
-For reproduction of the work from \citet{fan2017learning}, we created a separate query dependent dataset with the same snapshots where all query words are highlighted in red (HEX value: \#ff0000).
+Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack styling and images files in order to render the full page.
+To overcome this issue, we use the Wayback Machine which offers various archived versions of web pages with styling and images since 2005.
+For each page in CueWeb12 that is also judged in TREC Web Tracks 2013 \& 2014 (see the first row in Table~\ref{tab:countsources})
+we scrape an entry on the Wayback Machine that is closest to the original page scrape date as recorded in ClueWeb12.
+A snapshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework.\footnote{\url{http://selenium-python.readthedocs.io/}}
+To reproduce \cite{fan2017learning}, we also create a separate query dependent dataset with the same snapshots where all query words are highlighted in red (HEX value: \#ff0000).
+Examples of snapshots and snapshots with highlights are shown in Figure~\ref{fig:exampleshots} (first two columns).
 
 \begin{figure}[h]
 \begin{tabular}{ccc}
@@ -99,16 +105,19 @@ For reproduction of the work from \citet{fan2017learning}, we created a separate
 \caption{Examples of the vanilla snapshot, red highlighted snapshot and saliency heatmap from left to right respectively}\label{fig:exampleshots}
 \end{figure}
 
+
 \subsubsection{Filtering}\label{sec:datasetsum}
 As the Wayback Machine does not contain an archived or working version of each document in the ClueWeb12 collection, a filtering process was introduced to maximize the quality of each snapshot. Using the following criteria, a snapshot was selected for each available document. 
+\todo{@Maarten: could you compress this enumeration please?}
 \begin{enumerate}    
-\item Each document was requested from the Wayback Machine separately. 
-\item Documents that were not on the Wayback Machine, timed out, threw a JavaScript error or resulted in a .PNG snapshot smaller than 100kb are marked as broken. These documents are rendered again with the ClueWeb12 html using the online rendering service provided by the creators of ClueWeb12.
-\item A manual selection was made between all documents that were rendered from both sources: The Wayback version was used if it contained more styling elements and if the content was the same as the rendering service. Otherwise, the rendering service version was used. 
-\item In total, 265 documents were discarded because of issues during rendering.
+\item Each document is requested from the Wayback Machine. 
+\item A document that is not on the Wayback Machine, times out, throws a JavaScript error or results in a PNG snapshot smaller than 100KB is marked as broken. Such documents are rendered again using the online rendering service provided by ClueWeb12.
+\item A manual selection is made between all documents that are rendered from both sources. The Wayback version is used if it contains more styling elements and if the content is the same as in the rendering service. Otherwise, the rendering service version is used. 
 \end{enumerate}
-
-At the end of the process, each a total of 28,906 judged documents have a corresponding snapshot from either the Wayback Machine or ClueWeb12 rendering service. Table \ref{tab:countsources} shows how the different sources are divided.
+%
+At the end of the above process, most of 28,906 judged documents had a corresponding snapshot from either the Wayback Machine or ClueWeb12 rendering service.
+Only 265 documents did not pass the filtering and were discarded.
+The first row of Table \ref{tab:countsources} summarizes the results of the \datasetname~acquisition process.
 
 
 \subsection{Content features} \label{sec:contentfeature}
