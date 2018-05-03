@@ -121,20 +121,31 @@ The first row of Table \ref{tab:countsources} summarizes the results of the \dat
 
 
 \subsection{Content features} \label{sec:contentfeature}
-In LTR, documents are ranked based on various calculated content features. We computed these content features by doing a full pass over the complete ClueWeb12 using Apache Spark. This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21gb memory each. During this process an HTML parser (\textit{jsoup}\footnote{{\url{https://jsoup.org/}}}) extracted the title and content from the raw HTML. Because the HTML structure in some larger documents could not be parsed efficiently by jsoup, all documents with more than one million tokens were ignored. Using the Apache Spark 2.2.1 implementation of TF and IDF, a sparse vector was obtained for each item in each document.  On top of the IR features, PageRank scores from the ClueWeb12 \textit{Related Data} section\footnote{{\url{https://lemurproject.org/clueweb12/related-data.php}}} were added to each document as well. In total, 11 features are computed of which a full overview can be found in Table \ref{tab:setdescription}. Finally, the following modifications based on the features from LETOR 3.0 \cite{qin2010letor} were made to stabilize training:
+In LTR, documents are ranked based on various content features, such as BM25 and PageRank.
+We compute these content features by doing a full pass over the complete ClueWeb12 using Apache Spark.\footnote{This took us approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21gb memory each.}
+During this process an HTML parser (jsoup\footnote{\url{https://jsoup.org/}} in our case) extracts the title and content from the raw HTML.
+Because the HTML structure in very large documents cannot be parsed efficiently by jsoup, all documents with more than one million tokens are ignored.
+Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained for each term in each document.
+\todo{Then how do we compute features and what features exactly?}
+
+Additionally, PageRank scores from the ClueWeb12 Related Data section\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}} are added to each document.
+In total, 11 features are computed, summarized in Table \ref{tab:setdescription}.
+
+Finally, the following modifications based on the features from LETOR 3.0~\cite{qin2010letor} are made to stabilize training:
+\todo{@Maarten: could you also compress this one please?}
 \begin{enumerate}  
 % \item IDF is calculates as follows: 
 % $$IDF(q, D) = \sum_{t_i \in q} IDF(t_i, D) = \sum_{t_i \in t} \log \frac{|D| + 1}{DF(t_i) + 1}$$
 % Where  $q_i$ and $t_i$ represent a list of all terms in a query and a single query term respectively. $D$ represents a list of all terms in a document with $|D|$ as its total length. $DF(t_i)$ is the document frequency for the given query term.  
 \item Free parameters $k_1$, $k_3$ and $b$ for BM25 were set to $2.5$, $0$ and $0.8$ respectively. 
-\item Because the PageRank score are usually an order of magnitude smaller than all the other scores, we multiplied each value with $10^5$.
-\item After all features have been computed, the log is taken over the final results.
+\item Because the PageRank scores are usually an order of magnitude smaller than all the other scores, we multiply each value by $10^5$.
+\item After all features are computed, the log is taken over the final results.
 \item The logged features are normalized per query.  
 \end{enumerate}
 
 \begin{table}[h]
 \centering
-\captionof{table}{A description of all content features provided with \datasetname.}  \label{tab:setdescription} 
+\captionof{table}{Content features provided with \datasetname.}  \label{tab:setdescription} 
 \begin{tabular}{lllrllrl}
 \toprule
 Id & Description &\qquad & Id & Description &\qquad & Id & Description    \\ 
