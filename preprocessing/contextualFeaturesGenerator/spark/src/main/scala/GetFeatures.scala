@@ -22,17 +22,7 @@ object GetFeatures {
     val sc = spark.sparkContext
     val docIDs = sc.textFile("all_ids").collect().toSet
 
-//    val docIDs = Set("")
-    
-//    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/0012wb/0012wb-99.warc.gz"
-//    val path = "/data/private/clueweb12/Disk1/ClueWeb12_00/*/*.warc.gz"
     val path = "/data/private/clueweb12/Disk[0-4]*/*/*/*.warc.gz"
-
-//    val total_cores = sc.hadoopConfiguration.get("spark.executor.instances").toInt *
-//      sc.hadoopConfiguration.get("spark.executor.cores").toInt
-//    val partitions = total_cores * 3
-
-//    val conf = sc.hadoopConfiguration.set("mapred.max.split.size", (3 * total_cores).toString())
 
     // Read all Warc records that have a TREC-ID.
     val warcRdd = sc.newAPIHadoopFile[LongWritable, WarcRecord, WarcInputFormat](path).
@@ -41,8 +31,6 @@ object GetFeatures {
       map(x => Try(getWarcRecord(x._2, docIDs))).collect{ case Success(df) => df }
 
     // Create a dataframe with only the required Warc Files.
-//    var warcDf = spark.createDataFrame(warcRdd).toDF()
-//    var filteredWarcDf = warcDf.filter(warcDf("docID").isin(docIDs: _*))
     var filteredWarcDf = spark.createDataFrame(warcRdd).toDF()
 
     // Load the pre-trained tf and idf models
