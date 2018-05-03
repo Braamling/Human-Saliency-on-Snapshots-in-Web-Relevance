@@ -165,12 +165,18 @@ Id & Description &\qquad & Id & Description &\qquad & Id & Description    \\
 
 
 \subsection{Final collection}\label{sec:finalcollection}
-The process mentioned in the previous sections resulted in: 
+In summary, \datasetname~contains:
 \begin{inparaenum}[(i)]
-\item a set of files containing the content features, and
-\item a directory with snapshots.
+\item a directory with web page snapshots (Section~\ref{sec:screenshotsec}), and
+\item a set of files with the corresponding content features (Section~\ref{sec:contentfeature}).
 \end{inparaenum}
-The content features are stored in LETOR formatted files containing the raw, logged and query normalized values. The query normalized values were randomly split per query into five equal fold-partitions. There fold-partitions were then divided in five folds containing three fold-partitions for training and the remaining two for validation and testing. Each snapshot is stored as a .PNG which can be identified by its corresponding ClueWeb12 document id. 
+\todo{Why do we have a set of files with features and not only one file?}
+%
+Each snapshot is stored as a PNG file which can be identified by its corresponding ClueWeb12 document id. 
+The content features are stored in LETOR formatted files containing the raw, logged and query normalized values.
+The query normalized values are randomly split per query into five equal fold-partitions.
+These fold-partitions are then divided in five folds containing three \todo{equal?} fold-partitions for training and the remaining two for validation and testing.
+\todo{Why do we need to additionally split each fold? So we have five fold split into five fold each?}
 %A separate file contains an entry for each snapshot indicating whether the snapshots was created using the Wayback Machine or online rendering service. 
 
 %\begin{figure*}[t]
