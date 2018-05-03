@@ -8,9 +8,8 @@ Similarly to \cite{fan2017learning}, we use a combination of visual and content 
 This is achieved by separating the base model into a visual feature extraction and scoring component.
 The visual feature extraction component takes an image $x_{img}$ as an input and outputs a visual feature vector $x_{v}$.
 This feature vector is concatenated with a content feature vector $x_{c}$ and the concatenated vector is then used as an input to the scoring component.
-In our case, the scoring component is a single fully connected layer with a hidden size of $10$ with dropout set to $10\%$.
-\todo{Why these values? Same as in \cite{fan2017learning}?}
-The combined models \todo{what do you mean by ``combined models'' here?} are trained end-to-end using pairwise hinge loss with $L_2$ regularization as in~\cite{fan2017learning}.
+In our case, we use the same single fully connected layer with a hidden size of $10$ as by\cite{fan2017learning}, but added a dropout of $10\%$ which was empirically found to improve the performance. 
+The visual feature extraction and scoring components are trained end-to-end using a pairwise hinge loss with $L_2$ regularization as in~\cite{fan2017learning}.
 For the experiments, we used various visual feature extraction models described below.
 
 \paragraph{ViP visual features}
@@ -20,18 +19,17 @@ This output is then passed top to bottom through an LSTM which results in a visu
 %The full dimensions can be found in Figure \ref{fig:ViPfeat}.
 
 \paragraph{VGG-16 visual features}
-Since \datasetname~has a relatively low amount of snapshots to train a separate feature extractor, we use a pretrained ImageNet VGG-16 model~\cite{simonyan2014very} as a feature extractor.
-\todo{Maybe say something about this being the state-of-the-art for visual feature extraction.}
-These convolutional filters \todo{Which ``these'' filters? Also, we should either introduce what a ``convolutional filter'' is or replace this phrase} are generic with respect to an input and task, so we can reuse them to create visual features for LTR.
-\todo{The next sentence is unclear to me and seems to be lacking context.}
-During training, we only optimize the fully connected layers, of which the last one has been replaced by a reinitialized layer with an output of size $30$.
+Since \datasetname~has a relatively low amount of snapshots to train a separate feature extractor, we use a pretrained ImageNet VGG-16 model~\cite{simonyan2014very} as a feature extractor. 
+The VGG-16 architecture consists of a set of convolutional filters and fully connected layers. The convolutional filters extract features from the input image, which are used by the fully connected layers to classify the image. 
+These filters are generic with respect to input and task, so we can reuse them to create visual features for LTR. The fully connected layers can altered and retrained to specifically learn to handle new inputs and tasks. 
+In our case, we replace the last fully connected layer with a reinitialized layer with an output of size $30$. During training, we only optimize the fully connected layers.
+
 VGG-16 uses a $224\times224$ image with three color channels as an input
-as opposed to \todo{XXX} used by ViP,
-\todo{which gives us the following advantages: YYY.}
+as opposed to gray-scaled $64\times64$ input used by ViP, giving us the advantage that both color and low level features are persisted. 
+
 
 \paragraph{Saliency heatmaps}
-Following \cite{shan2017two}, we generate synthetic saliency heatmaps for each snapshot in the \datasetname~data\-set.
-The resulting heatmaps have a dimension of $64\times64$.
-They are then linearly scaled to $224\times244$ and used as an input to the VGG-16 feature extraction component discussed above.
+Following \cite{shan2017two}, we generate synthetic saliency heatmaps for each snapshot in the \datasetname~data\-set. These heatmaps attempt to predict the viewing pattern of a user, creating a data driven alternative to the F-shape that is modeled in the ViP architecture. 
+The heatmaps have a dimension of $64\times64$ which is linearly scaled to $224\times244$ in order to use them as an input to the VGG-16 feature extraction component discussed above.
 Figure \ref{fig:exampleshots} shows example saliency heatmaps with their corresponding snapshots.
-\todo{Same here: why did we decide to do this? What does it give us?}
+
