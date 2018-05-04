@@ -24,7 +24,7 @@ A second limitation is the method used to extract visual features in the ViP arc
 \begin{inparaenum}[(i)]
 \item is based on a strong assumption that users view websites in an F-shape pattern, 
 \item grayscales and shrinks the input images to $64\times64$, and
-\item does not use a state-of-the-art visual feature extraction method.
+\item does not use an advanced visual feature extraction method \todo{find an alternative for the word 'advanced'. State-of-the-art would not be correct}.
 \end{inparaenum}
 
 % \todo{a suboptimal / not state-of-the-art visual features extraction. Describe this in detail similarly to the above.}
@@ -37,7 +37,7 @@ First, we propose \datasetname, a dataset that contains rich and highly diverse 
 Using \datasetname, we show that the results of the ViP model from \citet{fan2017learning} can be reproduced on a more diverse dataset.
 The proposed dataset is made publicly available.\footnote{URL removed for review.}
 
-Second, we use the following two state-of-the-art methods to extract visual features from snapshots:
+Second, we use the following two improved methods to extract visual features from snapshots:
 \begin{inparaenum}[(i)]
 \item transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf,simonyan2014very}, and
 \item generation of synthetic saliency heatmaps from the web page snapshots~\cite{shen2014webpage,shan2017two}.

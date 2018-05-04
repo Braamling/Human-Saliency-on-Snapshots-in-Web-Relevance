@@ -19,9 +19,9 @@ This output is then passed top to bottom through an LSTM which results in a visu
 %The full dimensions can be found in Figure \ref{fig:ViPfeat}.
 
 \paragraph{VGG-16 visual features}
-Since \datasetname~has a relatively low amount of snapshots to train a separate feature extractor, we use a pretrained ImageNet VGG-16 model~\cite{simonyan2014very} as a feature extractor. 
+Since \datasetname~has a relatively low amount of snapshots to train a separate feature extractor, we use a pretrained ImageNet VGG-16 model~\cite{simonyan2014very} as a feature extractor. Although VGG-16 is not the state-of-the-art visual feature extractor, it is a reasonable trade-off between effectiveness and simplicity.
 The VGG-16 architecture consists of a set of convolutional filters and fully connected layers. The convolutional filters extract features from the input image, which are used by the fully connected layers to classify the image. 
-These filters are generic with respect to input and task, so we can reuse them to create visual features for LTR. The fully connected layers can altered and retrained to specifically learn to handle new inputs and tasks. 
+These filters are generic with respect to input and task\cite{donahue2014decaf}, so we can reuse them to create visual features for LTR. The fully connected layers can altered and retrained to specifically learn to handle new inputs and tasks. 
 In our case, we replace the last fully connected layer with a reinitialized layer with an output of size $30$. During training, we only optimize the fully connected layers.
 
 VGG-16 uses a $224\times224$ image with three color channels as an input

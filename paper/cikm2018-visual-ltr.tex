@@ -81,7 +81,12 @@
 
 \begin{abstract}
 % TODO write abstract
-% \footnote{This is an abstract footnote}
+In this work we introduce \datasetname, a rich and diverse dataset for \ac{LTR} using visual features. \datasetname~consists of visual snapshots, content features and relevance judgments from judged ClueWeb12 documents in the TREC Web Track query sets. The visual snapshots are rendered with both styling and images by using the Wayback Machine from archive.org and the ClueWeb12 online rendering service. Content features have been calculated using the complete ClueWeb12 collection with Apache Spark. 
+Using \datasetname~we reproduce the results from previous work by \citet{fan2017learning} and demonstrate two methods that significantly improve \ac{LTR} performance using: 
+\begin{inparaenum}[(i)]
+\item transfer learning from a pre-trained image recognition model, and
+\item synthetic generated saliency heatmaps from the web page snapshots.
+\end{inparaenum}.
 \end{abstract}
 
 %
