@@ -38,8 +38,9 @@
 \usepackage{acronym}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\im}[1]{\textcolor{blue}{IM: #1}}
+\newcommand{\mdr}[1]{\textcolor{cyan}{#1}}
 \acrodef{LTR}{learning to rank}
-\acrodef{ViTOR}{\textit{Visual learning TO Rank \todo{Working name}}}
+\acrodef{ViTOR}{\textit{Visual learning TO Rank}}
 
 \newcommand{\datasetname}{\ac{ViTOR}}
 
@@ -76,17 +77,16 @@
 % The default list of authors is too long for headers.
 \renewcommand{\shortauthors}{B. van den Akker et al.}
 
-
 \begin{document}
 
 \begin{abstract}
-% TODO write abstract
-In this work we introduce \datasetname, a rich and diverse dataset for \ac{LTR} using visual features. \datasetname~consists of visual snapshots, content features and relevance judgments from judged ClueWeb12 documents in the TREC Web Track query sets. The visual snapshots are rendered with both styling and images by using the Wayback Machine from archive.org and the ClueWeb12 online rendering service. Content features have been calculated using the complete ClueWeb12 collection with Apache Spark. 
-Using \datasetname~we reproduce the results from previous work by \citet{fan2017learning} and demonstrate two methods that significantly improve \ac{LTR} performance using: 
+\mdr{In \ac{LTR} web pages using visual features one uses the visual appearance of web pages as (additional) features to rank (textual) web pages in response to a query.}
+\mdr{We introduce to methods that significantly improve performance for \ac{LTR} compared to the state-of-the-art based on visual feature using: 
 \begin{inparaenum}[(i)]
 \item transfer learning from a pre-trained image recognition model, and
 \item synthetic generated saliency heatmaps from the web page snapshots.
-\end{inparaenum}.
+\end{inparaenum}\ 
+To support our work we introduce \datasetname, a rich and diverse dataset for \ac{LTR} using visual features.} \datasetname~consists of visual snapshots, content features and relevance judgments from judged ClueWeb12 documents in the TREC Web Track query sets. The visual snapshots are rendered with both styling and images by using the Wayback Machine from archive.org and the ClueWeb12 online rendering service. Content features have been calculated using the complete ClueWeb12 collection with Apache Spark. 
 \end{abstract}
 
 %
@@ -125,7 +125,7 @@ Using \datasetname~we reproduce the results from previous work by \citet{fan2017
 % \ccsdesc[100]{Networks~Network reliability}
 
 
-\keywords{ACM proceedings, \LaTeX, text tagging}
+\keywords{Learning to rank, visual features}
 
 
 \maketitle
