@@ -26,6 +26,12 @@
 
 %%%%%
 
+% Space hacks
+\clubpenalty=10000
+\widowpenalty=10000
+\usepackage[subtle, wordspacing=normal, tracking=normal, bibnotes, charwidths=normal, leading, indent, lists, paragraphs=normal, mathspacing=normal, bibliography=normal]{savetrees}
+\looseness=-1
+
 \settopmatter{printfolios=true}
 \fancyhead{}
 
@@ -35,6 +41,7 @@
 \usepackage[skip=0pt]{caption}
 \usepackage{graphicx}
 \usepackage{paralist}
+\usepackage{enumitem}
 \usepackage{acronym}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\im}[1]{\textcolor{blue}{IM: #1}}
@@ -45,7 +52,7 @@
 \newcommand{\datasetname}{\ac{ViTOR}}
 
 \title{Learning to Rank Web Pages Based on Visual Features}
-\subtitle{A Dataset and an Improved Method}
+\subtitle{A Method and a Dataset}
 
 \author{Bram van den Akker}
 \orcid{}
@@ -138,10 +145,11 @@ To support our work we introduce \datasetname, a rich and diverse dataset for \a
 %\input{cikm2018-visual-ltr-06}
 \input{cikm2018-visual-ltr-07}
 
-\subsection*{Acknowledgements}
-Anonymized.
 \if0
+\subsection*{Acknowledgements}
 The Spark experiments in this work were carried out on the Dutch national e-infrastructure with the support of SURF Cooperative. Thanks to the Amsterdam Robotics Lab for using their computational resources. Thanks to Jamie Callan and his team for providing access to the online services for ClueWeb12. 
+
+Anonymized.
 \fi
 
 \bibliographystyle{ACM-Reference-Format}
