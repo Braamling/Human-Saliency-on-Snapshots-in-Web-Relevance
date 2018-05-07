@@ -122,11 +122,12 @@ As a result, most of the 28,906 judged documents had a corresponding snapshot fr
 Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetname~acquisition process.
 
 
-\subsection{Content features} 
+\subsection{Non-visual features} 
 \label{sec:contentfeature}
-\mdr{PageRank is not a content feature. }
-In LTR, documents are ranked based on various content features, such as BM25 and PageRank.
-We compute these content features by doing a full pass over the complete ClueWeb12 collection using Apache Spark.\footnote{\url{https://spark.apache.org/}}
+\mdr{PageRank is not a content feature. (Bram: updated next lines)}
+In LTR, documents are ranked based on various types of features, such as content features (BM25), quality indicators (PageRank) and behavioral features (CTR).
+In order to use \datasetname~to measure the effect of visual features, we also add a set of content features and quality indicators. 
+The content features are computed by doing a full pass over the complete ClueWeb12 collection using Apache Spark.\footnote{\url{https://spark.apache.org/}}
 \if0
 $^{ }$\footnote{This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21Gb memory each.}
 \fi
@@ -135,7 +136,7 @@ Because the HTML structure in very large documents cannot be parsed efficiently 
 Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained for each term in each document. Finally, the sparse vectors are loaded into a Python Pandas dataframe, which is used to compute the TF, IDF, TFIDF and BM25 scores for each document-query pair.
 
 Additionally, PageRank scores from the ClueWeb12 Related Data section\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}} are added to each document.
-In total, 11 features are computed, summarized in Table \ref{tab:setdescription}.
+In total, 11 features are provided, summarized in Table \ref{tab:setdescription}.
 
 Finally, the following modifications based on the features from LETOR 3.0~\cite{qin2010letor} are made to stabilize training:
 \begin{enumerate}[nosep,leftmargin=14pt]
@@ -150,7 +151,7 @@ Finally, the following modifications based on the features from LETOR 3.0~\cite{
 
 \begin{table}[h]
 \centering
-\captionof{table}{Content features provided with \datasetname.}  \label{tab:setdescription} 
+\captionof{table}{Non-visual features provided with \datasetname.}  \label{tab:setdescription} 
 \begin{tabular}{rlrlrl}
 \toprule
 Id & Description & Id & Description & Id & Description    \\ 
@@ -177,7 +178,7 @@ In summary, \datasetname~contains:
 \end{inparaenum}
 %\todo{Why do we have a set of files with features and not only one file?}
 Each snapshot is stored as a PNG file which can be identified by its corresponding ClueWeb12 document id. 
-The content features are stored in LETOR formatted files containing the raw, logged and query normalized values.
+The non-visual features are stored in LETOR formatted files containing the raw, logged and query normalized values.
 The query normalized values are randomly split per query into five equal fold-partitions.
 These fold-partitions are then divided in five folds where each fold contains three fold-partitions for training and the remaining two for validation and testing.
 
