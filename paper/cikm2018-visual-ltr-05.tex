@@ -15,7 +15,11 @@
 
 \section{Experiments and Results}
 In this section, we discuss experiments performed on the proposed \datasetname~dataset.
-These experiments are set out to demonstrate the abilities of visual features in LTR and set a baseline for future visual LTR research.
+These experiments are set out test whether:
+\begin{inparaenum}[(i)]
+\item the ViP results by \cite{fan2017learning} can be reproduced on \datasetname, 
+\item commonly effective feature extractors can improve upon the ViP results, and
+\item \ac{LTR} using visual features can outperform \ac{LTR} without visual features. \end{inparaenum}
 
 \if0
 Table \ref{tab:11vs46} shows the results of the benchmark experiments. Each model was trained by optimizing the $P@5$ on the validation set. The results show that using the features from \datasetname~compared to the feature from LETOR has a minor impact on \ac{LTR} performance.
@@ -44,7 +48,6 @@ Significance is determined using a two tailed paired t-test (p-value $\leq 0.05$
 Table~\ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. 
 Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
 We see that in terms of significance the results are similar to the work of \citet{fan2017learning}, where the snapshots with highlights yield better performance than using the vanilla snapshots.
-\todo{Can we say anything else here? (This is not necessary, just asking)}
 
 \begin{table}[h]
 \caption{Comparison between different \ac{LTR} methods with visual features. $\dagger$ indicates a significant improvement over the ViP baseline and $\ddagger$ indicates an improvement over ViP highlights.}
@@ -68,7 +71,6 @@ VGG saliency       & 0.554$^\ddagger$    & 0.453$^\ddagger$ & 0.310$^\ddagger$  
 
 \paragraph{Improved feature extraction methods}
 The $\ddagger$ sign in Table~\ref{tab:visresults} indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted snapshots. The results clearly show that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance.
-\todo{Can we say anything else here? (This is not necessary, just asking)}
 
 \paragraph{Content-based baselines}
 Table \ref{tab:baseresults} compares the results of the VGG-16 model using highlighted snapshots with BM25, RankBoost, Ada\-Rank and Lambda\-mart. The baselines with a significant difference from the VGG-16 model have been marked with a $*$. Although VGG-16 produces higher average results than the baseline methods, it is not possible to proof the statistical significance for some RankBoost and LambdaMart results. These results suggest that combining the visual features using more sophisticated ranking method could further improve \ac{LTR} performance using \datasetname. 
@@ -94,10 +96,11 @@ VGG highlights        & 0.560  & 0.520 & 0.323   & 0.346   & 0.456 \\
 
 %\todo{Here we can add the benchmarking experiment that I left out for now.}
 
+\if0
 \paragraph{Benchmarking content features}
 \todo{In fact, this should go into discussion and not experimental setup and/or experiments. But let's do this later.}
-In \ac{LTR} research, the amount and type of content features used for training varies widely per dataset and study.
-To assess the performance of the 11 content features used in this study (see Table~\ref{tab:setdescription}), we use a set of known LTR algorithms on the million query track 2007 (MQ2007)\cite{allan2007million} with the LETOR 4.0\footnote{\url{https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/}} content features.
+In \ac{LTR} research, the amount and type of non-visual features used for training varies widely per dataset and study.
+To assess the performance of the 11 non-visual features used in this study (see Table~\ref{tab:setdescription}), we use a set of known LTR algorithms on the million query track 2007 (MQ2007)\cite{allan2007million} with the LETOR 4.0\footnote{\url{https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/}} non-visual features.
 MQ2007 and LETOR 4.0 have a total of 46 features containing all 11 features from Table~\ref{tab:setdescription}.
 The experiment use the RankLib\footnote{https://sourceforge.net/p/lemur/wiki/RankLib/} implementations of RankBoost, AdaRank and LambdaMart on both 46 and 11 features using their default settings. 
 
@@ -121,3 +124,5 @@ LambdaMart - 11 & 0.448 & 0.380 & 0.397  & 0.443   & 0.455 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\fi

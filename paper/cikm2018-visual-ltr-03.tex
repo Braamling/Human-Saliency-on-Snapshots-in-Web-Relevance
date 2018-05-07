@@ -1,7 +1,7 @@
 % !TEX root = cikm2018-visual-ltr.tex
 
 \section{Visual ranking methods}
-In this section we discuss the improved visual feature extraction methods that we use for \ac{LTR} based on the visual appearance of web pages.
+In this section we discuss the improved visual feature extraction methods that we use for \ac{LTR} based on the visual appearance of web pages. The corresponding code is available on Github.\footnote{URL removed for review}
 
 \subsection{Visual feature models}
 Similarly to \cite{fan2017learning}, we use a combination of visual and content features for training.
@@ -19,8 +19,7 @@ This output is then passed top to bottom through an LSTM which results in a visu
 %The full dimensions can be found in Figure \ref{fig:ViPfeat}.
 
 \paragraph{VGG-16 visual features}
-Since \mdr{the dataset in \citep{fan2017learning} and the \datasetname{} dataset that we introduce in this paper} have a relatively low number of snapshots to train a separate feature extractor, we use the on ImageNet pretrained VGG-16 model~\cite{simonyan2014very} from Torchvision\footnote{\url{https://github.com/pytorch/vision/blob/master/torchvision/models/vgg.py}} as a feature extractor. 
-Although VGG-16 is not the state-of-the-art visual feature extractor, it is a reasonable trade-off between effectiveness and simplicity.
+Since the dataset in \citep{fan2017learning} and the \datasetname{} dataset that we introduce in this paper have a relatively low number of snapshots to train a separate feature extractor, we use the on ImageNet pretrained VGG-16 model~\cite{simonyan2014very} from Torchvision\footnote{\url{https://github.com/pytorch/vision/blob/master/torchvision/models/vgg.py}} as a feature extractor. Although VGG-16 is not the state-of-the-art visual feature extractor, it is a reasonable trade-off between effectiveness and simplicity.
 The VGG-16 architecture consists of a set of convolutional filters and fully connected layers. The convolutional filters extract features from the input image, which are used by the fully connected layers to classify the image. 
 These filters are generic with respect to input and task~\citep{donahue2014decaf}, so we can reuse them to create visual features for LTR. The fully connected layers can altered and retrained to specifically learn to handle new inputs and tasks. 
 In our case, we replace the last fully connected layer with a reinitialized layer with an output of size $30$. During training, we only optimize the fully connected layers.

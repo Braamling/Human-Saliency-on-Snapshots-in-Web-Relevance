@@ -86,14 +86,19 @@
 
 \begin{document}
 
+%Web page \ac{LTR} based on visual features is a method of ranking (textual) web pages for a query using their visual appearance as (additional) features.  
+%
+%In this work we improve web page \ac{LTR} based on visual features, a method of ranking web pages for a query using their visual appearance as (additional) features. 
+%
+%\mdr{In \ac{LTR} web pages using visual features one uses the visual appearance of web pages as (additional) features to rank (textual) web pages in response to a query.}
 \begin{abstract}
-\mdr{In web page \ac{LTR} using visual features one uses the visual appearance of web pages as (additional) features to rank (textual) web pages in response to a query.}
-\mdr{We introduce two methods that significantly improve performance for \ac{LTR} compared to the state-of-the-art based on visual feature using: 
+Recent work demonstrated that features learned from the visual appearance of a web page can help to improve \ac{LTR} performance. 
+In this work, we introduce two methods that significantly improve performance for \ac{LTR} compared to the current state-of-the-art based on visual feature using: 
 \begin{inparaenum}[(i)]
 \item transfer learning from a pre-trained image recognition model, and
 \item synthetic generated saliency heatmaps from the web page snapshots.
 \end{inparaenum}\ 
-To support our work we introduce \datasetname, a rich and diverse dataset for \ac{LTR} using visual features.} \datasetname~consists of visual snapshots, content features and relevance judgments from judged ClueWeb12 documents in the TREC Web Track query sets. The visual snapshots are rendered with both styling and images by using the Wayback Machine from archive.org and the ClueWeb12 online rendering service. Content features have been calculated using the complete ClueWeb12 collection with Apache Spark. 
+To support our work we introduce \datasetname, a rich and diverse dataset for \ac{LTR} using visual features. \datasetname~consists of visual snapshots, non-visual features and relevance judgments from judged ClueWeb12 documents in the TREC Web Track query sets. The visual snapshots are rendered with both styling and images by using the Wayback Machine from archive.org and the ClueWeb12 online rendering service. The non-visual features have been calculated using the complete ClueWeb12 collection with Apache Spark. 
 \end{abstract}
 
 %

@@ -124,9 +124,9 @@ Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetnam
 
 \subsection{Non-visual features} 
 \label{sec:contentfeature}
-\mdr{PageRank is not a content feature. (Bram: updated next lines)}
 In LTR, documents are ranked based on various types of features, such as content features (BM25), quality indicators (PageRank) and behavioral features (CTR).
-In order to use \datasetname~to measure the effect of visual features, we also add a set of content features and quality indicators. 
+In order to use \datasetname~to measure the effect of visual features, we also add a set of content features and quality indicators. In preliminary experiments, we compared the effect of reducing the 46 features in LETOR \cite{qin2010letor} to just the 11 features described in Table \ref{tab:setdescription}. As these features are relatively easy to compute and the experiments showed a minimal drop in performance, we decided to limit ourselves to these features for \datasetname. As behavioral features are not available for the TREC Web query sets, they were not  added.
+
 The content features are computed by doing a full pass over the complete ClueWeb12 collection using Apache Spark.\footnote{\url{https://spark.apache.org/}}
 \if0
 $^{ }$\footnote{This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21Gb memory each.}
@@ -136,7 +136,6 @@ Because the HTML structure in very large documents cannot be parsed efficiently 
 Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained for each term in each document. Finally, the sparse vectors are loaded into a Python Pandas dataframe, which is used to compute the TF, IDF, TFIDF and BM25 scores for each document-query pair.
 
 Additionally, PageRank scores from the ClueWeb12 Related Data section\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}} are added to each document.
-In total, 11 features are provided, summarized in Table \ref{tab:setdescription}.
 
 Finally, the following modifications based on the features from LETOR 3.0~\cite{qin2010letor} are made to stabilize training:
 \begin{enumerate}[nosep,leftmargin=14pt]
