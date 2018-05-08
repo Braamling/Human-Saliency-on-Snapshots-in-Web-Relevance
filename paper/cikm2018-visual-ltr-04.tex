@@ -8,18 +8,19 @@ Section~\ref{sec:trecclue} contains information about the underlying ClueWeb12 c
 \fi
 
 \subsection{ClueWeb12 \& TREC Web Track}\label{sec:trecclue}
-For \datasetname{} we chose to use a combination of the ClueWeb12 document collection and the TREC Web Tracks 2013 \& 2014~\cite{collins2013trec,collins2015trec} query sets. These two were used because it is currently the most recent combination of a large-scale web page collection together with graded relevant judged queries. 
+For \datasetname{} we choose to use a combination of the ClueWeb12 document collection and the topics from the TREC Web Tracks 2013 \& 2014~\cite{collins2013trec,collins2015trec},
+because this is currently the most recent combination of a large-scale web page collection together with judged queries (with graded relevance). 
 
 ClueWeb12 is a highly diverse collection of web pages scraped in the first half of 2012.
 The total collection contains over 700 million documents that are crawled using the typical crawling settings of the Heritrix archival crawler project.\footnote{\url{https://webarchive.jira.com/wiki/spaces/Heritrix/overview}}
 
-We only use ClueWeb12 documents that have been judged for any of the 100 queries in the TREC Web Track query sets. In total, 28,906 pages from ClueWeb12 have judgements in the TREC Web Track 2013 \& 2014. 
-
-Table~\ref{tab:countsources} shows the breakdown of the total number of documents and different relevance labels in the combined set of topics from 2013 and 2014.
+We only use ClueWeb12 documents that have been judged for any of the 100 queries in the TREC Web Tracks 2013 \& 2014. In total, there are 28,906 judged pages.
+%
+Table~\ref{tab:countsources} shows the breakdown of the total number of pages and different relevance labels in the combined set of topics from 2013 and 2014.
 
 
 \begin{table}[h]
-  \captionof{table}{A breakdown of the relevance judgments for the TREC Web Track and the number of snapshots taken from the Wayback machine and ClueWeb12 rendering service.} 
+  \captionof{table}{A breakdown of the relevance judgments for the TREC Web Tracks and the number of snapshots taken from the Wayback Machine and ClueWeb12 rendering service.} 
   \label{tab:countsources}
   \begin{tabular}{ l  @{}r  r  r  r }
   \toprule
@@ -125,7 +126,10 @@ Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetnam
 \subsection{Non-visual features} 
 \label{sec:contentfeature}
 In LTR, documents are ranked based on various types of features, such as content features (BM25), quality indicators (PageRank) and behavioral features (CTR).
-In order to use \datasetname~to measure the effect of visual features, we also add a set of content features and quality indicators. In preliminary experiments, we compared the effect of reducing the 46 features in LETOR \cite{qin2010letor} to just the 11 features described in Table \ref{tab:setdescription}. As these features are relatively easy to compute and the experiments showed a minimal drop in performance, we decided to limit ourselves to these features for \datasetname. As behavioral features are not available for the TREC Web query sets, they were not  added.
+In order to use \datasetname~to measure the effect of visual features, we also add a set of content features and quality indicators.
+In preliminary experiments, we compared the effect of reducing the 46 features in LETOR~\cite{qin2010letor} to just the 11 features described in Table~\ref{tab:setdescription}.
+As these features are relatively easy to compute and the experiments showed a minimal drop in performance, we decided to limit ourselves to these features for \datasetname.
+Also note that behavioral features, such as CTR, are not available for the TREC Web Tracks.
 
 The content features are computed by doing a full pass over the complete ClueWeb12 collection using Apache Spark.\footnote{\url{https://spark.apache.org/}}
 \if0
@@ -133,7 +137,7 @@ $^{ }$\footnote{This took approximately 20 hours on 116 Hadoop worker nodes with
 \fi
 During this process an HTML parser (jsoup\footnote{\url{https://jsoup.org/}} in our case) extracts the title and content from the raw HTML.
 Because the HTML structure in very large documents cannot be parsed efficiently by jsoup, all documents with more than one million tokens are ignored.
-Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained for each term in each document. Finally, the sparse vectors are loaded into a Python Pandas dataframe, which is used to compute the TF, IDF, TFIDF and BM25 scores for each document-query pair.
+Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained for each term in each document. Finally, the sparse vectors are loaded into a Python Pandas dataframe, which is used to compute the TF, IDF, TF-IDF and BM25 scores for each document-query pair.
 
 Additionally, PageRank scores from the ClueWeb12 Related Data section\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}} are added to each document.
 
@@ -173,13 +177,13 @@ Id & Description & Id & Description & Id & Description    \\
 In summary, \datasetname~contains:
 \begin{inparaenum}[(i)]
 \item a directory with web page snapshots (Section~\ref{sec:screenshotsec}), and
-\item a set of files with content features divided into folds. (Section~\ref{sec:contentfeature}).
+\item a set of files with content features divided into folds (Section~\ref{sec:contentfeature}).
 \end{inparaenum}
 %\todo{Why do we have a set of files with features and not only one file?}
 Each snapshot is stored as a PNG file which can be identified by its corresponding ClueWeb12 document id. 
 The non-visual features are stored in LETOR formatted files containing the raw, logged and query normalized values.
-The query normalized values are randomly split per query into five equal fold-partitions.
-These fold-partitions are then divided in five folds where each fold contains three fold-partitions for training and the remaining two for validation and testing.
+The query normalized values are randomly split per query into five equal partitions.
+These partitions are then used to create five folds, where each fold contains three partitions for training and the remaining two partitions for validation and testing.
 
 %A separate file contains an entry for each snapshot indicating whether the snapshots was created using the Wayback Machine or online rendering service. 
 
