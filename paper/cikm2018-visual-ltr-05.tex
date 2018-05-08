@@ -15,9 +15,9 @@
 
 \section{Experiments and Results}
 In this section, we discuss experiments performed on the proposed \datasetname~dataset.
-These experiments are set out test whether:
+These experiments are set out to test whether:
 \begin{inparaenum}[(i)]
-\item the ViP results by \cite{fan2017learning} can be reproduced on \datasetname, 
+\item the ViP results~\cite{fan2017learning} can be reproduced on \datasetname, 
 \item commonly effective feature extractors can improve upon the ViP results, and
 \item \ac{LTR} using visual features can outperform \ac{LTR} without visual features. \end{inparaenum}
 
@@ -32,10 +32,10 @@ The experiments are divided into two types of setups:
 \item visual experiments using both content and visual features.
 \end{inparaenum}
 
-The ViP baseline refers to the experiments were the scoring component was used with only the content features. The other baseline experiments are performed using BM25, RankBoost, AdaRank and Lambdamart. 
-The visual experiments are divided in the setups using the ViP feature extraction model and the VGG-16 extraction model. The input is defined as either the vanilla snapshots, red highlighted snapshots or saliency heatmap. 
+The ViP baseline refers to the experiments were the scoring component was used with only the content features. The other baseline experiments are performed using BM25, RankBoost, AdaRank and Lambdamart. \todo{Reference or URL of a library with these methods.}
+The visual experiments are divided in the setups using the ViP feature extraction model and the VGG-16 feature extraction model. The input is defined as either the vanilla snapshots, red highlighted snapshots or saliency heatmap. 
 
-To average out the difference cause by random initialization, the experiments on \ac{LTR} with visual features are run five times for each of the five folds. 
+To average out the difference caused by random initialization, the experiments on \ac{LTR} with visual features are run five times for each of the five folds. 
 Each run is performed using the Adam optimizer with a batch size of 100 using a learning rate of $0.0001$ and $0.00005$ for the ViP and VGG-16 models, respectively. We empirically found that these values yield the highest performance for each model.
 Within each fold, the results for all five runs are averaged to create one measurement per fold per query.
 
@@ -45,12 +45,12 @@ Significance is determined using a two tailed paired t-test (p-value $\leq 0.05$
 \subsection{Results}
 
 \paragraph{Reproducing ViP}
-Table~\ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. 
-Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
+The top part of Table~\ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. 
+%Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
 We see that in terms of significance the results are similar to the work of \citet{fan2017learning}, where the snapshots with highlights yield better performance than using the vanilla snapshots.
 
 \begin{table}[h]
-\caption{Comparison between different \ac{LTR} methods with visual features. $\dagger$ indicates a significant improvement over the ViP baseline and $\ddagger$ indicates an improvement over ViP highlights.}
+\caption{\ac{LTR} methods with visual features. $\dagger$ indicates a significant improvement over the ViP baseline and $\ddagger$ indicates a significant improvement over ViP highlights.}
 \label{tab:visresults}
 \centering
 \begin{tabular}{l\OK l\OK l\OK l\OK l\OK l}
@@ -70,13 +70,19 @@ VGG saliency       & 0.554$^\ddagger$    & 0.453$^\ddagger$ & 0.310$^\ddagger$  
 
 
 \paragraph{Improved feature extraction methods}
-The $\ddagger$ sign in Table~\ref{tab:visresults} indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted snapshots. The results clearly show that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance.
+%The $\ddagger$ sign in Table~\ref{tab:visresults} indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted snapshots.
+The bottom part of Table~\ref{tab:visresults} shows that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance.
+\todo{Discuss in a bit more detail what we see: VGG highlights is the best, etc.}
 
 \paragraph{Content-based baselines}
-Table \ref{tab:baseresults} compares the results of the VGG-16 model using highlighted snapshots with BM25, RankBoost, Ada\-Rank and Lambda\-mart. The baselines with a significant difference from the VGG-16 model have been marked with a $*$. Although VGG-16 produces higher average results than the baseline methods, it is not possible to proof the statistical significance for some RankBoost and LambdaMart results. These results suggest that combining the visual features using more sophisticated ranking method could further improve \ac{LTR} performance using \datasetname. 
+Table \ref{tab:baseresults} compares the results of the VGG-16 model using highlighted snapshots with BM25, RankBoost, Ada\-Rank and Lambda\-mart.
+%The baselines with a significant drop in performance compared to the VGG-16 model have been marked with a $*$.
+Although VGG-16 produces higher average results than the baseline methods, it is not possible to prove the statistical significance for some RankBoost and LambdaMart results.
+These results suggest that combining the visual features using more sophisticated ranking method could further improve \ac{LTR} performance using \datasetname.
+\todo{Explain in more detail what you mean by ``more sophisticated''. More sophisticated compared to what? What are those more sophisticated methods?}
 
 \begin{table}[h]
-\caption{Comparison of the VGG-16 model using highlights to content-based baselines. $*$ indicates a significant drop in performance compared to VGG highlights. }
+\caption{VGG-16 model using highlights and content-based baselines. $*$ indicates a significant drop in performance compared to VGG highlights. }
 
 \label{tab:baseresults}
 \begin{tabular}{l\OK l\OK l\OK l\OK l\OK l}
