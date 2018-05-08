@@ -1,15 +1,15 @@
 % !TEX root = cikm2018-visual-ltr.tex
 
 \section{Introduction}
-The design and appearance of a web are a determining factor for a user to examine a page or divert to another page~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.
-Relatively little is known about the potential of visual features to help determine the perceived relevance of  a (web) page, in addition to content features such as BM25, quality indicators such as PageRank and behavioral features such as CTR.
+The design and appearance of a web page are a determining factor for a user to examine the page or divert to another page~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.
+Relatively little is known about the potential of visual features to help determine the perceived relevance of a (web) page, in addition to content features such as BM25, quality indicators such as PageRank and behavioral features such as CTR.
 Recently, \citet{fan2017learning} have introduced ViP, a \ac{LTR} model that uses a combination of both visual and content features.
 Visual features are calculated from snapshots, which are in turn created by rendering web pages.
 The authors demonstrate that adding these visual features helps to significantly improve the \ac{LTR} performance.
 
 The work by \citet{fan2017learning} is important because it indicates that the visual appearance of a web page can have a significant impact on perceived utility, which opens a new direction in web search and \ac{LTR}.
 However, there are several limitations in \cite{fan2017learning}.
-First, the method used to extract visual features in the ViP architecture, which 
+First, the method used to extract visual features in the ViP architecture
 \begin{inparaenum}[(i)]
 \item is based on a strong assumption that users view websites in an F-shape pattern, 
 \item grayscales and shrinks the input images to $64\times64$, and
@@ -17,7 +17,7 @@ First, the method used to extract visual features in the ViP architecture, which
 \end{inparaenum}
 
 A second limitation in~\citep{fan2017learning} is that
-the rendered web pages in the collection shared in~\citep{fan2017learning} come from the the GOV2 collection.\footnote{\url{http://ir.dcs.gla.ac.uk/test_collections/gov2-summary.htm}}
+the rendered web pages come from the the GOV2 collection.\footnote{\url{http://ir.dcs.gla.ac.uk/test_collections/gov2-summary.htm}}
 This collection is limited in the sense that:
 \begin{inparaenum}[(i)]
 \item it solely contains web pages within the .gov domain crawled in 2004, i.e., somewhat outdated pages with a relatively narrow scope, and
@@ -27,14 +27,14 @@ This collection is limited in the sense that:
 In order to advance research on \ac{LTR} with visual features it is important to have a dataset with more diverse and up-to-date documents and richer visual information (e.g., styling, images, etc).
 
 In this work, we address the above limitations.
-First, we propose the following two methods to extract visual features from snapshots:
+First, we introduce the following two methods to extract visual features from snapshots:
 \begin{inparaenum}[(i)]
 \item transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf,simonyan2014very}, and
 \item generation of synthetic saliency heatmaps from the web page snapshots~\cite{shen2014webpage,shan2017two}.
 \end{inparaenum}
 We show that both methods are able to improve retrieval performance significantly.
 
-Second, we propose \datasetname, a dataset that contains rich and highly diverse snapshots from the ClueWeb12 collection.\footnote{\url{https://lemurproject.org/clueweb12/}} The snapshots are acquired for judged documents in the TREC Web Track 2013 \& 2014 topics~\cite{collins2013trec,collins2015trec}. For each document, we also calculate content features, such as BM25 and TF-IDF, that can be used for \ac{LTR}.
+Second, we propose \datasetname, a dataset that contains rich and highly diverse snapshots from the ClueWeb12 collection.\footnote{\url{https://lemurproject.org/clueweb12/}} The snapshots are acquired for judged documents in the TREC Web Track 2013 \& 2014~\cite{collins2013trec,collins2015trec}. For each document, we also calculate content features, such as BM25 and TF-IDF, that can be used for \ac{LTR}.
 The proposed dataset is made publicly available.\footnote{URL removed for review.}
 
 %\todo{describe key features of the proposed dataset by unfolding the next sentence into a few sentences}
