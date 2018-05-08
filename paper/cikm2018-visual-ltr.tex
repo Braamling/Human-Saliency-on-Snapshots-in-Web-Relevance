@@ -52,7 +52,7 @@
 \newcommand{\datasetname}{\ac{ViTOR}}
 
 \title{Learning to Rank Web Pages Based on Visual Features}
-\subtitle{A Method and a Dataset}
+\subtitle{An Improved Method and a Dataset}
 
 \author{Bram van den Akker}
 \orcid{}
@@ -92,13 +92,17 @@
 %
 %\mdr{In \ac{LTR} web pages using visual features one uses the visual appearance of web pages as (additional) features to rank (textual) web pages in response to a query.}
 \begin{abstract}
-Recent work demonstrated that features learned from the visual appearance of a web page can help to improve \ac{LTR} performance. 
-In this work, we introduce two methods that significantly improve performance for \ac{LTR} compared to the current state-of-the-art based on visual feature using: 
+Recent work demonstrates that features learned from the visual appearance of a web page can help to improve \ac{LTR} performance. 
+In this work, we introduce two feature extraction methods that significantly improve performance of \ac{LTR} with visual features, namely: 
 \begin{inparaenum}[(i)]
 \item transfer learning from a pre-trained image recognition model, and
 \item synthetic generated saliency heatmaps from the web page snapshots.
 \end{inparaenum}\ 
-To support our work we introduce \datasetname, a rich and diverse dataset for \ac{LTR} using visual features. \datasetname~consists of visual snapshots, non-visual features and relevance judgments from judged ClueWeb12 documents in the TREC Web Track query sets. The visual snapshots are rendered with both styling and images by using the Wayback Machine from archive.org and the ClueWeb12 online rendering service. The non-visual features have been calculated using the complete ClueWeb12 collection with Apache Spark. 
+To support our work we introduce and publish \datasetname, a rich and diverse dataset for \ac{LTR} with visual features.
+\datasetname~consists of visual snapshots, non-visual features and relevance judgments for ClueWeb12 documents and TREC Web Track.
+The visual snapshots are rendered with both styling and images using the Wayback Machine and ClueWeb12 online rendering service.
+Using \datasetname, we confirm that visual features improve \ac{LTR} performance
+and show the effectiveness of the newly introduced methods.
 \end{abstract}
 
 %
