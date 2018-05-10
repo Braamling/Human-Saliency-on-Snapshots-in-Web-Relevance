@@ -1,13 +1,13 @@
 % !TEX root = cikm2018-visual-ltr.tex
 
 \section{Conclusion}
-In this paper, we introduced \todo{tow methods blah-blah-blah, and} \datasetname, an out-of-the-box dataset for research on both visual and non-visual web page \ac{LTR}.
-The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only non-visual features. \todo{I guess our experiments show more than that, please suumarize.}
+In this paper, we introduced two feature extraction methods that significantly improve \ac{LTR} performance using visual features, and \datasetname, an out-of-the-box dataset for research on both visual and non-visual web page \ac{LTR}.
+The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only non-visual features. Although using VGG-16 results in higher average results, there is no statistically significant improvement on some RankBoost and LambdaMart results. 
 
 \if0
 \todo{should we keep the following lines about masks in?} During this study we also explored using the highlights separate from the screenshots. However, this did not produce results worth mentioning. The dataset with separate highlights is available upon request. 
 \fi
 
-Future work should explore other visual extraction methods \todo{like what?} and combinations with well-known \ac{LTR} models \todo{like what?}.
-More qualitative work on visual features could provide proof for improving visual \ac{LTR} even further and potentially give new insights in good web design patterns. \todo{The last sentence is not clear.}
+In future work, it would be interesting to combine the visual features with other more powerful ranking methods eg. RankBoost and LambdaMart. It would also be interested to compare various visual extraction methods eg. CapsuleNet by \citet{sabour2017dynamic} which feature extractor that learns spatial relations. 
 
+Doing a more qualitative analysis on which elements cause the improvements in the visual \ac{LTR} methods could potentially be interesting. The results of such a qualitative analysis could not only be useful for improving visual \ac{LTR}, but might also reveal new data driven design principles that can be used by content creators. 

@@ -32,7 +32,7 @@ The experiments are divided into two types of setups:
 \item visual experiments using both content and visual features.
 \end{inparaenum}
 
-The ViP baseline refers to the experiments were the scoring component was used with only the content features. The other baseline experiments are performed using BM25, RankBoost, AdaRank and LambdaMart. \todo{Reference or URL of a library with these methods.}
+The ViP baseline refers to the experiments were the scoring component was used with only the content features. The other baseline experiments are performed using BM25 and the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank and LambdaMart.
 The visual experiments are divided in the setups using the ViP feature extraction model and the VGG-16 feature extraction model. The input is defined as either the vanilla snapshots, red highlighted snapshots or saliency heatmap. 
 
 To average out the difference caused by random initialization, the experiments on \ac{LTR} with visual features are run five times for each of the five folds. 
@@ -47,7 +47,7 @@ Significance is determined using a two tailed paired t-test (p-value $\leq 0.05$
 \paragraph{Reproducing ViP}
 The top part of Table~\ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. 
 %Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
-We see that in terms of significance the results, and relative performance of the visual ranking methods are similar to the work of \citet{fan2017learning}, where the snapshots with highlights outperform using the vanilla snapshots.
+We see that in terms of significance the results, and relative performance of the visual ranking methods are similar to the work of \citet{fan2017learning}, where the snapshots with highlights outperform using the vanilla snapshots. Although both snapshots with and without highlights have higher average results then the baseline, both do not show a significant improvement in terms of MAP.
 
 \begin{table}[h]
 \caption{\ac{LTR} methods with visual features. $\dagger$ indicates a significant improvement over the ViP baseline and $\ddagger$ indicates a significant improvement over ViP highlights.}
@@ -71,15 +71,15 @@ VGG saliency       & 0.554$^\ddagger$    & 0.453$^\ddagger$ & 0.310$^\ddagger$  
 
 \paragraph{Improved feature extraction methods}
 %The $\ddagger$ sign in Table~\ref{tab:visresults} indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted snapshots.
-The bottom part of Table~\ref{tab:visresults} shows that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance.
-\todo{Discuss in a bit more detail what we see: VGG highlights is the best, etc.}
+The bottom part of Table~\ref{tab:visresults} shows that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance. Similarly as the ViP results, the performance is increased when query words in the snapshots are highlighted. The saliency heatmaps seem to only positively effect performance for the first few documents, with an improved p@1 and ndcg@1 compared to using vanilla snapshots, but having the same MAP score as ViP using highlights.
 
 \paragraph{Content-based baselines}
 Table \ref{tab:baseresults} compares the results of the VGG-16 model using highlighted snapshots with BM25, RankBoost, Ada\-Rank and Lambda\-Mart.
 %The baselines with a significant drop in performance compared to the VGG-16 model have been marked with a $*$.
 Although VGG-16 produces higher average results than the baseline methods, there is no statistically significant improvement over some of the RankBoost and LambdaMart results.
-These results suggest that combining the visual features using more sophisticated ranking method could further improve \ac{LTR} performance using \datasetname.
-\todo{Explain in more detail what you mean by ``more sophisticated''. More sophisticated compared to what? What are those more sophisticated methods?}
+
+
+%These results suggest that by combining the visual features with m using more sophisticated ranking method could further improve \ac{LTR} performance using \datasetname.
 
 \begin{table}[h]
 \caption{VGG-16 model using highlights and content-based baselines. $*$ indicates a significant drop in performance compared to VGG highlights. }
