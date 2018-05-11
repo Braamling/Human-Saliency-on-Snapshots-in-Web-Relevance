@@ -2,12 +2,12 @@
 
 \section{Conclusion}
 In this paper, we introduced two feature extraction methods that significantly improve \ac{LTR} performance using visual features, and \datasetname, an out-of-the-box dataset for research on both visual and non-visual web page \ac{LTR}.
-The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only non-visual features. Although using VGG-16 results in higher average results, there is no statistically significant improvement on some RankBoost and LambdaMart results. 
+The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only non-visual features. Although using VGG-16 as a feature extractor results in higher average results, there is no statistically significant improvement on some RankBoost and LambdaMart results. 
 
 \if0
 \todo{should we keep the following lines about masks in?} During this study we also explored using the highlights separate from the screenshots. However, this did not produce results worth mentioning. The dataset with separate highlights is available upon request. 
 \fi
 
-In future work, it would be interesting to combine the visual features with other more powerful ranking methods eg. RankBoost and LambdaMart. It would also be interested to compare various visual extraction methods eg. CapsuleNet by \citet{sabour2017dynamic} which feature extractor that learns spatial relations. 
+In future work, it would be interesting to combine the visual features with other more powerful ranking methods such as RankBoost and LambdaMart. It would also be relevant to compare various visual extraction methods such as the recently introduced CapsuleNet \cite{sabour2017dynamic} which can learn spatial relations in images.  
 
 Doing a more qualitative analysis on which elements cause the improvements in the visual \ac{LTR} methods could potentially be interesting. The results of such a qualitative analysis could not only be useful for improving visual \ac{LTR}, but might also reveal new data driven design principles that can be used by content creators. 
