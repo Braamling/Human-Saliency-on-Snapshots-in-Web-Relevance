@@ -1,4 +1,6 @@
-\documentclass[sigconf,anonymous]{acmart} 
+\pdfoutput=1
+
+\documentclass[sigconf,screen=true,anonymous]{acmart} 
 
 %%%%%
 
@@ -18,7 +20,7 @@
 % \acmISBN{123-4567-24-567/08/06}
 
 %Conference
-\acmConference[CIKM '18]{CIKM}{October 2018}{Lingotto, Turin, Italy} 
+\acmConference[CIKM 2018]{CIKM 2018}{October 22--26, 2018}{Lingotto, Turin, Italy}
 \acmYear{2018}
 \copyrightyear{2018}
 % \acmPrice{15.00}
@@ -32,7 +34,7 @@
 \usepackage[subtle, wordspacing=normal, tracking=normal, bibnotes, charwidths=normal, leading, indent, lists, paragraphs=normal, mathspacing=normal, bibliography=normal]{savetrees}
 \looseness=-1
 
-\settopmatter{printfolios=true}
+\settopmatter{printfolios=true,printacmref=false}
 \fancyhead{}
 
 \usepackage{hyperref}
@@ -98,7 +100,7 @@ In this work, we introduce two feature extraction methods that significantly imp
 \item transfer learning from a pre-trained image recognition model, and
 \item synthetic generated saliency heatmaps from the web page snapshots.
 \end{inparaenum}\ 
-To support our work we introduce and publish \datasetname, a rich and diverse dataset for \ac{LTR} with visual features.
+To support our work we introduce and release \datasetname, a rich and diverse dataset for \ac{LTR} with visual features.
 \datasetname~consists of visual snapshots, non-visual features and relevance judgments for ClueWeb12 documents and TREC Web Track.
 The visual snapshots are rendered with both styling and images using the Wayback Machine and ClueWeb12 online rendering service.
 Using \datasetname, we confirm that visual features improve \ac{LTR} performance
