@@ -1,10 +1,7 @@
 import torch
 from torch.autograd import Variable
-import torch.nn as nn
 from torch.optim import lr_scheduler
-import pandas as pd
 import torch.optim as optim
-import numpy as np
 import argparse
 from models.scorer import LTR_score
 from models.vgg16 import vgg16
@@ -18,6 +15,8 @@ import tensorboard_logger as tfl
 import logging
 import copy
 import os
+
+from models.inception import inception_v3
 
 FORMAT = '%(name)s: [%(levelname)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
@@ -148,7 +147,11 @@ def prepare_model(use_scheduler=True):
             param.requires_grad = False
     elif FLAGS.model == "resnet152":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=30))
-        for param in list(model.feature_model.parameters())[:-1]:
+        for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
+            param.requires_grad = False
+    elif FLAGS.model == "inception":
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, inception_v3(pretrained=True, state_dict=None, output_size=30))
+        for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "features_only":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
@@ -251,6 +254,9 @@ if __name__ == '__main__':
                         help='The dropout to use in the classification layer.')
     parser.add_argument('--hidden_size', type=int, default=10,
                         help='The amount of hidden layers in the classification layer')
+    parser.add_argument('--finetune_n_layers', type=int, default=1,
+                        help='For resnet152 and inception, define the amount of layers at the end to be fine tuned. ')
+
 
     FLAGS, unparsed = parser.parse_known_args()
 
@@ -259,7 +265,7 @@ if __name__ == '__main__':
     FLAGS.query_specific = FLAGS.query_specific == "True"
     FLAGS.grayscale = FLAGS.grayscale == "True"
 
-    if FLAGS.model == "vgg16" or FLAGS.model == "resnet152" :
+    if FLAGS.model in ("vgg16", "resnet152", "inception"):
         FLAGS.size = (224,224)
     else:
         FLAGS.size = (64,64)
