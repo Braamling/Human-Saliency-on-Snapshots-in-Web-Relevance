@@ -150,7 +150,7 @@ def prepare_model(use_scheduler=True):
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "inception":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, inception_v3(pretrained=True, state_dict=None, output_size=30))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, inception_v3(pretrained=True, output_size=30))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "features_only":
