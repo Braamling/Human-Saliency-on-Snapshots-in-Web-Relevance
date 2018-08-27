@@ -74,7 +74,6 @@ class Inception3(nn.Module):
         self.fc = nn.Linear(2048, output_size)
 
     def forward(self, x):
-        print(x.size())
         if self.transform_input:
             x = x.clone()
             x[:, 0] = x[:, 0] * (0.229 / 0.5) + (0.485 - 0.5) / 0.5
