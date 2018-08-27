@@ -149,6 +149,10 @@ def prepare_model(use_scheduler=True):
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=30))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
+    elif FLAGS.model == "resnet18":
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=30))
+        for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
+            param.requires_grad = False
     elif FLAGS.model == "inception":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, inception_v3(pretrained=True, output_size=30))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
@@ -265,8 +269,10 @@ if __name__ == '__main__':
     FLAGS.query_specific = FLAGS.query_specific == "True"
     FLAGS.grayscale = FLAGS.grayscale == "True"
 
-    if FLAGS.model in ("vgg16", "resnet152", "inception"):
+    if FLAGS.model in ("vgg16", "resnet152", "resnet18"):
         FLAGS.size = (224,224)
+    if FLAGS.model in ("inception"):
+        FLAGS.size = (299,299)
     else:
         FLAGS.size = (64,64)
 

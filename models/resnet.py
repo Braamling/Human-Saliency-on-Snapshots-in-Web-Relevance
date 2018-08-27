@@ -151,7 +151,6 @@ class ResNet(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
@@ -167,6 +166,22 @@ def resnet152(pretrained=False, state_dict=None, output_size=4096, **kwargs):
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
     
+    model.change_output(output_size)
+
+    if state_dict != None:
+        model.load_state_dict(load(state_dict))
+
+    return model
+
+def resnet18(pretrained=False, state_dict=None, output_size=4096, **kwargs):
+    """Constructs a ResNet-18 model.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+    """
+    model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
+    if pretrained:
+        model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
+
     model.change_output(output_size)
 
     if state_dict != None:

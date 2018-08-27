@@ -74,12 +74,14 @@ class Inception3(nn.Module):
         self.fc = nn.Linear(2048, output_size)
 
     def forward(self, x):
+        print(x.size())
         if self.transform_input:
             x = x.clone()
             x[:, 0] = x[:, 0] * (0.229 / 0.5) + (0.485 - 0.5) / 0.5
             x[:, 1] = x[:, 1] * (0.224 / 0.5) + (0.456 - 0.5) / 0.5
             x[:, 2] = x[:, 2] * (0.225 / 0.5) + (0.406 - 0.5) / 0.5
         # 299 x 299 x 3
+
         x = self.Conv2d_1a_3x3(x)
         # 149 x 149 x 32
         x = self.Conv2d_2a_3x3(x)
