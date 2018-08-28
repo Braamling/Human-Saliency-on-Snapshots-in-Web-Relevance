@@ -142,19 +142,19 @@ def prepare_model(use_scheduler=True):
     if FLAGS.model == "ViP":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(16, 10, FLAGS.batch_size))
     elif FLAGS.model == "vgg16":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, vgg16(pretrained=True, state_dict=None, output_size=30))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, vgg16(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
         for param in model.feature_model.features.parameters():
             param.requires_grad = False
     elif FLAGS.model == "resnet152":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=30))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "resnet18":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=30))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "inception":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, inception_v3(pretrained=True, output_size=30))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, inception_v3(pretrained=True, output_size=FLAGS.visual_features))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "features_only":
@@ -258,6 +258,8 @@ if __name__ == '__main__':
                         help='The dropout to use in the classification layer.')
     parser.add_argument('--hidden_size', type=int, default=10,
                         help='The amount of hidden layers in the classification layer')
+    parser.add_argument('--visual_features', type=int, default=30,
+                        help='The size of the visual feature vector')
     parser.add_argument('--finetune_n_layers', type=int, default=1,
                         help='For resnet152 and inception, define the amount of layers at the end to be fine tuned. ')
 
