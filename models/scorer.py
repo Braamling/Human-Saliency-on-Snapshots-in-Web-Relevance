@@ -31,6 +31,12 @@ class LTR_score(nn.Module):
                 if static_features.dim() == 1:
                     static_features = static_features.unsqueeze(0)
 
+                # Most dirty hack in the history of hacks, but don't want out this problem right now.
+                if type(image) is tuple:
+                    image = image[0]
+                if type(static_features) is tuple:
+                    static_features = static_features[0]
+
                 features = torch.cat((image, static_features), 1)
         else:
             features = static_features
