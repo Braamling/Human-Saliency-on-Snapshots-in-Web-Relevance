@@ -3,6 +3,8 @@ from torch.autograd import Variable
 from torch.optim import lr_scheduler
 import torch.optim as optim
 import argparse
+
+from models.mlp import MLP
 from models.scorer import LTR_score
 from models.vgg16 import vgg16
 from models.resnet import resnet152
@@ -159,6 +161,8 @@ def prepare_model(use_scheduler=True):
             param.requires_grad = False
     elif FLAGS.model == "features_only":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
+    elif FLAGS.model == "mlp":
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, MLP(output_size=FLAGS.visual_features))
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 

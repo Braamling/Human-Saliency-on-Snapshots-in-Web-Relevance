@@ -9,6 +9,7 @@ import pickle
 from os import listdir
 from os.path import isfile, join
 
+import numpy as np
 from torch.utils.data import Dataset
 from torchvision import transforms
 from torchvision.datasets.folder import default_loader
@@ -48,7 +49,7 @@ class VectorCache():
 
     def add(self, name, input):
         print(input.unsqueeze(0).size())
-        output = self.model.cache_forward(input.unsqueeze(0)).data.cpu().numpy()
+        output = np.squeeze(self.model.cache_forward(input.unsqueeze(0)).data.cpu().numpy(), axis=0)
         self.index[name] = output
 
     def add_images_from_folder(self, folder_name, size):
