@@ -43,9 +43,9 @@ def prepare_dataloaders(train_file, test_file, vali_file):
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
                                                   shuffle=True, num_workers=10)
     # Initiate the Evaluation classes
-    trainEval = Evaluate(train_file, train_dataset, FLAGS.load_images, "train", FLAGS.batch_size, FLAGS.cache_path)
-    testEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "test", FLAGS.batch_size, FLAGS.cache_path)
-    valiEval = Evaluate(vali_file, vali_dataset, FLAGS.load_images, "validation", FLAGS.batch_size, FLAGS.cache_path)
+    trainEval = Evaluate(train_file, train_dataset, FLAGS.load_images, "train", FLAGS.batch_size)
+    testEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "test", FLAGS.batch_size)
+    valiEval = Evaluate(vali_file, vali_dataset, FLAGS.load_images, "validation", FLAGS.batch_size)
 
     return dataloader, trainEval, testEval, valiEval
 

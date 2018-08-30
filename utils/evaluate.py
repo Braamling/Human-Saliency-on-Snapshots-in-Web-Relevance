@@ -20,9 +20,9 @@ Evaluation measures are taken from https://gist.github.com/bwhite/3726239
 
 
 class Evaluate():
-    def __init__(self, path, dataset, load_images, prefix, batch_size=None, cache_path=None):
+    def __init__(self, path, dataset, load_images, prefix, batch_size=None):
         self.dataset = dataset
-        self.storage = FeatureStorage(path, dataset.image_dir, dataset.query_specific, dataset.only_with_image, cache_path)
+        self.storage = FeatureStorage(path, dataset.image_dir, dataset.query_specific, dataset.only_with_image)
         self.prepare_eval_data()
         self.use_gpu = torch.cuda.is_available()
         self.load_images = load_images
