@@ -5,6 +5,7 @@ from torch.autograd import Variable
 
 logger = logging.getLogger("ViP")
 
+
 class ViP_features(nn.Module):
     def __init__(self, region_height, feature_size, batch_size):
         super(ViP_features, self).__init__()
@@ -20,7 +21,7 @@ class ViP_features(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
 
-        self.hidden_dim = 10 
+        self.hidden_dim = 10
         self.lstm = nn.LSTM(256, self.hidden_dim)
         self.reldecision = nn.Linear(self.hidden_dim, self.feature_size)
 
@@ -38,15 +39,11 @@ class ViP_features(nn.Module):
 
     def apply_lstm(self, x):
         for i, layer in enumerate(x):
-            # Create correct dimensions
-            # if layer.dim() == 3:
-            #     layer = layer.unsqueeze(0)
-
             if self.use_gpu:
                 layer = layer.cuda()
             else:
                 layer = layer
-            
+
             if i is 0:
                 batch_size = layer.size()[0]
                 hidden = self.init_hidden(batch_size)
@@ -58,7 +55,7 @@ class ViP_features(nn.Module):
 
     def forward(self, x):
         height = x.size()[2]
-        splits = int(height/self.region_height)
+        splits = int(height / self.region_height)
         x = torch.split(x, splits, 2)
 
         lstm_out = self.apply_lstm(x)

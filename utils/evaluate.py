@@ -1,14 +1,13 @@
-import torch
+import logging
+import time
+
 import numpy as np
 import pandas as pd
-import time
-from preprocessing.contextualFeaturesGenerator.utils.featureStorage import FeatureStorage
+import torch
 from torch.autograd import Variable
+
+from preprocessing.contextualFeaturesGenerator.utils.featureStorage import FeatureStorage
 from .customExceptions import NoImageAvailableException, NoRelDocumentsException
-
-
-import logging 
-import time
 
 logger = logging.getLogger('Evaluate')
 
@@ -18,6 +17,8 @@ stages of the training process.
 
 Evaluation measures are taken from https://gist.github.com/bwhite/3726239
 """
+
+
 class Evaluate():
     def __init__(self, path, dataset, load_images, prefix, batch_size=None):
         self.dataset = dataset
@@ -27,9 +28,11 @@ class Evaluate():
         self.load_images = load_images
         self.prefix = prefix
         self.batch_size = batch_size
+
     """
     Get all the ranked queries and their scores. 
     """
+
     def prepare_eval_data(self):
         self.query_ids = self.storage.get_queries()
         self.queries = {}
@@ -56,9 +59,7 @@ class Evaluate():
         return scores
 
     def _get_predictions(self, model, doc_ids, scores, query_id):
-        predictions = []
         batch_vec = []
-        batch_score = []
         images = []
         for doc, score in zip(doc_ids, scores):
             try:
@@ -76,8 +77,7 @@ class Evaluate():
                 logger.error("Document {} in query {} gave an exception while loading, file is probabily corrupt. ".format(doc, query_id))
                 raise e
 
-
-        batch_vec = np.vstack( batch_vec )
+        batch_vec = np.vstack(batch_vec)
 
         if self.load_images:
             images = torch.stack(images)
@@ -95,7 +95,6 @@ class Evaluate():
         batch_pred = model.forward(images, batch_vec).data.cpu().numpy()
 
         return list(batch_pred.flatten())
-
 
     def _get_scores(self, query_id, model):
         logger.debug('Starting to prepare {} batch to evaluate query {}'.format(self.prefix, query_id))
@@ -124,10 +123,8 @@ class Evaluate():
             predictions += self._get_predictions(model, batch_doc_ids, batch_scores, query_id)
 
         predictions = [(pred, score, doc_ids) for pred, score, doc_ids in zip(predictions, scores, doc_ids)]
-        # Sort predictions and replace with relevance scores.
-        logger.debug('test log')
 
-        # Shuffle the prediction before sorting to make sure equal predictions are 
+        # Shuffle the prediction before sorting to make sure equal predictions are
         # in random order.
         np.random.shuffle(predictions)
         predictions = sorted(predictions, key=lambda x: -x[0])
@@ -154,25 +151,14 @@ class Evaluate():
         for key in sorted(list(scores.keys())):
             logger.info("{}_{} {}".format(self.prefix, key, scores[key]))
 
-    """
-    #Deprecated. Print a short summary of the first 5 rankings.
-    """
-    # def print_ranking_summary(self, rankings):
-    #     for i in range(0, min(5, len(rankings))):
-    #         rank = []
-    #         for j in range(0, min(10, len(rankings[i][1]))):
-    #             rank.append(rankings[i][1][j])
-
-    #         logger.info("{}_ranking ({}): {}".format(self.prefix, rankings[i][0], " ".join(rank)))
-
-    """
-    Append a dict of scores to file. 
-
-    Path: Full path to the file to be stored
-    Description: Prefix for run identification to the scores that will be appended 
-    Scores: Dict with score name as key and score value as value.
-    """
     def store_scores(self, path, description, scores):
+        """
+        Append a dict of scores to file.
+
+        Path: Full path to the file to be stored
+        Description: Prefix for run identification to the scores that will be appended
+        Scores: Dict with score name as key and score value as value.
+        """
         with open(path, "a") as f:
             scores = " ".join(["{0}:{1:.4f}".format(k, scores[k]) for k in sorted(list(scores.keys()))])
             f.write("{}-{} {}\n".format(self.prefix, description, scores))
@@ -188,9 +174,8 @@ class Evaluate():
         else:
             self.ranking_df = pd.concat([self.ranking_df, df], axis=1)
 
-        
     def eval(self, model, tf_logger=None, epoch=None, get_df=False):
-        self.failed = 0 
+        self.failed = 0
         scores = {}
         self.ranking_df = None
         for q_id in self.queries.keys():

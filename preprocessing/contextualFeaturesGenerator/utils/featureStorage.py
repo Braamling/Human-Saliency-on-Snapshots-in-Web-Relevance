@@ -12,7 +12,6 @@ but also to iterate over the content of a LETOR file.
 """
 class FeatureStorage():
     def __init__(self, path, image_dir, query_specific=False, only_with_image=False):
-        # self.f = h5py.File(hdf5_path, "a")
         self.letorIterator = LETORIterator(path)
         self.pairs = []
         self.scores = {}
@@ -58,8 +57,7 @@ class FeatureStorage():
             for doc_id in self.queries[query_id][rel_score]:
                 if self._get_image(query_id, doc_id):
                     documents.append((rel_score, doc_id))
-                # documents = np.concatenate((documents, list(score.keys())))
-             
+
         return documents
 
     def _get_image(self, q_id, d_id):
@@ -128,12 +126,6 @@ class FeatureStorage():
             self.scores[query_id] = sorted(self.scores[query_id], key=lambda x: -x[1])
 
         return self.scores[query_id]
-
-    """
-    Add query to query list
-    """
-    # def _add_score(self, route):
-        # route = route.split( _id, int(score)))
 
     def print_index(self):
         self.f.visit(self.printname)

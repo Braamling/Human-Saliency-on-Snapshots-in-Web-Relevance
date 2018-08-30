@@ -33,11 +33,11 @@ This method prepares the dataloaders for training and returns a training/validat
 def prepare_dataloaders(train_file, test_file, vali_file):
     # Get the train/test datasets
     train_dataset = ClueWeb12Dataset(FLAGS.image_path, train_file, FLAGS.load_images,
-                                     FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale)
+                                     FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale, FLAGS.cache_path)
     test_dataset = ClueWeb12Dataset(FLAGS.image_path, test_file, FLAGS.load_images,
-                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale)
+                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale, FLAGS.cache_path)
     vali_dataset = ClueWeb12Dataset(FLAGS.image_path, vali_file, FLAGS.load_images,
-                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale)
+                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale, FLAGS.cache_path)
 
     # Prepare the loaders
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
@@ -226,6 +226,8 @@ if __name__ == '__main__':
                         help='The amount of training sessions to average per fold.')
     parser.add_argument('--image_path', type=str, default='storage/images/snapshots/',
                         help='The location of the salicon images for training.')
+    parser.add_argument('--cache_path', type=int, default=None,
+                        help='Provide the path of a feature extractor cache path in order to speed up training ie. storage/model_cache/restnet152-saliency-cache. ')
 
     parser.add_argument('--batch_size', type=int, default=3,
                         help='The batch size used for training.')
