@@ -28,7 +28,7 @@ def build_cache():
 
             vector_cache.add_images_from_folder(os.path.join(FLAGS.image_folder, image_type), size)
 
-        vector_cache.save()
+        # vector_cache.save()
 
 
 if __name__ == '__main__':

@@ -9,6 +9,7 @@ import pickle
 from os import listdir
 from os.path import isfile, join
 
+import h5py
 import numpy as np
 from torch.utils.data import Dataset
 from torchvision import transforms
@@ -43,13 +44,17 @@ class VectorCache():
         self.model = model
 
         if os.path.isfile(self.cache_path):
-            self.index = pickle.load(open(self.cache_path, "rb"))
+            self.h5 = h5py.File(self.cache_path, 'r+')
+            self.vectors = self.h5["vectors"]
+            # self.index = pickle.load(open(self.cache_path, "rb"))
         else:
-            self.index = {}
+            self.h5 = h5py.File(self.cache_path, 'w')
+            self.vectors = self.h5.create_group("vectors")
+            # self.index = {}
 
     def add(self, name, input):
         output = np.squeeze(self.model.cache_forward(input.unsqueeze(0)).data.cpu().numpy(), axis=0)
-        self.index[name] = output
+        self.vectors[name] = output
 
     def add_images_from_folder(self, folder_name, size):
         dataset = ImageDataset(folder_name, size)
@@ -57,8 +62,8 @@ class VectorCache():
             self.add(name, image)
 
 
-    def save(self):
-        pickle.dump(self.index, open(self.cache_path, "wb"))
+    # def save(self):
+    #     pickle.dump(self.index, open(self.cache_path, "wb"))
 
     def __getitem__(self, name):
-        return self.index[name]
+        return self.vectors[name]
