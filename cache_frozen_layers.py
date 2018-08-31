@@ -13,7 +13,7 @@ models = {
     # "inception": inception_v3,
 }
 
-image_paths = ["snapshots", "highlights", "saliency"]
+image_paths = ["snapshots", "highlights", "saliency_deepgaze"]
 
 
 def build_cache():

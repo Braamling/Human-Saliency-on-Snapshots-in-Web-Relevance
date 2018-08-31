@@ -48,16 +48,13 @@ class VectorCache():
             self.index = {}
 
     def add(self, name, input):
-        print(input.unsqueeze(0).size())
         output = np.squeeze(self.model.cache_forward(input.unsqueeze(0)).data.cpu().numpy(), axis=0)
         self.index[name] = output
 
     def add_images_from_folder(self, folder_name, size):
         dataset = ImageDataset(folder_name, size)
-        for i, (name, image) in enumerate(dataset.iterate()):
+        for name, image in dataset.iterate():
             self.add(name, image)
-            if i > 15:
-                return
 
 
     def save(self):
