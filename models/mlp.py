@@ -15,7 +15,7 @@ model_urls = {
 
 class MLP(nn.Module):
 
-    def __init__(self, num_classes=1000, init_weights=True):
+    def __init__(self, output_size=1000, init_weights=True):
         super(MLP, self).__init__()
         self.classifier = nn.Sequential(
             nn.Linear(512 * 7 * 7, 4096),
@@ -24,10 +24,10 @@ class MLP(nn.Module):
             nn.Linear(4096, 4096),
             nn.ReLU(True),
             nn.Dropout(),
-            nn.Linear(4096, num_classes),
+            nn.Linear(4096, output_size),
         )
 
-        self.feature_size = num_classes
+        self.feature_size = output_size
         if init_weights:
             self._initialize_weights()
 

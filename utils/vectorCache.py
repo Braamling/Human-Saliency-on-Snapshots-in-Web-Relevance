@@ -5,7 +5,6 @@ from __future__ import print_function
 import logging
 import os
 import pathlib
-import pickle
 from os import listdir
 from os.path import isfile, join
 
@@ -35,22 +34,24 @@ class ImageDataset(Dataset):
 
 class VectorCache():
 
-    def __init__(self, model_name, image_type, model=None, indentifier="cache"):
-        self.storage_location = 'storage/model_cache'
-        pathlib.Path(self.storage_location).mkdir(parents=True, exist_ok=True)
+    def __init__(self, cache_path=None, model_name=None, image_type=None, model=None, indentifier="cache"):
+        if cache_path is None:
+            self.storage_location = 'storage/model_cache'
+            pathlib.Path(self.storage_location).mkdir(parents=True, exist_ok=True)
 
-        self.cache_name = "{}-{}-{}".format(model_name, image_type, indentifier)
-        self.cache_path = os.path.join(self.storage_location, self.cache_name)
+            self.cache_name = "{}-{}-{}".format(model_name, image_type, indentifier)
+            self.cache_path = os.path.join(self.storage_location, self.cache_name)
+        else:
+            self.cache_path = cache_path
+
         self.model = model
 
         if os.path.isfile(self.cache_path):
             self.h5 = h5py.File(self.cache_path, 'r+')
             self.vectors = self.h5["vectors"]
-            # self.index = pickle.load(open(self.cache_path, "rb"))
         else:
             self.h5 = h5py.File(self.cache_path, 'w')
             self.vectors = self.h5.create_group("vectors")
-            # self.index = {}
 
     def add(self, name, input):
         output = np.squeeze(self.model.cache_forward(input.unsqueeze(0)).data.cpu().numpy(), axis=0)
@@ -60,10 +61,6 @@ class VectorCache():
         dataset = ImageDataset(folder_name, size)
         for name, image in dataset.iterate():
             self.add(name, image)
-
-
-    # def save(self):
-    #     pickle.dump(self.index, open(self.cache_path, "wb"))
 
     def __getitem__(self, name):
         return self.vectors[name]
