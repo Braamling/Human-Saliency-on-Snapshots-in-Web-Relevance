@@ -11,7 +11,7 @@ The interface can both be used to add new queries, documents and features,
 but also to iterate over the content of a LETOR file.
 """
 class FeatureStorage():
-    def __init__(self, path, image_dir, query_specific=False, only_with_image=False):
+    def __init__(self, path, image_dir, query_specific=False, only_with_image=False, vector_cache=None):
         self.letorIterator = LETORIterator(path)
         self.pairs = []
         self.scores = {}
@@ -20,6 +20,7 @@ class FeatureStorage():
         self.only_with_image = only_with_image
         self.query_specific = query_specific
         self.image_dir = image_dir
+        self.image_cache = vector_cache
 
         self.parse()
 
@@ -62,14 +63,21 @@ class FeatureStorage():
 
     def _get_image(self, q_id, d_id):
         if self.query_specific:
-            image = os.path.join(self.image_dir, "{}-{}.png".format(q_id, d_id))
+            image_path = os.path.join(self.image_dir, "{}-{}.png".format(q_id, d_id))
         else:
-            image = os.path.join(self.image_dir, "{}.png".format(d_id))
+            image_path = os.path.join(self.image_dir, "{}.png".format(d_id))
 
-        if (self.only_with_image and os.path.isfile(image)) or not self.only_with_image:
-            return image
+        if (self.only_with_image and self._is_image_available(image_path)) or not self.only_with_image:
+            return image_path
         else:
-            False
+            return False
+
+
+    def _is_image_available(self, image_path):
+        if self.image_cache is not None:
+            return self.image_cache.exists(image_path)
+        else:
+            return os.path.isfile(image_path)
 
 
     """
@@ -105,6 +113,7 @@ class FeatureStorage():
                 for doc_id in self.queries[query_id][scores].keys():
                     if self._get_image(query_id, doc_id):
                         self.scores[query_id].append((doc_id, int(scores)))
+
 
             self.scores[query_id] = sorted(self.scores[query_id], key=lambda x: -x[1])
 

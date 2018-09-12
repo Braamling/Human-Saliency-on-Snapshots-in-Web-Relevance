@@ -63,4 +63,10 @@ class VectorCache():
             self.add(name, image)
 
     def __getitem__(self, name):
-        return self.vectors[name]
+        return self.vectors[self._prep_name(name)].value
+
+    def exists(self, name):
+        return self._prep_name(name) in self.vectors
+
+    def _prep_name(self, name):
+        return name.split("/")[-1]

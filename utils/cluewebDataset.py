@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import logging
 import random
+import torch
 
 from torch.utils.data import Dataset
 from torchvision import transforms
@@ -63,7 +64,8 @@ class ClueWeb12Dataset(Dataset):
                                                      normalize])
 
     def make_dataset(self, image_dir, features_file):
-        feature_storage = FeatureStorage(features_file, image_dir, self.query_specific, self.only_with_image)
+        feature_storage = FeatureStorage(features_file, image_dir, self.query_specific, self.only_with_image,
+                                         vector_cache=self.vector_cache)
         dataset = []
 
         i = 0
@@ -172,6 +174,6 @@ class ClueWeb12Dataset(Dataset):
 
     def _load_image(self, image):
         if self.cache:
-            return self.vector_cache[image]
+            return torch.Tensor(self.vector_cache[image])
 
         return self.img_transform(default_loader(image))

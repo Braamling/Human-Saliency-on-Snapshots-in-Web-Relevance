@@ -43,12 +43,16 @@ def prepare_dataloaders(train_file, test_file, vali_file):
                                     FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale, FLAGS.vector_cache)
 
     # Prepare the loaders
+    # note that with h5py only one worker can be used to access the dataset.
     dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size,
-                                                  shuffle=True, num_workers=10)
+                                                  shuffle=True, num_workers=1)
     # Initiate the Evaluation classes
-    trainEval = Evaluate(train_file, train_dataset, FLAGS.load_images, "train", FLAGS.batch_size)
-    testEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "test", FLAGS.batch_size)
-    valiEval = Evaluate(vali_file, vali_dataset, FLAGS.load_images, "validation", FLAGS.batch_size)
+    trainEval = Evaluate(train_file, train_dataset, FLAGS.load_images, "train", vector_cache=FLAGS.vector_cache,
+                         batch_size=FLAGS.batch_size)
+    testEval = Evaluate(test_file, test_dataset, FLAGS.load_images, "test", vector_cache=FLAGS.vector_cache,
+                        batch_size=FLAGS.batch_size)
+    valiEval = Evaluate(vali_file, vali_dataset, FLAGS.load_images, "validation", vector_cache=FLAGS.vector_cache,
+                        batch_size=FLAGS.batch_size)
 
     return dataloader, trainEval, testEval, valiEval
 
@@ -117,7 +121,7 @@ def train_model(model, criterion, dataloader, trainEval, testEval,
             # Compute the loss
             loss = criterion(positive, negative)
 
-            running_loss += loss.data[0] # * p_static_features.size(0)
+            running_loss += loss.data[0].item() # * p_static_features.size(0)
 
             optimizer.zero_grad()
             loss.backward()
