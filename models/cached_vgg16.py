@@ -13,10 +13,10 @@ model_urls = {
 }
 
 
-class MLP(nn.Module):
+class CachedVGG16(nn.Module):
 
     def __init__(self, output_size=1000, init_weights=True):
-        super(MLP, self).__init__()
+        super(CachedVGG16, self).__init__()
         self.classifier = nn.Sequential(
             nn.Linear(512 * 7 * 7, 4096),
             nn.ReLU(True),

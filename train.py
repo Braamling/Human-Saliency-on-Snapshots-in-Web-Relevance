@@ -4,7 +4,8 @@ from torch.optim import lr_scheduler
 import torch.optim as optim
 import argparse
 
-from models.mlp import MLP
+from models.cached_resnet import ResNetCached
+from models.cached_vgg16 import CachedVGG16
 from models.scorer import LTR_score
 from models.vgg16 import vgg16
 from models.resnet import resnet152
@@ -138,7 +139,7 @@ def train_model(model, criterion, dataloader, trainEval, testEval,
         tf_logger.log_value('train_loss', running_loss, epoch)
         logger.info('Train_loss: {}'.format(running_loss))
 
-    return best_test_score, model
+    return best_test_score, best_model
 
 """
 Prepare the model with the correct weights and format the the configured use.
@@ -146,6 +147,7 @@ Prepare the model with the correct weights and format the the configured use.
 def prepare_model(use_scheduler=True):
     use_gpu = torch.cuda.is_available()
 
+    # TODO THIS SHOULD BE REFACTORED
     if FLAGS.model == "ViP":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(16, 10, FLAGS.batch_size))
     elif FLAGS.model == "vgg16":
@@ -166,8 +168,10 @@ def prepare_model(use_scheduler=True):
             param.requires_grad = False
     elif FLAGS.model == "features_only":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
-    elif FLAGS.model == "mlp":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, MLP(output_size=FLAGS.visual_features))
+    elif FLAGS.model == "cached_vgg16":
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, CachedVGG16(output_size=FLAGS.visual_features))
+    elif FLAGS.model == "cached_resnet152":
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ResNetCached(expansion_size=4, output_size=FLAGS.visual_features))
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 
