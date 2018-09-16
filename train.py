@@ -227,7 +227,8 @@ def train():
     testEval.print_scores(test_scores)
     valiEval.print_scores(vali_scores)
     testEval.store_scores(FLAGS.optimized_scores_path + FLAGS.description, FLAGS.description + "_final", test_scores)
-    valiEval.store_scores(FLAGS.optimized_scores_path + FLAGS.description, FLAGS.description + "_final", vali_scores)
+    valiEval.store_scores(FLAGS.optimized_scores_path + FLAGS.description, FLAGS.description + "_final", vali_scores,
+                          final=True)
 
 
 if __name__ == '__main__':

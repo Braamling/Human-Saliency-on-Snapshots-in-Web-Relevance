@@ -152,7 +152,7 @@ class Evaluate():
         for key in sorted(list(scores.keys())):
             logger.info("{}_{} {}".format(self.prefix, key, scores[key]))
 
-    def store_scores(self, path, description, scores):
+    def store_scores(self, path, description, scores, final=False):
         """
         Append a dict of scores to file.
 
@@ -160,9 +160,15 @@ class Evaluate():
         Description: Prefix for run identification to the scores that will be appended
         Scores: Dict with score name as key and score value as value.
         """
+        scores = " ".join(["{0}:{1:.4f}".format(k, scores[k]) for k in sorted(list(scores.keys()))])
         with open(path, "a") as f:
-            scores = " ".join(["{0}:{1:.4f}".format(k, scores[k]) for k in sorted(list(scores.keys()))])
             f.write("{}-{} {}\n".format(self.prefix, description, scores))
+
+        # Write final results to aggregate file
+        if final:
+            with open('storage/logs/{}'.format(self.prefix), "a") as f:
+                f.write("{} {}".format(scores, description))
+
 
     def _log_scores(self, scores, tf_logger, epoch):
         for key in scores.keys():
