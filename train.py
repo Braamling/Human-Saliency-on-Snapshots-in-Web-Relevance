@@ -26,6 +26,8 @@ FORMAT = '%(name)s: [%(levelname)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 logger = logging.getLogger("train")
+torch.manual_seed(1337)
+
 
 def pair_hinge_loss(positive, negative):
     loss = torch.clamp(1.0 - positive + negative, 0.0)
@@ -235,7 +237,7 @@ if __name__ == '__main__':
                         help='The location of all the folds with train, test and validation files.')
     parser.add_argument('--folds', type=int, default=5,
                         help='The amounts of folds to train on.')
-    parser.add_argument('--sessions_per_fold', type=int, default=5,
+    parser.add_argument('--sessions_per_fold', type=int, default=1,
                         help='The amount of training sessions to average per fold.')
     parser.add_argument('--image_path', type=str, default='storage/images/snapshots/',
                         help='The location of the salicon images for training.')
