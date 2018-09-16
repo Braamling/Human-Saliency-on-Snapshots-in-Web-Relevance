@@ -4,7 +4,7 @@ from torch.optim import lr_scheduler
 import torch.optim as optim
 import argparse
 
-from models.cached_resnet import ResNetCached
+from models.cached_resnet import TransformCache
 from models.cached_vgg16 import CachedVGG16
 from models.scorer import LTR_score
 from models.vgg16 import vgg16
@@ -172,8 +172,10 @@ def prepare_model(use_scheduler=True):
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
     elif FLAGS.model == "cached_vgg16":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, CachedVGG16(output_size=FLAGS.visual_features))
-    elif FLAGS.model == "cached_resnet152":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ResNetCached(expansion_size=4, output_size=FLAGS.visual_features))
+    elif FLAGS.model == "transform_cache":
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size,
+                          TransformCache(input_size=FLAGS.cache_vector_size, hidden_layers=FLAGS.visual_layers,
+                                         output_size=FLAGS.visual_features))
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 
@@ -276,6 +278,11 @@ if __name__ == '__main__':
                         help='The dropout to use in the classification layer.')
     parser.add_argument('--hidden_size', type=int, default=10,
                         help='The amount of hidden layers in the classification layer')
+    parser.add_argument('--visual_layers', type=str, default="2048x2048",
+                        help="[cached only] Provide hidden sizes seperated by an 'x' that transforms the visual outputs to a hidden" 
+                             "representation")
+    parser.add_argument('--cache_vector_size', type=int, default=25088,
+                        help="[cached only] the size of the output vectors stored in the cache")
     parser.add_argument('--visual_features', type=int, default=30,
                         help='The size of the visual feature vector')
     parser.add_argument('--finetune_n_layers', type=int, default=1,
