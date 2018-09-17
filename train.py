@@ -4,7 +4,7 @@ from torch.optim import lr_scheduler
 import torch.optim as optim
 import argparse
 
-from models.cached_resnet import TransformCache
+from models.transform_cache import TransformCache
 from models.cached_vgg16 import CachedVGG16
 from models.scorer import LTR_score
 from models.vgg16 import vgg16
@@ -175,7 +175,7 @@ def prepare_model(use_scheduler=True):
     elif FLAGS.model == "transform_cache":
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size,
                           TransformCache(input_size=FLAGS.cache_vector_size, hidden_layers=FLAGS.visual_layers,
-                                         output_size=FLAGS.visual_features))
+                                         output_size=FLAGS.visual_features, dropout=FLAGS.dropout))
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 

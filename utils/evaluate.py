@@ -64,7 +64,7 @@ class Evaluate():
         images = []
         for doc, score in zip(doc_ids, scores):
             try:
-                image, vec, rel_score = self.dataset.get_document(doc, query_id)
+                image, vec, rel_score, saliency = self.dataset.get_document(doc, query_id)
 
                 batch_vec.append(vec)
                 images.append(image)
@@ -92,7 +92,6 @@ class Evaluate():
             if self.load_images:
                 images = Variable(images.float())
 
-        # TODO check whether this can be done in batches
         batch_pred = model.forward(images, batch_vec).data.cpu().numpy()
 
         return list(batch_pred.flatten())
@@ -167,7 +166,7 @@ class Evaluate():
         # Write final results to aggregate file
         if final:
             with open('storage/logs/{}'.format(self.prefix), "a") as f:
-                f.write("{} {}".format(scores, description))
+                f.write("{} {}\n".format(scores, description))
 
 
     def _log_scores(self, scores, tf_logger, epoch):

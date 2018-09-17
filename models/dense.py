@@ -2,11 +2,9 @@ import math
 
 import torch.nn as nn
 
-class TransformCache(nn.Module):
+class Dense(nn.Module):
 
-    def __init__(self, input_size=25088, hidden_layers='4096x4096', output_size=1000, init_weights=True):
-        super(TransformCache, self).__init__()
-
+    def _create_layers(self, input_size, hidden_layers, output_size, dropout):
         hidden_sizes = [input_size] + [int(x) for x in hidden_layers.split('x')] + [output_size]
         n_hidden_units = len(hidden_sizes)
 
@@ -15,13 +13,9 @@ class TransformCache(nn.Module):
             layers.append(nn.Linear(hidden_sizes[i], hidden_sizes[i + 1]))
 
             if i < n_hidden_units - 2:
-                layers += [nn.ReLU(True), nn.Dropout()] # TODO should this dropout be configurable?
+                layers += [nn.ReLU(True), nn.Dropout(dropout)]  # TODO should this dropout be configurable?
 
-        self.classifier = nn.Sequential(*layers)
-
-        self.feature_size = output_size
-        if init_weights:
-            self._initialize_weights()
+        return layers
 
     def forward(self, x):
         x = self.classifier(x)

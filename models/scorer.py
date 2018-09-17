@@ -22,16 +22,20 @@ class LTR_score(nn.Module):
         self.relu = torch.nn.ReLU()
         self.predict = torch.nn.Linear(hidden_size, 1) 
 
-    def forward(self, image, static_features):
+    def forward(self, image, static_features, saliency=None):
         if self.feature_model is not None:
-            image = self.feature_model(image)
+            if saliency:
+                image = self.feature_model(image, saliency)
+            else:
+                image = self.feature_model(image)
+
             if self.static_feature_size == 0:
                 features = image
             else:
                 if static_features.dim() == 1:
                     static_features = static_features.unsqueeze(0)
 
-                # Most dirty hack in the history of hacks, but don't want out this problem right now.
+                # Most dirty hack in the history of hacks, but don't want to figure out this problem right now.
                 if type(image) is tuple:
                     image = image[0]
                 if type(static_features) is tuple:

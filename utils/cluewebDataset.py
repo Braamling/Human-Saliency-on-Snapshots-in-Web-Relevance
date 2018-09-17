@@ -31,7 +31,7 @@ def is_image_file(filename):
 
 class ClueWeb12Dataset(Dataset):
     def __init__(self, image_dir=None, features_file=None, get_images=False, query_specific=False, only_with_image=False,
-                 size=(64, 64), grayscale=True, vector_cache=None):
+                 size=(64, 64), grayscale=True, vector_cache=None, saliency_dir=None):
         """
         Args:
             img_dir (string): directory containing all images for the ClueWeb12 webpages
@@ -44,6 +44,7 @@ class ClueWeb12Dataset(Dataset):
         self.image_dir = image_dir
         self.vector_cache = vector_cache
         self.cache = vector_cache is not None
+        self.saliency_dir = saliency_dir
 
         # External doc id to internal doc id
         self.ext2int = {}
@@ -63,14 +64,19 @@ class ClueWeb12Dataset(Dataset):
                                                      transforms.ToTensor(),
                                                      normalize])
 
+        self.saliency_transform = transforms.Compose([transforms.Resize((64,64), interpolation=2),
+                                                 transforms.Grayscale(),
+                                                 transforms.ToTensor()])
+
     def make_dataset(self, image_dir, features_file):
         feature_storage = FeatureStorage(features_file, image_dir, self.query_specific, self.only_with_image,
-                                         vector_cache=self.vector_cache)
+                                         vector_cache=self.vector_cache, saliency_dir=self.saliency_dir)
         dataset = []
 
         i = 0
         # Create a dataset with all query-document pairs
-        for q_id, score, d_id, vec, image in feature_storage.get_all_entries():
+        for q_id, score, d_id, vec, image, saliency in feature_storage.get_all_entries():
+
             # Make the query-score index.
             qs_idx = "{}:{}".format(q_id, score)
 
@@ -89,7 +95,7 @@ class ClueWeb12Dataset(Dataset):
                 i += 1
 
                 # Create the dataset entry
-                item = (image, q_id, score, d_id, vec)
+                item = (image, q_id, score, d_id, vec, saliency)
                 dataset.append(item)
 
         logger.info("Added a dataset with {} queries with {} documents".format(len(feature_storage.get_queries()), i))
@@ -121,7 +127,7 @@ class ClueWeb12Dataset(Dataset):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        _, q_id, score, _, _ = self.dataset[idx]
+        _, q_id, score, _, _, _ = self.dataset[idx]
 
         # Get the id for the query-score pair
         qs_idx = "{}:{}".format(q_id, score)
@@ -130,24 +136,28 @@ class ClueWeb12Dataset(Dataset):
         posneg_idx = self.idx2posneg[qs_idx][posneg_idx - 1]
 
         if self.dataset[idx][2] > self.dataset[posneg_idx][2]:
-            p_image, _, p_score, _, p_vec = self.dataset[idx]
-            n_image, _, n_score, _, n_vec = self.dataset[posneg_idx]
+            p_image, _, p_score, _, p_vec, p_saliency = self.dataset[idx]
+            n_image, _, n_score, _, n_vec, n_saliency = self.dataset[posneg_idx]
         else:
-            p_image, _, p_score, _, p_vec = self.dataset[posneg_idx]
-            n_image, _, n_score, _, n_vec = self.dataset[idx]
+            p_image, _, p_score, _, p_vec, p_saliency = self.dataset[posneg_idx]
+            n_image, _, n_score, _, n_vec, n_saliency = self.dataset[idx]
 
         # Load the positive and negative input image
         if self.get_images:
             p_image = self._load_image(p_image)
             n_image = self._load_image(n_image)
 
+        if self.saliency_dir:
+            p_saliency = self.saliency_transform(default_loader(p_saliency))
+            n_saliency = self.saliency_transform(default_loader(n_saliency))
+
         # The model will filter out the vector, but an empty vector is not supported by pytorch.
         if len(n_vec) is 0:
             p_vec = -1
             n_vec = -1
 
-        positive_sample = (p_image, p_vec, p_score)
-        negative_sample = (n_image, n_vec, n_score)
+        positive_sample = (p_image, p_vec, p_score, p_saliency)
+        negative_sample = (n_image, n_vec, n_score, n_saliency)
 
         return positive_sample, negative_sample
 
@@ -162,7 +172,7 @@ class ClueWeb12Dataset(Dataset):
             print(query_doc_idx)
             raise NoRelDocumentsException("document not in index, probably no relevant documents were found")
 
-        image, _, score, _, vec = self.dataset[self.ext2int[query_doc_idx]]
+        image, _, score, _, vec, saliency = self.dataset[self.ext2int[query_doc_idx]]
 
         # The model will filter out the vector, but an empty vector is not supported by pytorch.
         if len(vec) is 0:
@@ -170,7 +180,11 @@ class ClueWeb12Dataset(Dataset):
 
         if self.get_images:
             image = self._load_image(image)
-        return image, vec, score
+
+        if self.saliency_dir:
+            saliency = self.saliency_transform(default_loader(saliency))
+
+        return image, vec, score, saliency
 
     def _load_image(self, image):
         if self.cache:

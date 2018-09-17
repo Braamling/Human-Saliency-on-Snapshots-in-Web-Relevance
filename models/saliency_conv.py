@@ -1,0 +1,1 @@
+# Transform the saliency input to a vector using conv and dense layers
