@@ -28,6 +28,8 @@ FORMAT = '%(name)s: [%(levelname)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 logger = logging.getLogger("train")
+
+torch.backends.cudnn.deterministic = True
 torch.manual_seed(1337)
 
 
