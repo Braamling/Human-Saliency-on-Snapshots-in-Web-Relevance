@@ -82,14 +82,14 @@ class FeatureStorage():
 
     def _get_saliency(self, d_id):
         if self.saliency_dir is None:
-            return False
+            return None
 
         saliency_path = os.path.join(self.saliency_dir, "{}.png".format(d_id))
 
         if self._is_image_available(saliency_path):
             return saliency_path
 
-        return False
+        return None
 
 
     """

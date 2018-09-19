@@ -14,7 +14,7 @@ external features. The model is then trained end-to-end.
 
 
 class SaliencyAdd(Dense):
-    def __init__(self, visual_model, saliency_model, hidden_layers='4096x4096', output_size=1000):
+    def __init__(self, visual_model, saliency_model, hidden_layers='4096x4096', output_size=1000, dropout=0.2):
         super(SaliencyAdd, self).__init__()
 
         self.visual_model = visual_model
@@ -22,7 +22,7 @@ class SaliencyAdd(Dense):
 
         input_size = visual_model.feature_size + saliency_model.feature_size
 
-        self.classifier = nn.Sequential(*self._create_layers(input_size, hidden_layers, output_size))
+        self.classifier = nn.Sequential(*self._create_layers(input_size, hidden_layers, output_size, dropout))
 
         self.feature_size = output_size
 

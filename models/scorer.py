@@ -24,7 +24,7 @@ class LTR_score(nn.Module):
 
     def forward(self, image, static_features, saliency=None):
         if self.feature_model is not None:
-            if saliency:
+            if saliency is not None:
                 image = self.feature_model(image, saliency)
             else:
                 image = self.feature_model(image)

@@ -4,6 +4,8 @@ from torch.optim import lr_scheduler
 import torch.optim as optim
 import argparse
 
+from models.saliency_add import SaliencyAdd
+from models.saliency_conv import SaliencyConv
 from models.transform_cache import TransformCache
 from models.cached_vgg16 import CachedVGG16
 from models.scorer import LTR_score
@@ -39,11 +41,14 @@ This method prepares the dataloaders for training and returns a training/validat
 def prepare_dataloaders(train_file, test_file, vali_file):
     # Get the train/test datasets
     train_dataset = ClueWeb12Dataset(FLAGS.image_path, train_file, FLAGS.load_images,
-                                     FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale, FLAGS.vector_cache)
+                                     FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale,
+                                     FLAGS.vector_cache, FLAGS.saliency_dir)
     test_dataset = ClueWeb12Dataset(FLAGS.image_path, test_file, FLAGS.load_images,
-                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale, FLAGS.vector_cache)
+                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale,
+                                    FLAGS.vector_cache, FLAGS.saliency_dir)
     vali_dataset = ClueWeb12Dataset(FLAGS.image_path, vali_file, FLAGS.load_images,
-                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale, FLAGS.vector_cache)
+                                    FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale,
+                                    FLAGS.vector_cache, FLAGS.saliency_dir)
 
     # Prepare the loaders
     # note that with h5py only one worker can be used to access the dataset.
@@ -83,11 +88,11 @@ def train_model(model, criterion, dataloader, trainEval, testEval,
     # Set model to training mode
     model.train(False)  
     best_model = copy.deepcopy(model)
-    train_scores = trainEval.eval(model, tf_logger, 0)
+    trainEval.eval(model, tf_logger, 0)
     test_scores = testEval.eval(model, tf_logger, 0)
     best_test_score = test_scores
 
-    for epoch in range(num_epochs):
+    for epoch in range(num_epochs + 1):
         logger.info('Epoch {}/{}'.format(epoch, num_epochs - 1))
         logger.info('-' * 10)
 
@@ -102,24 +107,31 @@ def train_model(model, criterion, dataloader, trainEval, testEval,
         # Iterate over data.
         for data in dataloader:
             # Get the inputs and wrap them into varaibles
+            # TODO, can we move the variable loading to the dataloader itself?
             if use_gpu:
                 p_static_features = Variable(data[0][1].float().cuda())
                 n_static_features = Variable(data[1][1].float().cuda())
                 if FLAGS.load_images:
                     p_image = Variable(data[0][0].float().cuda())
                     n_image = Variable(data[1][0].float().cuda())
+                if FLAGS.saliency_dir:
+                    p_saliency = Variable(data[0][3].float().cuda())
+                    n_saliency = Variable(data[1][3].float().cuda())
             else:
                 p_static_features = Variable(data[0][1].float())
                 n_static_features = Variable(data[1][1].float())
                 if FLAGS.load_images:
                     p_image = Variable(data[0][0].float())
                     n_image = Variable(data[1][0].float())
+                if FLAGS.saliency_dir:
+                    p_saliency = Variable(data[0][3].float())
+                    n_saliency = Variable(data[1][3].float())
 
             if not FLAGS.load_images:
                 p_image = n_image = None
 
-            positive = model.forward(p_image, p_static_features)
-            negative = model.forward(n_image, n_static_features)
+            positive = model.forward(p_image, p_static_features, p_saliency)
+            negative = model.forward(n_image, n_static_features, n_saliency)
 
             # Compute the loss
             loss = criterion(positive, negative)
@@ -131,7 +143,7 @@ def train_model(model, criterion, dataloader, trainEval, testEval,
             optimizer.step()
 
         model.train(False) 
-        train_scores = trainEval.eval(model, tf_logger, epoch)
+        trainEval.eval(model, tf_logger, epoch)
         test_scores = testEval.eval(model, tf_logger, epoch)
         if best_test_score[FLAGS.optimize_on] < test_scores[FLAGS.optimize_on]:
             logger.debug("Improved the current best score.")
@@ -176,6 +188,14 @@ def prepare_model(use_scheduler=True):
         model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size,
                           TransformCache(input_size=FLAGS.cache_vector_size, hidden_layers=FLAGS.visual_layers,
                                          output_size=FLAGS.visual_features, dropout=FLAGS.dropout))
+    elif FLAGS.model == "saliency_add": # TODO integrate this with a separate flag.
+        visual_model = TransformCache(input_size=FLAGS.cache_vector_size, hidden_layers=FLAGS.visual_layers,
+                                         output_size=FLAGS.visual_features, dropout=FLAGS.dropout)
+        saliency_model = SaliencyConv()
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size,
+                          SaliencyAdd(visual_model, saliency_model,
+                                      hidden_layers='4096x4096',
+                                      output_size=1000, dropout=FLAGS.dropout))
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 
@@ -244,8 +264,12 @@ if __name__ == '__main__':
                         help='The amount of training sessions to average per fold.')
     parser.add_argument('--image_path', type=str, default='storage/images/snapshots/',
                         help='The location of the salicon images for training.')
+    parser.add_argument('--saliency_dir', type=str, default=None,
+                        help='[optional] The path of the directory where the saliency images are stored. No saliency '
+                             'images will be stored the argument is not passed')
     parser.add_argument('--cache_path', type=str, default=None,
-                        help='Provide the path of a feature extractor cache path in order to speed up training ie. storage/model_cache/restnet152-saliency-cache. ')
+                        help='Provide the path of a feature extractor cache path in order to speed up training ie. '
+                             'storage/model_cache/restnet152-saliency-cache. ')
 
     parser.add_argument('--batch_size', type=int, default=3,
                         help='The batch size used for training.')

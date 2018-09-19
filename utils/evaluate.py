@@ -62,11 +62,15 @@ class Evaluate():
     def _get_predictions(self, model, doc_ids, scores, query_id):
         batch_vec = []
         images = []
+        batch_saliency = []
         for doc, score in zip(doc_ids, scores):
             try:
                 image, vec, rel_score, saliency = self.dataset.get_document(doc, query_id)
 
                 batch_vec.append(vec)
+
+                if saliency is not None:
+                    batch_saliency.append(saliency)
                 images.append(image)
 
                 if score is not rel_score:
@@ -80,19 +84,34 @@ class Evaluate():
 
         batch_vec = np.vstack(batch_vec)
 
+        if len(batch_saliency) > 0:
+            batch_saliency = torch.stack(batch_saliency)
+        else:
+            batch_saliency = None
+
         if self.load_images:
             images = torch.stack(images)
 
         if self.use_gpu:
             batch_vec = Variable(torch.from_numpy(batch_vec).float().cuda())
+
+            if batch_saliency is not None:
+                batch_saliency = Variable(batch_saliency.float().cuda())
+
             if self.load_images:
                 images = Variable(images.float().cuda())
         else:
             batch_vec = Variable(torch.from_numpy(batch_vec).float())
+
+            if batch_saliency is not None:
+                batch_saliency = Variable(batch_saliency.float())
             if self.load_images:
                 images = Variable(images.float())
 
-        batch_pred = model.forward(images, batch_vec).data.cpu().numpy()
+        if batch_saliency is not None:
+            batch_pred = model.forward(images, batch_vec, batch_saliency).data.cpu().numpy()
+        else:
+            batch_pred = model.forward(images, batch_vec).data.cpu().numpy()
 
         return list(batch_pred.flatten())
 
