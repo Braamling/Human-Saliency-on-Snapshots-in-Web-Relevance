@@ -69,7 +69,7 @@ class Evaluate():
 
                 batch_vec.append(vec)
 
-                if saliency is not None:
+                if saliency is not False:
                     batch_saliency.append(saliency)
                 images.append(image)
 

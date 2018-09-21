@@ -132,6 +132,9 @@ def train_model(model, criterion, dataloader, trainEval, testEval,
             if not FLAGS.load_images:
                 p_image = n_image = None
 
+            if not FLAGS.saliency_dir:
+                p_saliency = n_saliency = None
+
             positive = model.forward(p_image, p_static_features, p_saliency)
             negative = model.forward(n_image, n_static_features, n_saliency)
 
