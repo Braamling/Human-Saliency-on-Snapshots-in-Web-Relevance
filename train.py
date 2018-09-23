@@ -168,39 +168,39 @@ def prepare_model(use_scheduler=True):
 
     # TODO THIS SHOULD BE REFACTORED
     if FLAGS.model == "ViP":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, ViP_features(16, 10, FLAGS.batch_size))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size, ViP_features(16, 10, FLAGS.batch_size))
     elif FLAGS.model == "vgg16":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, vgg16(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size, vgg16(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
         for param in model.feature_model.features.parameters():
             param.requires_grad = False
     elif FLAGS.model == "resnet152":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "resnet18":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size, resnet152(pretrained=True, state_dict=None, output_size=FLAGS.visual_features))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "inception":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, inception_v3(pretrained=True, output_size=FLAGS.visual_features))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size, inception_v3(pretrained=True, output_size=FLAGS.visual_features))
         for param in list(model.feature_model.parameters())[:-FLAGS.finetune_n_layers]:
             param.requires_grad = False
     elif FLAGS.model == "features_only":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size)
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size)
     elif FLAGS.model == "cached_vgg16":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size, CachedVGG16(output_size=FLAGS.visual_features))
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size, CachedVGG16(output_size=FLAGS.visual_features))
     elif FLAGS.model == "transform_cache":
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size,
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size,
                           TransformCache(input_size=FLAGS.cache_vector_size, hidden_layers=FLAGS.visual_layers,
-                                         output_size=FLAGS.visual_features, dropout=FLAGS.dropout))
+                                         output_size=FLAGS.visual_features, dropout=FLAGS.visual_dropout))
     elif FLAGS.model == "saliency_add": # TODO integrate this with a separate flag.
         visual_model = TransformCache(input_size=FLAGS.cache_vector_size, hidden_layers=FLAGS.visual_layers,
-                                         output_size=FLAGS.visual_features, dropout=FLAGS.dropout)
+                                         output_size=FLAGS.visual_features, dropout=FLAGS.visual_dropout)
         saliency_model = SaliencyConv()
-        model = LTR_score(FLAGS.content_feature_size, FLAGS.dropout, FLAGS.hidden_size,
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size,
                           SaliencyAdd(visual_model, saliency_model,
                                       hidden_layers='4096x4096',
-                                      output_size=1000, dropout=FLAGS.dropout))
+                                      output_size=1000, dropout=FLAGS.visual_dropout))
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 
@@ -303,8 +303,10 @@ if __name__ == '__main__':
     parser.add_argument('--grayscale', type=str, default='False',
                         help='Flag whether to convert the images to grayscale.')
 
-    parser.add_argument('--dropout', type=float, default=.1,
+    parser.add_argument('--classification_dropout', type=float, default=.1,
                         help='The dropout to use in the classification layer.')
+    parser.add_argument('--visual_dropout', type=float, default=.1,
+                        help='The dropout to use in the visual feature layer.')
     parser.add_argument('--hidden_size', type=int, default=10,
                         help='The amount of hidden layers in the classification layer')
     parser.add_argument('--visual_layers', type=str, default="2048x2048",

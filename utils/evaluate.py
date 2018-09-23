@@ -182,9 +182,9 @@ class Evaluate():
         with open(path, "a") as f:
             f.write("{}-{} {}\n".format(self.prefix, description, scores))
 
-        # Write final results to aggregate file
+        # Write final results to aggregate file with model name prefix
         if final:
-            with open('storage/logs/{}'.format(self.prefix), "a") as f:
+            with open('storage/logs/{}_{}'.format(self.prefix, description.split("_")[0]), "a") as f:
                 f.write("{} {}\n".format(scores, description))
 
 
