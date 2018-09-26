@@ -18,7 +18,7 @@ def tune():
     else:
         commands += ['--load_images', 'True']
 
-    if FLAGS.input_type in ('saliency'):
+    if FLAGS.infrastructure_type in ('saliency_add'):
         commands += FLAGS.saliency_path.split()
 
     commands += FLAGS.image_path.format(FLAGS.input_type).split()
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     FLAGS, unparsed = parser.parse_known_args()
 
     FLAGS.image_path = '--image_path storage/images_224x224/{}/'
-    FLAGS.saliency_path = '--saliency_path storage/images_224x224/saliency/'
+    FLAGS.saliency_path = '--saliency_dir storage/images_224x224/saliency/'
     FLAGS.cache_vector = '--cache_vector_size {}'
     FLAGS.cache_path = '--cache_path storage/model_cache/{}-{}-cache'
     FLAGS.infrastructure = '--model {}'
