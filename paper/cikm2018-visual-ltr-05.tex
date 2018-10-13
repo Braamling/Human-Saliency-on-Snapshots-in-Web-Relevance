@@ -11,7 +11,6 @@
 
 % !TEX root = cikm2018-visual-ltr.tex
 
-\newcommand{\OK}{@{\mbox{}\hspace*{.25cm}}}
 
 \section{Experiments and Results}
 In this section, we discuss experiments performed on the proposed \datasetname~dataset.
@@ -49,6 +48,8 @@ The top part of Table~\ref{tab:visresults} shows the results using the different
 %Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
 We see that in terms of significance, the results and relative performance of the visual ranking methods are similar to the work of \citet{fan2017learning}, where the snapshots with highlights outperform the vanilla snapshots. Although both snapshots with and without highlights have higher average results than the baseline, neither show a significant improvement in terms of MAP.
 
+
+
 \begin{table}[h]
 \caption{\ac{LTR} methods with visual features. $\dagger$ indicates a significant improvement over the ViP baseline and $\ddagger$ indicates a significant improvement over ViP highlights.}
 \label{tab:visresults}
@@ -64,6 +65,10 @@ ViP highlights        & 0.418$^\dagger$  & 0.416$^\dagger$ & 0.239$^\dagger$   &
 VGG snapshots      & 0.514$^\ddagger$    & 0.484$^\ddagger$ & 0.292$^\ddagger$   & 0.324$^\ddagger$   & 0.442$^\ddagger$ \\ 
 VGG highlights     & \textbf{0.560}$^\ddagger$    & \textbf{0.520}$^\ddagger$ & \textbf{0.323}$^\ddagger$   & \textbf{0.346}$^\ddagger$   & \textbf{0.456}$^\ddagger$ \\ 
 VGG saliency       & 0.554$^\ddagger$    & 0.453$^\ddagger$ & 0.310$^\ddagger$   & 0.302$^\ddagger$   & 0.422 \\ 
+\midrule
+ResNet snapshots   & 0.550 & 0.452 & 0.310 & 0.301 & 0.437 \\ % TODO: perform significance test
+ResNet highlights  & 0.530 & 0.463 & 0.305 & 0.312 & 0.440 \\
+ResNet saliency	   & 0.560 & 0.476 & 0.333 & 0.321 & 0.442 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -102,9 +107,8 @@ VGG highlights        & \textbf{0.560}  & \textbf{0.520} & \textbf{0.323}   & \t
 
 %\todo{Here we can add the benchmarking experiment that I left out for now.}
 
-\if0
 \paragraph{Benchmarking content features}
-\todo{In fact, this should go into discussion and not experimental setup and/or experiments. But let's do this later.}
+% \todo{In fact, this should go into discussion and not experimental setup and/or experiments. But let's do this later.}
 In \ac{LTR} research, the amount and type of non-visual features used for training varies widely per dataset and study.
 To assess the performance of the 11 non-visual features used in this study (see Table~\ref{tab:setdescription}), we use a set of known LTR algorithms on the million query track 2007 (MQ2007)\cite{allan2007million} with the LETOR 4.0\footnote{\url{https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/}} non-visual features.
 MQ2007 and LETOR 4.0 have a total of 46 features containing all 11 features from Table~\ref{tab:setdescription}.
@@ -131,4 +135,3 @@ LambdaMart - 11 & 0.448 & 0.380 & 0.397  & 0.443   & 0.455 \\
 \end{tabular}
 \end{table}
 
-\fi

@@ -200,7 +200,16 @@ def prepare_model(use_scheduler=True):
         model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size,
                           SaliencyAdd(visual_model, saliency_model,
                                       hidden_layers='4096x4096',
-                                      output_size=1000, dropout=FLAGS.visual_dropout))
+                                      output_size=FLAGS.visual_features, dropout=FLAGS.visual_dropout))
+    elif FLAGS.model == "saliency_twin_add": # TODO integrate this with a separate flag.
+        visual_model = TransformCache(input_size=FLAGS.cache_vector_size, hidden_layers=FLAGS.visual_layers,
+                                         output_size=FLAGS.visual_features, dropout=FLAGS.visual_dropout)
+        saliency_model = TransformCache(input_size=FLAGS.cache_vector_size, hidden_layers=FLAGS.visual_layers,
+                                         output_size=FLAGS.visual_features, dropout=FLAGS.visual_dropout)
+        model = LTR_score(FLAGS.content_feature_size, FLAGS.classification_dropout, FLAGS.hidden_size,
+                          SaliencyAdd(visual_model, saliency_model,
+                                      hidden_layers='4096x4096',
+                                      output_size=FLAGS.visual_features, dropout=FLAGS.visual_dropout))
     else:
         raise NotImplementedError("Model: {} is not implemented".format(FLAGS.model))
 
