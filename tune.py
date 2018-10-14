@@ -18,7 +18,7 @@ def tune():
     else:
         commands += ['--load_images', 'True']
 
-    if FLAGS.infrastructure_type in ('saliency_add'):
+    if FLAGS.infrastructure_type in ('saliency_add', 'saliency_twin_add'):
         commands += FLAGS.saliency_path.split()
 
     commands += FLAGS.image_path.format(FLAGS.input_type).split()
@@ -75,7 +75,8 @@ if __name__ == '__main__':
         '--visual_layers':          ['4096x4096x4096x4096', '4096x4096x4096', '2048x2048x2048x2048',
                                      '1024x1024x1024x1024x1024x1024',
                                      '1024x1024x1024x1024', '2048x4096x2048'],
-        '--optimize_on':            ['ndcg@1', 'ndcg@10', 'p@1', 'p@10', 'map'],
+        # '--optimize_on':            ['ndcg@1', 'ndcg@10', 'p@1', 'p@10', 'map'],
+        '--optimize_on':            ['p@10'],
         '--batch_size':             ['100']
     }
 
