@@ -69,4 +69,6 @@ class VectorCache():
         return self._prep_name(name) in self.vectors
 
     def _prep_name(self, name):
+        if type(name) is bool:
+            a = 1
         return name.split("/")[-1]

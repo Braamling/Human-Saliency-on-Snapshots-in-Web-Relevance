@@ -104,7 +104,7 @@ class FeatureStorage():
                     image = self._get_image(query_id, doc_id)
                     saliency = self._get_saliency(doc_id)
 
-                    if image:
+                    if image and (self.saliency_dir is None or saliency):
                         yield (query_id, rel_score, doc_id, vec, image, saliency)
 
 
