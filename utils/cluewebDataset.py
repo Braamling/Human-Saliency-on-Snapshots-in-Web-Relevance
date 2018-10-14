@@ -148,8 +148,10 @@ class ClueWeb12Dataset(Dataset):
             n_image = self._load_image(n_image)
 
         if self.saliency_dir:
-            p_saliency = self.saliency_transform(default_loader(p_saliency))
-            n_saliency = self.saliency_transform(default_loader(n_saliency))
+            p_saliency = self._load_image(p_saliency)
+            n_saliency = self._load_image(n_saliency)
+            # p_saliency = self.saliency_transform(default_loader(p_saliency))
+            # n_saliency = self.saliency_transform(default_loader(n_saliency))
 
         # The model will filter out the vector, but an empty vector is not supported by pytorch.
         if len(n_vec) is 0:
@@ -182,7 +184,8 @@ class ClueWeb12Dataset(Dataset):
             image = self._load_image(image)
 
         if self.saliency_dir:
-            saliency = self.saliency_transform(default_loader(saliency))
+            saliency = self._load_image(saliency)
+            # saliency = self.saliency_transform(default_loader(saliency))
 
         return image, vec, score, saliency
 
