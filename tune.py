@@ -21,6 +21,9 @@ def tune():
     if FLAGS.infrastructure_type in ('saliency_add', 'saliency_twin_add'):
         commands += FLAGS.saliency_path.split()
 
+    if FLAGS.infrastructure_type in ('saliency_twin_add'):
+        commands += FLAGS.saliency_cache_path.format(FLAGS.model, 'saliency').split()
+
     commands += FLAGS.image_path.format(FLAGS.input_type).split()
     commands += FLAGS.cache_path.format(FLAGS.model, FLAGS.input_type).split()
     commands += FLAGS.infrastructure.format(FLAGS.infrastructure_type).split()
@@ -65,6 +68,7 @@ if __name__ == '__main__':
     FLAGS.saliency_path = '--saliency_dir storage/images_224x224/saliency/'
     FLAGS.cache_vector = '--cache_vector_size {}'
     FLAGS.cache_path = '--cache_path storage/model_cache/{}-{}-cache'
+    FLAGS.saliency_cache_path = '--saliency_cache_path storage/model_cache/{}-{}-cache'
     FLAGS.infrastructure = '--model {}'
     FLAGS.run_cmd = 'python3 train.py --content_feature_size 11 --content_feature_dir storage/clueweb12_web_trec  --epochs 20'
 

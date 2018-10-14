@@ -44,13 +44,13 @@ def prepare_dataloaders(train_file, test_file, vali_file):
     # Get the train/test datasets
     train_dataset = ClueWeb12Dataset(FLAGS.image_path, train_file, FLAGS.load_images,
                                      FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale,
-                                     FLAGS.vector_cache, FLAGS.saliency_dir)
+                                     FLAGS.vector_cache, FLAGS.saliency_dir, saliency_cache=FLAGS.saliency_cache)
     test_dataset = ClueWeb12Dataset(FLAGS.image_path, test_file, FLAGS.load_images,
                                     FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale,
-                                    FLAGS.vector_cache, FLAGS.saliency_dir)
+                                    FLAGS.vector_cache, FLAGS.saliency_dir, saliency_cache=FLAGS.saliency_cache)
     vali_dataset = ClueWeb12Dataset(FLAGS.image_path, vali_file, FLAGS.load_images,
                                     FLAGS.query_specific, FLAGS.only_with_image, FLAGS.size, FLAGS.grayscale,
-                                    FLAGS.vector_cache, FLAGS.saliency_dir)
+                                    FLAGS.vector_cache, FLAGS.saliency_dir, saliency_cache=FLAGS.saliency_cache)
 
     # Prepare the loaders
     # note that with h5py only one worker can be used to access the dataset.
@@ -281,6 +281,9 @@ if __name__ == '__main__':
     parser.add_argument('--saliency_dir', type=str, default=None,
                         help='[optional] The path of the directory where the saliency images are stored. No saliency '
                              'images will be stored the argument is not passed')
+    parser.add_argument('--saliency_cache_path', type=str, default=None,
+                        help='[optional] The path of the directory where the saliency images cache is stored. ie.'
+                             'storage/model_cache/restnet152-saliency-cache.')
     parser.add_argument('--cache_path', type=str, default=None,
                         help='Provide the path of a feature extractor cache path in order to speed up training ie. '
                              'storage/model_cache/restnet152-saliency-cache. ')
@@ -347,6 +350,11 @@ if __name__ == '__main__':
         FLAGS.vector_cache = VectorCache(cache_path=FLAGS.cache_path)
     else:
         FLAGS.vector_cache = None
+
+    if FLAGS.saliency_cache_path is not None:
+        FLAGS.saliency_cache = VectorCache(cache_path=FLAGS.saliency_cache_path)
+    else:
+        FLAGS.saliency_cache = None
 
     logger.info(FLAGS)
 
