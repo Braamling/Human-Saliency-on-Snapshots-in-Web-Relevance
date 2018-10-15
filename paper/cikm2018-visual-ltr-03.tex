@@ -24,14 +24,16 @@ Although VGG-16 is not the state-of-the-art visual feature extractor, it is a re
 The VGG-16 architecture consists of a set of convolutional filters and fully connected layers. 
 The convolutional filters extract features from the input image, which are used by the fully connected layers to classify the image. 
 These filters are generic with respect to input and task~\citep{donahue2014decaf}, so we can reuse them to create visual features for LTR. 
-The fully connected layers can be altered and retrained to specifically learn to handle new inputs and tasks. 
-In our case, we replace the last fully connected layer with a reinitialized layer with an output of size $30$. During training, we only optimize the fully connected layers.
+The fully connected layers can be altered and retrained to specifically learn to handle new inputs and tasks. In order to increase training perforamnce and reduce the computational requirements we first transform all input images using the convolutional layers, changing all $3\times224\times224$ input images to a single vector of $1\times25088$ drastically reducing the amount of parameters. The remaining fully connected layers are retrained, with the last fully connected layer reinitalized to produce an output of size $30$.
 
-VGG-16 uses a $224\times224$ image with three color channels as input as opposed to the gray-scaled $64\times64$ input used by ViP, giving us the advantage that both color and low level features persist. 
+% VGG-16 uses a $224\times224$ image with three color channels as input as opposed to the gray-scaled $64\times64$ input used by ViP, giving us the advantage that both color and low level features persist. 
+
+\paragraph{ResNet-152 visual features}
+The ResNet-152 architecture has a significant increase in image classification over VGG-16\cite{he2016deep}. The residual connections between convolutional layers allow for deeper networks to be trained without suffering from vanishing gradients. Similar as with the VGG-16 model, we use the convolutional layers to convert each $3\times224\times224$ input images to a single vectors of $1\times2048$. The original ResNet-152 architecture only has a single fully connected layer making it hard to fine tune the model. Instead, we use completely untrained fully connected network consisting of three layers with $4096$ hidden units, producing a final output of size $30$.
 
 
 \paragraph{Saliency heatmaps}
 Following \cite{shan2017two}, we generate synthetic saliency heatmaps for each snapshot in our data\-set. 
 These heatmaps attempt to predict the viewing pattern of a user, creating a data driven alternative to the F-shape that is modeled in the ViP architecture. 
-The heatmaps have a dimension of $64\times64$ which is linearly scaled to $224\times244$ in order to use them as input to the VGG-16 feature extraction component discussed above.
+The heatmaps have a dimension of $64\times64$ which is linearly scaled to $224\times224$ in order to use them as input to the VGG-16 feature extraction component discussed above.
 Fig.~\ref{fig:exampleshots} shows example snapshots with their corresponding saliency heatmaps.

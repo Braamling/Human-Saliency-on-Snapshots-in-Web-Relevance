@@ -31,7 +31,7 @@ def is_image_file(filename):
 
 class ClueWeb12Dataset(Dataset):
     def __init__(self, image_dir=None, features_file=None, get_images=False, query_specific=False, only_with_image=False,
-                 size=(64, 64), grayscale=True, vector_cache=None, saliency_dir=None):
+                 size=(64, 64), grayscale=True, vector_cache=None, saliency_dir=None, saliency_cache=None):
         """
         Args:
             img_dir (string): directory containing all images for the ClueWeb12 webpages
@@ -44,6 +44,7 @@ class ClueWeb12Dataset(Dataset):
         self.image_dir = image_dir
         self.vector_cache = vector_cache
         self.cache = vector_cache is not None
+        self.saliency_cache = saliency_cache
         self.saliency_dir = saliency_dir
 
         # External doc id to internal doc id
@@ -70,7 +71,8 @@ class ClueWeb12Dataset(Dataset):
 
     def make_dataset(self, image_dir, features_file):
         feature_storage = FeatureStorage(features_file, image_dir, self.query_specific, self.only_with_image,
-                                         vector_cache=self.vector_cache, saliency_dir=self.saliency_dir)
+                                         vector_cache=self.vector_cache, saliency_dir=self.saliency_dir,
+                                         saliency_cache=self.saliency_cache)
         dataset = []
 
         i = 0
@@ -148,8 +150,8 @@ class ClueWeb12Dataset(Dataset):
             n_image = self._load_image(n_image)
 
         if self.saliency_dir:
-            p_saliency = self.saliency_transform(default_loader(p_saliency))
-            n_saliency = self.saliency_transform(default_loader(n_saliency))
+            p_saliency = self._load_saliency_image(p_saliency)
+            n_saliency = self._load_saliency_image(n_saliency)
 
         # The model will filter out the vector, but an empty vector is not supported by pytorch.
         if len(n_vec) is 0:
@@ -182,8 +184,7 @@ class ClueWeb12Dataset(Dataset):
             image = self._load_image(image)
 
         if self.saliency_dir:
-            saliency = self.saliency_transform(default_loader(saliency))
-
+            saliency = self._load_saliency_image(saliency)
         return image, vec, score, saliency
 
     def _load_image(self, image):
@@ -191,3 +192,9 @@ class ClueWeb12Dataset(Dataset):
             return torch.Tensor(self.vector_cache[image])
 
         return self.img_transform(default_loader(image))
+
+    def _load_saliency_image(self, image):
+        if self.saliency_cache is not None:
+            return torch.Tensor(self.saliency_cache[image])
+
+        return self.saliency_transform(default_loader(image))

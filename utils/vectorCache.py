@@ -47,7 +47,7 @@ class VectorCache():
         self.model = model
 
         if os.path.isfile(self.cache_path):
-            self.h5 = h5py.File(self.cache_path, 'r+')
+            self.h5 = h5py.File(self.cache_path, 'r')
             self.vectors = self.h5["vectors"]
         else:
             self.h5 = h5py.File(self.cache_path, 'w')

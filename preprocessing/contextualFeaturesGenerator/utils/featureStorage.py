@@ -11,7 +11,7 @@ The interface can both be used to add new queries, documents and features,
 but also to iterate over the content of a LETOR file.
 """
 class FeatureStorage():
-    def __init__(self, path, image_dir, query_specific=False, only_with_image=False, vector_cache=None, saliency_dir=None):
+    def __init__(self, path, image_dir, query_specific=False, only_with_image=False, vector_cache=None, saliency_dir=None, saliency_cache=None):
         self.letorIterator = LETORIterator(path)
         self.pairs = []
         self.scores = {}
@@ -22,6 +22,7 @@ class FeatureStorage():
         self.image_dir = image_dir
         self.image_cache = vector_cache
         self.saliency_dir  = saliency_dir
+        self.saliency_cache = saliency_cache
 
         self.parse()
 
@@ -81,16 +82,17 @@ class FeatureStorage():
             return os.path.isfile(image_path)
 
     def _get_saliency(self, d_id):
-        if self.saliency_dir is None:
+        if self.saliency_dir is None and self.saliency_cache is None:
             return False
 
         saliency_path = os.path.join(self.saliency_dir, "{}.png".format(d_id))
 
-        if self._is_image_available(saliency_path):
+        if self.saliency_cache is not None and self.saliency_cache.exists(saliency_path):
+            return saliency_path
+        elif os.path.isfile(saliency_path):
             return saliency_path
 
         return False
-
 
     """
     Get all available query-document pairs in an array of with tuple values of

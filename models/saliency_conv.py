@@ -3,14 +3,7 @@ import logging
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-
 logger = logging.getLogger("saliency_conv")
-
-"""
-The LTR score model can hold a second feature network that can be fed
-external features. The model is then trained end-to-end.
-"""
 
 
 class SaliencyConv(nn.Module):
@@ -28,7 +21,6 @@ class SaliencyConv(nn.Module):
 
         # self._initialize_weights()
 
-
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
@@ -39,4 +31,3 @@ class SaliencyConv(nn.Module):
         return x
 
         return x
-
