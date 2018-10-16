@@ -18,7 +18,7 @@ def tune():
     else:
         commands += ['--load_images', 'True']
 
-    if FLAGS.infrastructure_type in ('saliency_add', 'saliency_twin_add'):
+    if FLAGS.infrastructure_type in ('saliency_add'):
         commands += FLAGS.saliency_path.split()
 
     if FLAGS.infrastructure_type in ('saliency_twin_add'):
