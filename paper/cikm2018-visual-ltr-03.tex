@@ -1,39 +1,73 @@
 % !TEX root = cikm2018-visual-ltr.tex
 
 \section{Visual feature extraction methods}
-In this section we discuss the improved visual feature extraction methods that we use for \ac{LTR} based on the visual appearance of web pages. The corresponding code is available on Github.\footnote{URL removed for review}
+In this section we discuss various visual feature extraction methods and how to use these in order to create \ac{LTR} features based on the visual appearance of web pages. 
 
-%\subsection{Visual feature models}
-Similarly to \cite{fan2017learning}, we use a combination of visual and content features for training.
-This is achieved by separating the base model into a visual feature extraction and scoring component.
-The visual feature extraction component takes an image $x_{img}$ as an input and outputs a visual feature vector $x_{v}$.
-This feature vector is concatenated with a content feature vector $x_{c}$ and the concatenated vector is then used as an input to the scoring component.
-In our case, we use the same single fully connected layer with a hidden size of $10$ as by~\citep{fan2017learning}, but added a dropout of $10\%$ which was empirically found to improve the performance. 
-The visual feature extraction and scoring components are trained end-to-end using a pairwise hinge loss with $L_2$ regularization as in~\cite{fan2017learning}.
-For the experiments, we used various visual feature extraction models described below.
+We start by proposing a multimodal architecture used to train a \ac{LTR} model with both visual and content features. 
+Secondly, we demonstrate how the architecture can be exploited to drastically reduce the computational costs during training. 
+The three paragraphs that follow decribe the implementation of three visual feature extractors, being:
+\begin{inparaenum}[(i)]
+\item the ViP baseline model proposed in~\citet{fan2017learning}, 
+\item the VGG-16~\cite{simonyan2014very} classification model pretrained on ImageNet, and
+\item the ResNet-152~\cite{he2016deep} classification model pretrained on ImageNet.
+\end{inparaenum} 
+
+All corresponding code is available on Github.\footnote{URL removed for review}
+
+\paragraph{Multimodal architecture}
+In order to compare the performance of various visual feature extractor methods, we propose a reusable multimodal architecture. 
+The multimodal architecture is visualized in Figure~\ref{fig:multimodelarchitecture}. 
+The model starts by taking an image $x_{img}$ (1) as an input to the visual feature extraction layer (2) in order to create a generic visual feature vector $x_{img\_feat}$. In turn, $x_{img\_feat}$ is then used as an input to the visual feature transformation layer (3).
+This visual feature transformation layer learns to transforms the generic visual features to a \ac{LTR} specific visual feature vector $x_{img\_ltr}$.
+
+The final \ac{LTR} feature vector $x_{ltr}$ is constructed by concatenting the visual \ac{LTR} features $x_{img\_ltr}$ with the content \ac{LTR} features $x_{content}$ (4). 
+
+$x_{content}$ is then used as an input to the scoring component (5), which transforms the features to a single score for each document-query pair. The scoring component uses a single fully connected layer with a hidden size of $10$. During preliminary experiments, we found that adding a dropout of $10\%$ increased overall performance, which was then consistently used in further experiments. The resulting model is trained end-to-end using a pairwise hinge loss with $L_2$ regularization. 
+
+\paragraph{Reducing training complexity}
+Both training and inference using deep convolutional networks are generally computationally expensive.
+By separating the network in a visual feature extraction and transformation layer as described above, we can drastically reduce the computational requirements by freezing the parameters of the extractor layers.
+To even further reduce the memory and computational cost during training, we can store the $x_{img\_feat}$ vectors to disk prior to training, allowing us to replace $x_{img}$ with the much smaller $x_{img\_feat}$ as an input to the model and removing the parameters of the visual feature extractor completely during training.
+
+\begin{figure}[t]
+\includegraphics[width = 3.5in]{images/multimodelarchitecture.pdf}
+\caption{The proposed multimodal architecture, which the visual feature extraction}
+\label{fig:multimodelarchitecture}
+\end{figure}
 
 \paragraph{ViP visual features}
 As a baseline, we implement the visual feature extractor proposed in~\citet{fan2017learning} using PyTorch.
-In this model, an input image $x_{img}$ is gray-scaled, normalized and horizontally segmented into $4\times16$ slices, which are processed separately through a shallow convolutional network.
-This output is then passed top to bottom through an LSTM which results in a visual feature vector~$x_{v}$. 
-%The full dimensions can be found in Figure \ref{fig:ViPfeat}.
+In this model, $x_{img}$ is gray-scaled, normalized and horizontally segmented into $4\times16$ slices before being processed by the visual feature extractor. The visual feature extractor processes all slices separately using a shallow convolutional network.
+Each of these outputs is then being passed from top to bottom through an LSTM in order to create $x_{ltr}$.
 
 \paragraph{VGG-16 visual features}
-Since the dataset in \citep{fan2017learning} and the \datasetname{} dataset that we introduce in this paper have a relatively low number of snapshots to train a separate feature extractor, we use the VGG-16 model~\cite{simonyan2014very} from Torchvision,\footnote{\url{https://github.com/pytorch/vision/blob/master/torchvision/models/vgg.py}} pretrained on ImageNet, as a feature extractor. 
-Although VGG-16 is not the state-of-the-art visual feature extractor, it is a reasonable trade-off between effectiveness and simplicity.
+Since the \datasetname{} data\-set that we introduce in this paper has a relatively low number of snapshots to train a separate feature extractor, we use the VGG-16 model~\cite{simonyan2014very} from Torchvision,\footnote{\url{https://github.com/pytorch/vision/blob/master/torchvision/models/vgg.py}} pretrained on ImageNet, as a feature extractor. 
+Although VGG-16 is not the current state-of-the-art visual feature extractor, it is a reasonable trade-off between effectiveness and simplicity.
 The VGG-16 architecture consists of a set of convolutional filters and fully connected layers. 
 The convolutional filters extract features from the input image, which are used by the fully connected layers to classify the image. 
-These filters are generic with respect to input and task~\citep{donahue2014decaf}, so we can reuse them to create visual features for LTR. 
-The fully connected layers can be altered and retrained to specifically learn to handle new inputs and tasks. In order to increase training perforamnce and reduce the computational requirements we first transform all input images using the convolutional layers, changing all $3\times224\times224$ input images to a single vector of $1\times25088$ drastically reducing the amount of parameters. The remaining fully connected layers are retrained, with the last fully connected layer reinitalized to produce an output of size $30$.
+These filters are generic with respect to input and task~\citep{donahue2014decaf}, which make them suitable for being used as a visual feature extractor to create generic visual features $x_{img\_feat}$. The fully connected layers can be altered and retrained in order to be used with new inputs and tasks, making them suitable to be used as a visual feature transformation layer.
 
-% VGG-16 uses a $224\times224$ image with three color channels as input as opposed to the gray-scaled $64\times64$ input used by ViP, giving us the advantage that both color and low level features persist. 
+As described above, we transform all input images using the convolutional layers prior to training, changing all $3\times224\times224$ input images to a single vector of $1\times25088$ reducing the input size by $84.7\%$ and removing all convolutional parameters. The remaining fully connected layers are retrained, with the last fully connected layer reinitialized to produce $x_{img\_ltr}$. The size of $x_{img\_ltr}$ was set to $30$ which was empirically found to provide good performance in preliminary results.
+
+% TODO: Bring this back? VGG-16 uses a $224\times224$ image with three color channels as input as opposed to the gray-scaled $64\times64$ input used by ViP, giving us the advantage that both color and low-level features persist. 
 
 \paragraph{ResNet-152 visual features}
-The ResNet-152 architecture has a significant increase in image classification over VGG-16\cite{he2016deep}. The residual connections between convolutional layers allow for deeper networks to be trained without suffering from vanishing gradients. Similar as with the VGG-16 model, we use the convolutional layers to convert each $3\times224\times224$ input images to a single vectors of $1\times2048$. The original ResNet-152 architecture only has a single fully connected layer making it hard to fine tune the model. Instead, we use completely untrained fully connected network consisting of three layers with $4096$ hidden units, producing a final output of size $30$.
+The ResNet-152~\cite{he2016deep} architecture has a significant increase in image classification performance over VGG-16. The residual connections between convolutional layers allow for deeper networks to be trained without suffering from vanishing gradients. Similar as with the VGG-16 model, we use the convolutional layers to convert each $3\times224\times224$ input image to $x_{img\_feat}$ prior to training, which has a size of only $1\times2048$ reducing the input size by $98.6\%$. The original ResNet-152 architecture only has a single fully connected layer, which empirically showed not be enough to successfully train the model. Instead, we train a fully connected network from scratch. The network was constructed using three layers with $4096$ hidden units and a final layer resulting in $x_{img\_ltr}$ with a size of $30$, which was empirically found to provide good performance in preliminary results.
 
 
 \paragraph{Saliency heatmaps}
-Following \cite{shan2017two}, we generate synthetic saliency heatmaps for each snapshot in our data\-set. 
-These heatmaps attempt to predict the viewing pattern of a user, creating a data driven alternative to the F-shape that is modeled in the ViP architecture. 
-The heatmaps have a dimension of $64\times64$ which is linearly scaled to $224\times224$ in order to use them as input to the VGG-16 feature extraction component discussed above.
-Fig.~\ref{fig:exampleshots} shows example snapshots with their corresponding saliency heatmaps.
+In order to increase the ability to learn the visual quality of a webpage, we propose to explicitly model the user viewing pattern by using synthetic saliency heatmaps. 
+Following \cite{shan2017two}, we implemented and trained a two-stage transfer learning model that learns how to predict saliency heatmaps on webpages.
+Similarly to the visual feature extraction approaches in the paragraphs above, \cite{shan2017two} takes a pretrained image recognition model and finetunes the output layers on the following two datasets in order respectively:
+\begin{inparaenum}[(i)]
+\item SALICON by \cite{jiang2015salicon}, a large dataset containing saliency heatmaps created with eye-tracking hardware on natural images, and 
+\item the webpage saliency dataset by \cite{shen2014webpage}, a smaller dataset containing saliency heatmaps created with eye-tracking hardware on webpages.
+\end{inparaenum}
+
+The trained model is applied to the $3\times224\times224$ input images from the \datasetname data\-set, resulting in grayscale heatmaps with a dimension of $1\times64\times64$. These heatmaps can then be used as the $x_{img}$ for the visual feature extractors described above by linearly scaling them to $3\times224\times224$, matching them with the VGG-16 and ResNet-152 input dimensions. Figure~\ref{fig:exampleshots} shows example snapshots with their corresponding saliency heatmaps.
+
+The saliency heatmaps generated using this method have various advantages over the usage of vanilla and keyword highlighted snapshots because synthetic saliency heatmaps:
+\begin{inparaenum}[(i)]
+\item explicitly learn to predict the viewing pattern by training an end-to-end model on actual eye-tracking data, and 
+\item reduce the average storage requirement by $93.5\%$ and $77\%$ respectively compared to the $3\times224\times224$ snapshot images when stored as $1\times64\times64$ and $3\times224\times224$ saliency heatmap images.
+\end{inparaenum}

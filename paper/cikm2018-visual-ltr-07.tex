@@ -1,6 +1,9 @@
 % !TEX root = cikm2018-visual-ltr.tex
 
 \section{Conclusion}
+% TODO write a piece about how these features can be used in a operational enviroment with having a big increase on performance requirements by storing $x_{ltr}$, r
+
+
 In this paper, we introduced two feature extraction methods that significantly improve \ac{LTR} performance using visual features, and \datasetname, an out-of-the-box dataset for research on both visual and non-visual web page \ac{LTR}.
 The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only non-visual features. Although using VGG-16 as a feature extractor results in higher average results, there is no statistically significant improvement on some RankBoost and LambdaMart results. 
 
@@ -8,6 +11,9 @@ The experiments show that using state-of-the-art visual extraction methods can h
 \todo{should we keep the following lines about masks in?} During this study we also explored using the highlights separate from the screenshots. However, this did not produce results worth mentioning. The dataset with separate highlights is available upon request. 
 \fi
 
-In future work, it would be interesting to combine visual features with other more powerful ranking methods such as RankBoost and LambdaMart. 
-It would also be relevant to compare visual extraction methods such as the recently introduced CapsuleNet \cite{sabour2017dynamic} that can learn spatial relations in images.  
+In future work it could be interesting to look at more ways to combine multiple visual features. Combining the features extracted from snapshots, highlights and saliency heatmaps could prove to improve ranking performance. 
+A fairly straightforward future improvement would be to usage of more state-of-the-art ranking methods such as RankBoost and LambdaMart, which could improve ranking performance without changing the visual extraction method.
+
+The recently introduced CapsuleNet \cite{sabour2017dynamic}, which is able to learn spatial relations in images, could potentially provide a significant increase \ac{LTR} performance when used as a visual feature extractor.  
+
 Performing a more qualitative analysis on which elements cause the improvements in the visual \ac{LTR} methods would be interesting. The results would not only be useful for improving visual \ac{LTR}, but might also reveal new data driven design principles that can be used by content creators. 

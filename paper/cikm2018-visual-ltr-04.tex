@@ -142,7 +142,7 @@ Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained
 
 Additionally, PageRank scores from the ClueWeb12 Related Data section\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}} are added to each document.
 
-Finally, the following modifications based on the features from LETOR 3.0~\cite{qin2010letor} are made to stabilize training:
+Finally, the following modifications based on the feature transformations described in LETOR 3.0~\cite{qin2010letor} are made to stabilize training:
 \begin{enumerate}[nosep,leftmargin=14pt]
 % \item IDF is calculates as follows: 
 % $$IDF(q, D) = \sum_{t_i \in q} IDF(t_i, D) = \sum_{t_i \in t} \log \frac{|D| + 1}{DF(t_i) + 1}$$

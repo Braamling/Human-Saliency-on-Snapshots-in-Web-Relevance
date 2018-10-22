@@ -1,7 +1,7 @@
 % !TEX root = cikm2018-visual-ltr.tex
 
 \section{Introduction}
-The design and appearance of a web page are a determining factor for a user to examine the page or divert to another page~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.
+The design and appearance of a web page are determining factors for a user to examine the page or divert to another page~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.
 Relatively little is known about the potential of visual features to help determine the perceived relevance of a (web) page, in addition to content features such as BM25, quality indicators such as PageRank, and behavioral features such as CTR.
 Recently, \citet{fan2017learning} have introduced ViP, a \ac{LTR} model that uses a combination of both visual and content features.
 Visual features are calculated from snapshots, which are in turn created by rendering web pages.
@@ -27,27 +27,33 @@ This collection is limited in the sense that:
 In order to advance research on \ac{LTR} with visual features it is important to have a dataset with more diverse and up-to-date documents and richer visual information (e.g., styling, images, etc).
 
 In this work, we address the above limitations.
-First, we introduce the following two methods to extract visual features from snapshots:
-\begin{inparaenum}[(i)]
-\item transfer learning from a pre-trained image recognition model~\cite{donahue2014decaf,simonyan2014very}, and
-\item generation of synthetic saliency heatmaps from the web page snapshots~\cite{shen2014webpage,shan2017two}.
-\end{inparaenum}
-Neither of the two methods suffer from the previously mentioned limitations from \cite{fan2017learning}; both show a significant increase in retrieval performance.
 
-Second, we release \datasetname, a dataset that contains rich and highly diverse snapshots from the ClueWeb12 collection.\footnote{\url{https://lemurproject.org/clueweb12/}} The snapshots are acquired for judged documents in the TREC Web Track 2013 \& 2014~\cite{collins2013trec,collins2015trec}. For each document, we also calculate content features, such as BM25 and TF-IDF, that can be used for \ac{LTR}.
+First, we release \datasetname, a dataset that contains rich and highly diverse snapshots from the ClueWeb12 collection.\footnote{\url{https://lemurproject.org/clueweb12/}} The snapshots are acquired for judged documents in the TREC Web Track 2013 \& 2014~\cite{collins2013trec,collins2015trec}. For each document, we also calculate content features, such as BM25 and TF-IDF, that can be used for \ac{LTR}.
 The proposed dataset is made publicly available.\footnote{URL removed for review.}
+
+Second, we construct a multimodel architecture for comparing the performance of using modern feature extraction methods on webpage snapshots. Using transfer learning, we transform a pretrained VGG-16 and ResNet-152 ~\cite{simonyan2014very, he2016deep} model into a powerful \ac{LTR} visual feature extractor. These transfer learned models do not suffer from the previously mentioned limitations from \cite{fan2017learning} and show a significant increase in retrieval performance.
+
+
 
 %\todo{describe key features of the proposed dataset by unfolding the next sentence into a few sentences}
 %
 %We believe that this dataset allows the \ac{LTR} research community to investigate various methods of using visual features for search and ranking.
-Third, using \datasetname, we show that the results of the ViP model~\citep{fan2017learning} can be reproduced on a more diverse dataset.
+Third, we introduce a novel \ac{LTR} feature by training a model to explicitely model user web viewing patterns by using sythetnic saliency heatmaps. Other then increasing the retrieval performance compared to traditional \ac{LTR} methods, these saliency heatmaps also have a significantly lower storage requirement then using webpage snapshots.
 
-In summary, the main contributions of this work are:
+% Replaced the contributions as I think we should shift the attention from the ViP paper to our own contributions.
+% In summary, the main contributions of this work are:
+% \begin{inparaenum}[(i)]
+% \item We improve ViP by applying a transfer learning feature extractor and using synthetic saliency heatmaps as visual input. 
+% \item We propose and publish \datasetname, an out-of-the-box dataset for \ac{LTR} with visual features.
+% \item We reproduce the ViP model from \cite{fan2017learning} on the newly proposed dataset.
+% \end{inparaenum}
+
 \begin{inparaenum}[(i)]
-\item We improve ViP by applying a transfer learning feature extractor and using synthetic saliency heatmaps as visual input. 
+\item We improve \ac{LTR} with visual features by applying a transfer learning feature extractor 
 \item We propose and publish \datasetname, an out-of-the-box dataset for \ac{LTR} with visual features.
-\item We reproduce the ViP model from \cite{fan2017learning} on the newly proposed dataset.
+\item We introduce saliency heatmaps as a novel \ac{LTR} feature. 
 \end{inparaenum}
+
 \if0
 \todo{Revise this if we have space or drop it.} The rest of the paper is organized as follows. Section~\ref{sec:dataset} describes the collection process that was used to construct \datasetname. In Section~\ref{sec:experiments} we reproduce the work of \citet{fan2017learning} and demonstrate various feature extraction methods on \datasetname~and set a baseline for future visual \ac{LTR} research.  
 \fi

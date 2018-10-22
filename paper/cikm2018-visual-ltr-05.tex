@@ -14,15 +14,17 @@
 
 \section{Experiments and Results}
 In this section, we discuss experiments performed on the proposed \datasetname~dataset.
-These experiments are set out to test whether:
+These experiments are set out to test:
+% \begin{inparaenum}[(i)]
+% \item the ViP results~\cite{fan2017learning} can be reproduced on \datasetname, 
+% \item commonly effective feature extractors can improve upon the ViP results, and
+% \item \ac{LTR} using visual features can outperform \ac{LTR} without visual features. \end{inparaenum}
+
 \begin{inparaenum}[(i)]
 \item the ViP results~\cite{fan2017learning} can be reproduced on \datasetname, 
 \item commonly effective feature extractors can improve upon the ViP results, and
-\item \ac{LTR} using visual features can outperform \ac{LTR} without visual features. \end{inparaenum}
-
-\if0
-Table \ref{tab:11vs46} shows the results of the benchmark experiments. Each model was trained by optimizing the $P@5$ on the validation set. The results show that using the features from \datasetname~compared to the feature from LETOR has a minor impact on \ac{LTR} performance.
-\fi
+\item \ac{LTR} using visual features can outperform \ac{LTR} without visual features. 
+\end{inparaenum}
 
 \subsection{Experimental setup}
 The experiments are divided into two types of setup:
@@ -31,17 +33,27 @@ The experiments are divided into two types of setup:
 \item visual experiments using both content and visual features.
 \end{inparaenum}
 
+
+As a baseline, we implement the visual feature extractor proposed in~\citet{fan2017learning} using PyTorch.
+
 The ViP baseline refers to the experiments were the scoring component was used with only the content features. The other baseline experiments are performed using BM25 and the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank and LambdaMart.
 The visual experiments are divided in the setups using the ViP feature extraction model and the VGG-16 feature extraction model. The input is defined as either the vanilla snapshots, red highlighted snapshots or saliency heatmap. 
 
-To average out the difference caused by random initialization, the experiments on \ac{LTR} with visual features are run five times for each of the five folds. 
 Each run is generated using the Adam optimizer with a batch size of 100 using a learning rate of $0.0001$ and $0.00005$ for the ViP and VGG-16 models, respectively. We empirically found that these values yield the highest performance for each model.
-Within each fold, the results for all five runs are averaged to create one measurement per fold per query.
 
 We use the following retrieval performance measures: precision and ndcg at $\{1,10\}$ and MAP.
 Significance is determined using a two tailed paired t-test (p-value $\leq 0.05$). 
 
 \subsection{Results}
+
+% TODO rewrite this part to compare the ResNet and VGG feature extractors.
+% \paragraph{VGG-16 \& Resnet-152}
+% Tables~\ref{---} 
+% \paragraph{Saliency heatmaps}
+% % TODO Write a comparison of ResNet and VGG on snapshots vs Saliency.
+
+% \paragraph{Baseline comparison}
+% TODO write a comparison of all ResNet and VGG results compared to all baselines (including ViP)
 
 \paragraph{Reproducing ViP}
 The top part of Table~\ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. 
@@ -78,6 +90,10 @@ ResNet saliency	   & 0.560 & 0.476 & 0.333 & 0.321 & 0.442 \\
 %The $\ddagger$ sign in Table~\ref{tab:visresults} indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted snapshots.
 The bottom part of Table~\ref{tab:visresults} shows that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance. Similarly as the ViP results, the performance is increased when query words in the snapshots are highlighted. The saliency heatmaps seem to only positively affect performance for the first few documents, with improved p@1 and ndcg@1 scores compared to ViP with vanilla snapshots, but having the same MAP score as ViP with highlights.
 
+% TODO Should this stay or be moved to the experimental setup?
+
+%The full dimensions can be found in Figure \ref{fig:ViPfeat}.
+
 \paragraph{Content-based baselines}
 Table \ref{tab:baseresults} compares the results of the VGG-16 model using highlighted snapshots with BM25, RankBoost, Ada\-Rank and Lambda\-Mart.
 %The baselines with a significant drop in performance compared to the VGG-16 model have been marked with a $*$.
@@ -108,11 +124,14 @@ VGG highlights        & \textbf{0.560}  & \textbf{0.520} & \textbf{0.323}   & \t
 %\todo{Here we can add the benchmarking experiment that I left out for now.}
 
 \paragraph{Benchmarking content features}
+
+
+
 % \todo{In fact, this should go into discussion and not experimental setup and/or experiments. But let's do this later.}
 In \ac{LTR} research, the amount and type of non-visual features used for training varies widely per dataset and study.
 To assess the performance of the 11 non-visual features used in this study (see Table~\ref{tab:setdescription}), we use a set of known LTR algorithms on the million query track 2007 (MQ2007)\cite{allan2007million} with the LETOR 4.0\footnote{\url{https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/}} non-visual features.
 MQ2007 and LETOR 4.0 have a total of 46 features containing all 11 features from Table~\ref{tab:setdescription}.
-The experiment use the RankLib\footnote{https://sourceforge.net/p/lemur/wiki/RankLib/} implementations of RankBoost, AdaRank and LambdaMart on both 46 and 11 features using their default settings. 
+The experiment use the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank and LambdaMart on both 46 and 11 features using their default settings. 
 
 \begin{table}[h]
 \caption{Benchmark comparison on MQ2007 using all 46 LETOR features and the 11 LETOR features that are also used in \datasetname.}
