@@ -22,7 +22,7 @@ This visual feature transformation layer learns to transforms the generic visual
 
 The final \ac{LTR} feature vector $x_{ltr}$ is constructed by concatenting the visual \ac{LTR} features $x_{img\_ltr}$ with the content \ac{LTR} features $x_{content}$ (4). 
 
-$x_{content}$ is then used as an input to the scoring component (5), which transforms the features to a single score for each document-query pair. The scoring component uses a single fully connected layer with a hidden size of $10$. During preliminary experiments, we found that adding a dropout of $10\%$ increased overall performance, which was then consistently used in further experiments. The resulting model is trained end-to-end using a pairwise hinge loss with $L_2$ regularization. 
+$x_{ltr}$ is then used as an input to the scoring component (5), which transforms the features to a single score for each document-query pair. The scoring component uses a single fully connected layer with a hidden size of $10$ with dropout imperically set to $10\%$. The resulting model is trained end-to-end using a pairwise hinge loss with $L_2$ regularization. 
 
 \paragraph{Reducing training complexity}
 Both training and inference using deep convolutional networks are generally computationally expensive.
@@ -66,7 +66,7 @@ Similarly to the visual feature extraction approaches in the paragraphs above, \
 
 The trained model is applied to the $3\times224\times224$ input images from the \datasetname data\-set, resulting in grayscale heatmaps with a dimension of $1\times64\times64$. These heatmaps can then be used as the $x_{img}$ for the visual feature extractors described above by linearly scaling them to $3\times224\times224$, matching them with the VGG-16 and ResNet-152 input dimensions. Figure~\ref{fig:exampleshots} shows example snapshots with their corresponding saliency heatmaps.
 
-The saliency heatmaps generated using this method have various advantages over the usage of vanilla and keyword highlighted snapshots because synthetic saliency heatmaps:
+The saliency heatmaps generated using this method have various advantages over the usage of vanilla and keyword highlighted snapshots because synthetic saliency heatmaps
 \begin{inparaenum}[(i)]
 \item explicitly learn to predict the viewing pattern by training an end-to-end model on actual eye-tracking data, and 
 \item reduce the average storage requirement by $93.5\%$ and $77\%$ respectively compared to the $3\times224\times224$ snapshot images when stored as $1\times64\times64$ and $3\times224\times224$ saliency heatmap images.
