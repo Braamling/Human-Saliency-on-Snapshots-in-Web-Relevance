@@ -216,6 +216,11 @@ def prepare_model(use_scheduler=True):
     if use_gpu:
         model = model.cuda()
 
+    def count_parameters(model):
+        return sum(p.numel() for p in model.parameters())
+
+    logger.info("Total model parameters: {}".format(count_parameters(model)))
+
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=FLAGS.learning_rate, weight_decay=1e-5)
 
     if use_scheduler:
