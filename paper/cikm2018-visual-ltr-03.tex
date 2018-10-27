@@ -13,7 +13,7 @@ Finally, we propose the use of a saliency model to create synthetic saliency hea
 
 All corresponding code is available on Github.\footnote{URL removed for review}
 
-\paragraph{Multimodal architecture}
+\subsection{Multimodal architecture}
 In order to compare the performance of various visual feature extractor methods, we propose a reusable multimodal architecture. 
 The multimodal architecture is visualized in Figure~\ref{fig:multimodelarchitecture}. 
 The model starts by taking an image $x_{v}$ (1) as an input to the visual feature extraction layer (2) in order to create a generic visual feature vector $x_{vf}$. In turn, $x_{vf}$ is then used as an input to the visual feature transformation layer (3).
@@ -50,12 +50,9 @@ To even further reduce the memory and computational cost during training, we can
 \label{fig:multimodelarchitecture}
 \end{figure}
 
-\paragraph{ViP visual features}
-As a baseline, we implement the visual feature extractor proposed in~\citet{fan2017learning} using PyTorch.
-In this model, $x_{v}$ is gray-scaled, normalized and horizontally segmented into $4\times16$ slices before being processed by the visual feature extractor. The visual feature extractor processes all slices separately using a shallow convolutional network.
-Each of these outputs is then being passed from top to bottom through an LSTM in order to create $x_{l}$.
 
-\paragraph{VGG-16 visual features}
+\subsection{Visual Feature Extractors}
+\paragraph{VGG-16}
 Since the \datasetname{} data\-set that we introduce in this paper has a relatively low number of snapshots to train a separate feature extractor, we use the VGG-16 model~\cite{simonyan2014very} from Torchvision,\footnote{\url{https://github.com/pytorch/vision/blob/master/torchvision/models/vgg.py}} pretrained on ImageNet, as a feature extractor. 
 Although VGG-16 is not the current state-of-the-art visual feature extractor, it is a reasonable trade-off between effectiveness and simplicity.
 The VGG-16 architecture consists of a set of convolutional filters and fully connected layers. 
@@ -66,11 +63,11 @@ As described above, we transform all input images using the convolutional layers
 
 % TODO: Bring this back? VGG-16 uses a $224\times224$ image with three color channels as input as opposed to the gray-scaled $64\times64$ input used by ViP, giving us the advantage that both color and low-level features persist. 
 
-\paragraph{ResNet-152 visual features}
+\paragraph{ResNet-152}
 The ResNet-152~\cite{he2016deep} architecture has a significant increase in image classification performance over VGG-16. The residual connections between convolutional layers allow for deeper networks to be trained without suffering from vanishing gradients. Similar as with the VGG-16 model, we use the convolutional layers to convert each $3\times224\times224$ input image to $x_{vf}$ prior to training, which has a size of only $1\times2048$ reducing the input size by $98.6\%$. The original ResNet-152 architecture only has a single fully connected layer, which empirically showed not be enough to successfully train the model. Instead, we train a fully connected network from scratch. The network was constructed using three layers with $4096$ hidden units and a final layer resulting in $x_{img\_ltr}$ with a size of $30$, which was empirically found to provide good performance in preliminary results.
 
 
-\paragraph{Saliency heatmaps}
+\subsection{Saliency heatmaps}
 In order to increase the ability to learn the visual quality of a webpage, we propose to explicitly model the user viewing pattern by using synthetic saliency heatmaps. 
 Following \cite{shan2017two}, we implemented and trained a two-stage transfer learning model that learns how to predict saliency heatmaps on webpages.
 Similarly to the visual feature extraction approaches in the paragraphs above, \cite{shan2017two} takes a pretrained image recognition model and finetunes the output layers on the following two datasets in order respectively:
