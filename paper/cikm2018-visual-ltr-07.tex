@@ -7,9 +7,7 @@
 In this paper, we introduced two feature extraction methods that significantly improve \ac{LTR} performance using visual features, and \datasetname, an out-of-the-box dataset for research on both visual and non-visual web page \ac{LTR}.
 The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only non-visual features. Although using VGG-16 as a feature extractor results in higher average results, there is no statistically significant improvement on some RankBoost and LambdaMart results. 
 
-\if0
-\todo{should we keep the following lines about masks in?} During this study we also explored using the highlights separate from the screenshots. However, this did not produce results worth mentioning. The dataset with separate highlights is available upon request. 
-\fi
+During this study we also explored using the highlights separate from the screenshots. However, this did not produce results worth mentioning. The dataset with separate highlights is available upon request. 
 
 In future work it could be interesting to look at more ways to combine multiple visual features. Combining the features extracted from snapshots, highlights and saliency heatmaps could prove to improve ranking performance. 
 A fairly straightforward future improvement would be to usage of more state-of-the-art ranking methods such as RankBoost and LambdaMart, which could improve ranking performance without changing the visual extraction method.
