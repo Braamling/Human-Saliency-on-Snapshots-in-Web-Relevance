@@ -5,13 +5,13 @@
 
 We discuss related research on:
 \begin{inparaenum}[(i)]
-\item the relation between visual appearance of a web page and how it is perceived by users, and
+\item the relation between the visual appearance of a web page and how it is perceived by users, and
 \item the usage of visual information in \ac{LTR}.
 \end{inparaenum} 
 
 %The work in the paper is related to various research on user experience design. In this section we will discuss research on:
 %\begin{inparaenum}[(i)]
-%\item measuring usability, 
+%\item measuring usability,  
 %\item predicting saliency on web pages, and 
 %\item visual features in \ac{LTR}.
 %\end{inparaenum} 
@@ -35,21 +35,20 @@ The work of \citet{fan2017learning} is limited by the GOV2 dataset, which lacks 
 We approach these problems by proposing \datasetname, a more diverse dataset based on ClueWeb12, and by improving the feature extraction method using
 pre-trained weights from a deep convolutional network~\cite{simonyan2014very} and 
 synthetic saliency heatmaps~\cite{shan2017two} as input images.
+% TODO reevaluate in which form we want to keep the lines above.
 
-\citet{zhang2018relevance} propose a multimodel architecture for re-ranking \acp{SERP} by learning visual patterns in the result snippets. 
+Recently, \citet{zhang2018relevance} propose a multimodal architecture for re-ranking \acp{SERP} by learning visual patterns in the result snippets. 
 Their work demonstrates the potential of exploring visual patterns to improve \ac{LTR} performance. 
 
-%\todo{How is this relevance to our work apart from the fact that we use the method from \cite{shan2017two}?
-%I think this paragraph can be dropped.}
+%\todo{Now that we have put saliency more to the foreground, we might want to reintroduce the text below}
 %A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 
-
 
 %In this work, we create a more generic approach by using synthetic generated saliency heatmaps.
 %These heatmaps are used as an input to a convolution network in order to create features that can be used as an indicator of a web page communication effectiveness and usability. 
 
 %\citet{donahue2014decaf} show that the features learned on large-scale supervised data can be transferred to different tasks and labels. Transferring the feature extraction weights to a new task is a common solution to cope with relatively small datasets. Most query sets used for LTR are relatively small (approximately 30,000 documents) compared to a dataset as ImageNet (1 million images), which indicates that transfer learning methods can be of use. In this work we use a pretrained image classifier and fine-tune its final layers on a LTR task. 
 
-% Write something on how saliency can be used for evualuating web pages
+% Write something on how saliency can be used for evaluating web pages
 
 % TODO: describe more related work.
 % TODO: Show some work on visual features in web design

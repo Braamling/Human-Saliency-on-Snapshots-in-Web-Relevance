@@ -2,10 +2,10 @@
 
 %\section{Experimental Setup}\label{sec:experiments}
 %In this section, we discuss the setup of the experiments performed on \datasetname. The experiments are set out to demonstrate the abilities of visual features in LTR and set a baseline for future visual LTR research.
-%%All PyTorch experiments were performed on a GTX 1080 Ti with 11gb of RAM. Preproccessing was performed on a Thinkpad X250 with an Intel i5-5300U CPU and 16gb of ram. 
+%%All PyTorch experiments were performed on a GTX 1080 Ti with 11gb of RAM. Preprocessing was performed on a Thinkpad X250 with an Intel i5-5300U CPU and 16gb of ram. 
 %
 %\paragraph{\ac{LTR} with visual features}
-%To average out the difference cause by random initialization, the experiments on \ac{LTR} with visual features are run five times for each of the five folds. 
+%To average out the difference caused by random initialization, the experiments on \ac{LTR} with visual features are run five times for each of the five folds. 
 %Each run is performed using the Adam optimizer with a batch size of 100 using a learning rate of $0.0001$ and $0.00005$ for the ViP and VGG-16 models respectively. These values were found empirically to find the highest performance for each model.
 %Within each fold, the results for all five runs are averaged to create one measurement per fold per query.
 
@@ -14,63 +14,59 @@
 
 \section{Experiments and Results}
 In this section, we discuss experiments performed on the proposed \datasetname~dataset.
-These experiments are set out to test:
+These experiments are set out to test whether:
 \begin{inparaenum}[(i)]
-\item the \modelname model can improve the \ac{LTR} performance when introducting visual feature vectors. 
-\item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the the \modelname model, and
-\item the \modelname model results can improve both visual and non-visual state-of-the-art \ac{LTR} methods.
+\item the \modelname~model can improve the \ac{LTR} performance when introducing visual feature vectors. 
+\item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname model, and
+\item the \modelname~model results can improve both visual and non-visual state-of-the-art \ac{LTR} methods.
 \end{inparaenum}
 
-\subsection{Experimental setup}
-The experiments are divided into two types of setup:
+\subsection{Experimental Setup}
+The experiments are divided into two types of setups:
 \begin{inparaenum}[(i)]
 \item baseline experiments using only content features, and
 \item visual experiments using both content and visual features.
 \end{inparaenum}
 
 The \modelname~baseline refers to the baseline that demonstrates the performance increase of introducing visual features. We do so by using the \modelname~model and feeding the content features into the scoring component directly, without adding any visual features. 
-The other content baseline experiments are performed using BM25 and the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank and LambdaMart.
+The other content baseline experiments are performed using BM25 and the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank, and LambdaMart.
 
-As a baseline comparison for our multimodal model, we implement ViP, the visual feature extractor proposed in~\citet{fan2017learning} using PyTorch. We train ViP on both the vanilla and highlighted snapshot datasets with the results being refered to as ViP snapshots and ViP highlights respectively.
+As a baseline comparison for our multimodal model, we implement ViP, the visual feature extractor proposed in~\citet{fan2017learning} using PyTorch. We train ViP on both the vanilla and highlighted snapshot datasets with the results being referred to as ViP snapshots and ViP highlights respectively.
 
-The performance of the \modelname~model is demonstrated by learning visual feature vectors using VGG-16 and ResNet-152. Simarly to the baseline, both VGG-16 and ResNet-152 are trained on the vanilla and highlighted dataset. 
+The performance of the \modelname~model is demonstrated by learning visual feature vectors using VGG-16 and ResNet-152. Similarly as with the ViP model, both VGG-16 and ResNet-152 are trained on both the vanilla and highlighted snapshot dataset. 
 
 Finally, we use the synthetic saliency heatmaps as an input to the \modelname~model. For the saliency heatmaps, we again use both VGG-16 and ResNet-152 to learn the visual feature vectors.
 
-Each run is generated using the Adam optimizer with a batch size of $100$. The learning rate for all ResNet-152 and VGG-16 setups were set as $0.00005$ and $0.0001$ respectively. We empirically found that these values yield the highest performance for each model.
+Each run is generated using the Adam optimizer with a batch size of $100$. The learning rates for all ResNet-152 and VGG-16 setups were set to $0.00005$ and $0.0001$ respectively. We empirically found that these values yield the highest performance for each model.
 
-We use the following retrieval performance measures: precision and ndcg at $\{1,10\}$ and MAP.
-Significance is determined using a two tailed paired t-test (p-value $\leq 0.05$). 
+To measure the retrieval performance, we used precision and ndcg at $\{1,10\}$ and MAP.
+Significance is determined using a two-tailed paired t-test (p-value $\leq 0.05$). 
 
 All PyTorch experiments were performed on a single GTX 1080 Ti GPU with 11gb of RAM. 
-% Preproccessing was performed on a Thinkpad X250 with an Intel i5-5300U CPU and 16gb of ram. 
+% Preprocessing was performed on a Thinkpad X250 with an Intel i5-5300U CPU and 16gb of ram. 
 
-% TODO introduce the Benchmarking content features section here as well.
 
 \subsection{Results}
-
-% TODO rewrite this part to compare the ResNet and VGG feature extractors.
-% \paragraph{VGG-16 \& Resnet-152}
-% Tables~\ref{---} 
-% \paragraph{Saliency heatmaps}
-% % TODO Write a comparison of ResNet and VGG on snapshots vs Saliency.
-
-% \paragraph{Baseline comparison}
-% TODO write a comparison of all ResNet and VGG results compared to all baselines (including ViP)
-
-\paragraph{\modelname~model with VGG-16 and ResNet-152}
-In Table~\ref{tab:letorvisresults} we compare the performance of the \modelname~model when used with and without various different visual feature vectors. The top part shows the performance of using VGG-16 and ResNet-152 with both vanilla and highlighted snapshots. 
-These results clearly show that each of the method of learning visual feature vectors significantly improves the \ac{LTR} performance of the \modelname~model. 
-
-Interestingly, when comparing the results of using visual feature vectors we observe the following:
+In this section we will compare and discuss the results of the 
 \begin{inparaenum}[(i)]
-\item The best ranking performance is archieved by using VGG-16 on the highlighted snapshots, 
-\item performance is consistently better when comparing highlighted with vanilla snapshots using VGG-1, which is not the case when comparing the two datasets using ResNet-152, and 
-\item The performance increase for p@1 and ndcg@1, with an average of $+0.200$ and $+0.118$, is consistently higher than p@10 and ndcg@10, with an average of $+0.134$ and $+0.087$
+\item \modelname~implementions, 
+\item non-visual baselines, and 
+\item visual baselines.
+\end{inparaenum}  
+
+\paragraph{\modelname~Model with VGG-16 and ResNet-152}
+In Table~\ref{tab:letorvisresults}, we compare the performance of the \modelname~model when used with and without visual feature vectors. The first row shows the \modelname~baseline, when using only the content features as an input to the scoring component. The second to fifth rows shows the performance of using VGG-16 and ResNet-152 with both vanilla and highlighted snapshots. 
+These results clearly show that each of the methods of learning visual feature vectors significantly improves the \ac{LTR} performance of the \modelname~model compared to the \modelname~baseline. 
+
+When comparing the results of using visual feature vectors we observe the following:
+\begin{inparaenum}[(i)]
+\item the highest ranking performance is achieved by using VGG-16 on the highlighted snapshots, 
+\item performance on all performance metrics is consistently better when comparing highlighted with vanilla snapshots using VGG-16, which is not the case when comparing the two datasets using ResNet-152, and 
+\item the performance increase for p@1 and ndcg@1, with an average of $+0.200$ and $+0.118$, is consistently higher than p@10 and ndcg@10, with an average of $+0.134$ and $+0.087$.
 \end{inparaenum}
 
 \begin{table}[h]
-\caption{The \ac{LTR} results for the \modelname~model using vanilla snapshots, highlighted snapshots, saliency heatmaps and content features only. $\dagger$ indicates a significant improvement over the baseline results.}
+\caption{The \ac{LTR} results for the \modelname~model using vanilla snapshots, highlighted snapshots, saliency heatmaps and content features only. All results have a significant improvement over the \modelname~baseline. }
 \label{tab:letorvisresults}
 \centering
 \begin{tabular}{l\OK l\OK l\OK l\OK l\OK l}
@@ -79,46 +75,35 @@ Interestingly, when comparing the results of using visual feature vectors we obs
 \midrule
 \modelname~baseline & 0.338  & 0.370 & 0.189   & 0.233   & 0.415 \\ 
 \midrule
-VGG snapshots      & 0.514$^\dagger$ & 0.484$^\dagger$ & 0.292$^\dagger$ & 0.324$^\dagger$ & 0.442$^\dagger$ \\ 
-ResNet snapshots   & 0.550$^\dagger$ & 0.452$^\dagger$ & 0.310$^\dagger$ & 0.301$^\dagger$ & 0.437$^\dagger$ \\ 
-VGG highlights     & \textbf{0.560}$^\dagger$ & \textbf{0.520}$^\dagger$ & 0.323$^\dagger$ & \textbf{0.346}$^\dagger$ & \textbf{0.456}$^\dagger$ \\ 
-ResNet highlights  & 0.530$^\dagger$ & 0.463$^\dagger$ & 0.305$^\dagger$ & 0.312$^\dagger$ & 0.440$^\dagger$ \\
+VGG snapshots      & 0.514 & 0.484 & 0.292 & 0.324 & 0.442 \\ 
+ResNet snapshots   & 0.550 & 0.452 & 0.310 & 0.301 & 0.437 \\ 
+VGG highlights     & \textbf{0.560} & \textbf{0.520} & 0.323 & \textbf{0.346} & \textbf{0.456} \\ 
+ResNet highlights  & 0.530 & 0.463 & 0.305 & 0.312 & 0.440 \\
 \midrule
-VGG saliency       & 0.554$^\dagger$ & 0.453$^\dagger$ & 0.310$^\dagger$   & 0.302$^\dagger$   & 0.422$^\dagger$ \\ 
-ResNet saliency	   & \textbf{0.560}$^\dagger$ & 0.476$^\dagger$ & \textbf{0.333}$^\dagger$ & 0.321$^\dagger$ & 0.442$^\dagger$ \\
+VGG saliency       & 0.554 & 0.453 & 0.310   & 0.302   & 0.422 \\ 
+ResNet saliency    & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{\modelname~model with synthetic saliency heatmaps}
-The bottom of table~\ref{tab:letorvisresults} shows the \ac{LTR} performance when using synthetic saliency heatmaps as an input to the \modelname~model using both VGG-16 and ResNet-152 to learn the visual feature vectors. Other than with the vanilla and highlighted snapshots, ResNet-152 seems to consistently outperform VGG-16 when using synthetic saliency images. Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with synthetic saliency images on p@10, ndcg@10 and MAP, synthetic saliency images match and outperform p@1 and ndcg@1 respectivaly. 
-% \paragraph{Reproducing ViP}
-% The top part of Table~\ref{tab:visresults} shows the results using the different visual ranking methods and the ViP baseline. 
-% %Results marked with a $\dagger$ have a significance improvement compared to the ViP baseline model. 
-% We see that in terms of significance, the results and relative performance of the visual ranking methods are similar to the work of \citet{fan2017learning}, where the snapshots with highlights outperform the vanilla snapshots. Although both snapshots with and without highlights have higher average results than the baseline, neither show a significant improvement in terms of MAP.
-
-% Make a table that compares VGG and Resnet to all the baselines.
+The last two rows of Table~\ref{tab:letorvisresults} shows the \ac{LTR} performance when using synthetic saliency heatmaps as an input to the \modelname~model. Similarly as the vanilla and higlighted snapshots, the visual feature vectors are learned by using both VGG-16 and ResNet-152. In contract to the vanilla and highlighted snapshots, ResNet-152 seems to consistently outperform VGG-16 when using synthetic saliency images. Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with synthetic saliency images on p@10, ndcg@10 and MAP, the synthetic saliency images match and outperform performance when looking at p@1 and ndcg@1, respectively. 
 
 \paragraph{Baseline comparison}
-Table~\ref{tab:baseresults} shows the performance of 
-% \paragraph{Improved feature extraction methods}
-% %The $\ddagger$ sign in Table~\ref{tab:visresults} indicates results where the VGG-16 model significantly outperforms the ViP model with highlighted snapshots.
-% The bottom part of Table~\ref{tab:visresults} shows that introducing more powerful visual feature extraction methods significantly increases the \ac{LTR} performance. Similarly as the ViP results, the performance is increased when query words in the snapshots are highlighted. The saliency heatmaps seem to only positively affect performance for the first few documents, with improved p@1 and ndcg@1 scores compared to ViP with vanilla snapshots, but having the same MAP score as ViP with highlights.
+Table~\ref{tab:baseresults} compares the performance of the \modelname~model compared to both BM25, non-visual \ac{LTR} methods and the ViP model by~\citet{fan2017learning}. 
+The table also shows both VGG-16 with highlighted snapshots and ResNet-152 with synthetic saliency heatmaps. Because these two results yield the highest \ac{LTR} performance, they are used to compare the \modelname~model with the baselines. 
+We clearly see that both methods have a significant performance increase compared to using BM25, almost doubling the \ac{LTR} metrics.
+Although both \modelname~implementations seem to consistently outperform all non-visual \ac{LTR} methods, we cannot confirm the statistical significance of each of the performance measures. 
+However, we do find a significant improvement by the \modelname~implementations on the AdaRank \ac{LTR} results. Furthermore, when using VGG-16 with highlighted snapshots there is a significant performance increase in ndcg@10 compared to LambdaMart and in p@10 for both RankBoost and LambdaMart.
 
-% % TODO Should this stay or be moved to the experimental setup?
-
-% %The full dimensions can be found in Figure \ref{fig:ViPfeat}.
-
-% \paragraph{Content-based baselines}
-% Table \ref{tab:baseresults} compares the results of the VGG-16 model using highlighted snapshots with BM25, RankBoost, Ada\-Rank and Lambda\-Mart.
-% %The baselines with a significant drop in performance compared to the VGG-16 model have been marked with a $*$.
-% Although VGG-16 produces higher average results than the baseline methods, there is no statistically significant improvement over some of the RankBoost and LambdaMart results.
+Finally, we compare the results of the \modelname~implementations with ViP as a visual \ac{LTR} baseline. 
+Here we clearly see that both our implementations significantly outperform ViP on all measures. 
 
 \paragraph{ViP results on \datasetname}
-As addressed in the introduction, both ViP model and dataset used by ~\citet{fan2017learning} has a number of limitations. The results in table~\ref{tab:baseresults} clearly show that the limitations in the ViP model become apparent when being used with the more diverse and rich \datasetname~dataset. We do see that our results show a similar pattern as described by ~\citet{fan2017learning} where the model performs better on highlighted images than vanilla images. However, using ViP with vanilla and highlighted snapshots from the \datasetname~dataset is outperformed by both RankBoost and LambdaMart trained on content features only. 
+As addressed in the introduction, both ViP model and dataset used by ~\citet{fan2017learning} have a number of limitations. The results in Table~\ref{tab:baseresults} clearly show that the limitations in the ViP model become apparent when being used with the more diverse and rich \datasetname~dataset. We do see that the results show a similar pattern as described by ~\citet{fan2017learning} where the model performs better when using highlighted snapshots compared to vanilla snapshots. However, using ViP with vanilla and highlighted snapshots from the \datasetname~dataset is outperformed by both RankBoost and LambdaMart. 
 
 \begin{table}[h]
-\caption{The $\dagger$ indicates a significant descrease in performance compared to the VGG-16 model with highlighted snapshots and $\ddagger$ indicates a significant decrease in performance for both \modelname~model results}
+\caption{The $\dagger$ indicates a significant decrease in performance compared to the VGG-16 model with highlighted snapshots and $\ddagger$ indicates a significant decrease in performance for both \modelname~model results.}
 
 \label{tab:baseresults}
 \begin{tabular}{l\OK l\OK l\OK l\OK l\OK l}
@@ -135,40 +120,10 @@ ViP snapshots         & 0.392$^\ddagger$ & 0.398$^\ddagger$ & 0.217$^\ddagger$  
 ViP highlights        & 0.418$^\ddagger$  & 0.416$^\ddagger$ & 0.239$^\ddagger$   & 0.269$^\ddagger$   & 0.422$^\ddagger$ \\
 \midrule
 VGG highlights        & \textbf{0.560}  & \textbf{0.520} & 0.323   & \textbf{0.346}   & \textbf{0.456} \\ 
-ResNet saliency	   	  & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
+ResNet saliency       & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 
-\subsection{Benchmarking content features}
-
-
-
-% \todo{In fact, this should go into discussion and not experimental setup and/or experiments. But let's do this later.}
-In \ac{LTR} research, the amount and type of non-visual features used for training varies widely per dataset and study.
-To assess the performance of the 11 non-visual features used in this study (see Table~\ref{tab:setdescription}), we use a set of known LTR algorithms on the million query track 2007 (MQ2007)\cite{allan2007million} with the LETOR 4.0\footnote{\url{https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/}} non-visual features.
-MQ2007 and LETOR 4.0 have a total of 46 features containing all 11 features from Table~\ref{tab:setdescription}.
-The experiment use the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank and LambdaMart on both 46 and 11 features using their default settings. 
-
-\begin{table}[h]
-\caption{Benchmark comparison on MQ2007 using all 46 LETOR features and the 11 LETOR features that are also used in \datasetname.}
-\label{tab:11vs46}
-\centering
-\begin{tabular}{lccccc}
-\toprule
-%& \multicolumn{7}{c}{MQ2007 46 features vs 11 features}                                     \\
-           & p@1  & p@10   & ndcg@1 & ndcg@10 & map \\ 
-\midrule
-RankBoost - 46 & 0.453 & 0.371 & 0.391 & 0.430  & 0.457 \\
-RankBoost - 11 & 0.448 & 0.372 & 0.381  & 0.431   & 0.453 \\
-\midrule
-AdaRank - 46  & 0.420 & 0.360 & 0.367 & 0.424  & 0.449 \\
-AdaRank - 11  & 0.385 & 0.287 & 0.364  & 0.394   & 0.386 \\ 
-\midrule
-LambdaMart - 46 & 0.452 & 0.384 & 0.405 & 0.444  & 0.463 \\
-LambdaMart - 11 & 0.448 & 0.380 & 0.397  & 0.443   & 0.455 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
