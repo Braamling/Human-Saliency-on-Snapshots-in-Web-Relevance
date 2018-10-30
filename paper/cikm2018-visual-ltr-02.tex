@@ -3,7 +3,7 @@
 \section{Related work}
 \label{sec:relatedwork}
 
-We discuss related research on:
+We discuss related research on
 \begin{inparaenum}[(i)]
 \item the relation between the visual appearance of a web page and how it is perceived by users, and
 \item the usage of visual information in \ac{LTR}.
@@ -31,14 +31,13 @@ Finally, the proposed model (called ViP) is trained end-to-end by using a pairwi
 %\todo{Here, we have to briefly repeat what we have said in the introduction:
 %there are two limitations in \cite{fan2017learning} (what limitations?), which we fix in this paper (how do we do that?).} 
 
-The work of \citet{fan2017learning} is limited by the GOV2 dataset, which lacks visual diversity, and by not using advanced visual feature extraction methods.
-We approach these problems by proposing \datasetname, a more diverse dataset based on ClueWeb12, and by improving the feature extraction method using
-pre-trained weights from a deep convolutional network~\cite{simonyan2014very} and 
-synthetic saliency heatmaps~\cite{shan2017two} as input images.
+The work of \citet{fan2017learning} is limited by not using advanced visual feature extraction methods and by the GOV2 dataset, which lacks visual diversity.
+We approach these problems by proposing an improved feature extraction method using both pre-trained weights from a deep convolutional network~\cite{simonyan2014very} as well as synthetic saliency heatmaps~\cite{shan2017two} as input images, and by introducing \datasetname, a more diverse dataset based on ClueWeb12.
 % TODO reevaluate in which form we want to keep the lines above.
 
 Recently, \citet{zhang2018relevance} propose a multimodal architecture for re-ranking \acp{SERP} by learning visual patterns in the result snippets. 
 Their work demonstrates the potential of exploring visual patterns to improve \ac{LTR} performance. 
+\todo{But how does it relate to our work?}
 
 %\todo{Now that we have put saliency more to the foreground, we might want to reintroduce the text below}
 %A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 

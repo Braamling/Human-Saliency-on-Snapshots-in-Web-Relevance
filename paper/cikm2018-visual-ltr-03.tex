@@ -2,14 +2,13 @@
 
 \section{Method}
 In this section we proposing a multimodal architecture used to train a \ac{LTR} model with both visual and content features. 
-The first two paragraphs describe the implementation of three visual feature extractors, being:
+The first two paragraphs describe the implementation of three visual feature extractors, being 
 \begin{inparaenum}[(i)]
 \item the VGG-16~\cite{simonyan2014very} classification model pretrained on ImageNet, and
 \item the ResNet-152~\cite{he2016deep} classification model pretrained on ImageNet.
 \end{inparaenum} 
 In the last paragraph, we propose the use of a saliency model to create synthetic saliency heatmaps for each of the input images. These synthetic saliency images are trained to learn a more expressive representation of the viewing pattern of a user. 
-
-All corresponding code is available on Github.\footnote{URL removed for review}
+All code required to run the experiments in this is available on Github.\footnote{URL removed for review.}
 
 \subsection{Multimodal Architecture}
 In order to compare the performance of various visual feature extractor methods, we propose a reusable multimodal architecture. 

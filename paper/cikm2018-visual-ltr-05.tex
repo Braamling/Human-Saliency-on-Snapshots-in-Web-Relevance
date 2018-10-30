@@ -54,7 +54,7 @@ In this section we will compare and discuss the results of the
 \item visual baselines.
 \end{inparaenum}  
 
-\paragraph{\modelname~Model with VGG-16 and ResNet-152}
+\paragraph{\modelname~model with VGG-16 and ResNet-152}
 In Table~\ref{tab:letorvisresults}, we compare the performance of the \modelname~model when used with and without visual feature vectors. The first row shows the \modelname~baseline, when using only the content features as an input to the scoring component. The second to fifth rows shows the performance of using VGG-16 and ResNet-152 with both vanilla and highlighted snapshots. 
 These results clearly show that each of the methods of learning visual feature vectors significantly improves the \ac{LTR} performance of the \modelname~model compared to the \modelname~baseline. 
 
@@ -100,7 +100,7 @@ Finally, we compare the results of the \modelname~implementations with ViP as a 
 Here we clearly see that both our implementations significantly outperform ViP on all measures. 
 
 \paragraph{ViP results on \datasetname}
-As addressed in the introduction, both ViP model and dataset used by ~\citet{fan2017learning} have a number of limitations. The results in Table~\ref{tab:baseresults} clearly show that the limitations in the ViP model become apparent when being used with the more diverse and rich \datasetname~dataset. We do see that the results show a similar pattern as described by ~\citet{fan2017learning} where the model performs better when using highlighted snapshots compared to vanilla snapshots. However, using ViP with vanilla and highlighted snapshots from the \datasetname~dataset is outperformed by both RankBoost and LambdaMart. 
+As addressed in the introduction, both the ViP model and the dataset used by~\citet{fan2017learning} have a number of limitations. The results in Table~\ref{tab:baseresults} clearly show that the limitations in the ViP model become apparent when being used with the more diverse and rich \datasetname~dataset. We do see that the results show a similar pattern as described by ~\citet{fan2017learning} where the model performs better when using highlighted snapshots compared to vanilla snapshots. However, using ViP with vanilla and highlighted snapshots from the \datasetname~dataset is outperformed by both RankBoost and LambdaMart. 
 
 \begin{table}[h]
 \caption{The $\dagger$ indicates a significant decrease in performance compared to the VGG-16 model with highlighted snapshots and $\ddagger$ indicates a significant decrease in performance for both \modelname~model results.}
