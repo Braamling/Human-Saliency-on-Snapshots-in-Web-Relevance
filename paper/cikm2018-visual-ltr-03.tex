@@ -22,8 +22,9 @@ The final feature vector $x_{l}$ is constructed by concatenating the visual feat
 %
 This final feature vector $x_{l}$ is then used as an input to the scoring component (5),
 which transforms the features into a single score $x_s$ for each query-document pair.
-%The scoring component uses a single fully connected layer with a hidden size of $10$ and dropout empirically set to $10\%$.
 The resulting model is trained end-to-end using a pairwise hinge loss with $L_2$ regularization similarly to~\cite{fan2017learning}.
+The scoring component uses a single fully connected layer with a hidden size of $10$ and dropout set to $10\%$,
+which showed good performance in preliminary experiments.
 
 % \begin{multline}
 % x_{vl} = f_{t}(f_{v}(x_{v})) \\ x_{s} = f_{s}(x_{vl} \oplus x_{c}) 
@@ -65,7 +66,14 @@ The network was constructed using three layers with $4096$ hidden units and a fi
 
 
 \subsection{Saliency Heatmaps} \label{sec:saliency}
-In order to increase the ability to learn the visual quality of a webpage, we propose to explicitly model the user viewing pattern by using synthetic saliency heatmaps. 
+In order to increase the ability to learn the visual quality of a webpage, we propose to explicitly model the user viewing pattern through synthetic saliency heatmaps.
+The use of saliency heatmaps could be advantageous compared to the use of raw snapshots for the following reasons.
+First, synthetic saliency heatmaps explicitly learn to predict how users perceive webpages by training an end-to-end model on actual eye-tracking data.
+We expect this information to better correlate with webpage relevance compared to raw snapshots.
+Second, saliency heatmaps reduce the average storage requirements by up to 90\%, because \todo{XXX}.
+This makes the use of saliency heatmaps attractive for practical applications.
+Figure~\ref{fig:exampleshots} shows example snapshots with their corresponding heatmaps (first and third columns respectively).
+
 Following \cite{shan2017two}, we use a two-stage transfer learning model that learns how to predict saliency heatmaps on webpages.
 Similarly to the visual feature extraction approaches above, \cite{shan2017two} takes a pretrained image recognition model and finetunes the output layers on the following two datasets in order respectively:
 \begin{inparaenum}[(i)]
@@ -73,10 +81,10 @@ Similarly to the visual feature extraction approaches above, \cite{shan2017two} 
 \item the webpage saliency dataset from \cite{shen2014webpage}, a smaller dataset containing saliency heatmaps created with eye-tracking hardware on webpages.
 \end{inparaenum}
 
-The trained model is applied to the $3\times224\times224$ input images from the \datasetname~data\-set, resulting in grayscale heatmaps with a dimension of $1\times64\times64$. These heatmaps can then be used as the $x_{v}$ for the visual feature extractors described above by linearly scaling them to $3\times224\times224$, matching them with the VGG-16 and ResNet-152 input dimensions. Figure~\ref{fig:exampleshots} shows example snapshots with their corresponding saliency heatmaps.
+The trained model is used to convert a raw snapshot into a synthetic saliency heatmap. This heatmap is then used as an input image $x_i$ for the \datasetname{} model (see Figure~\ref{fig:multimodelarchitecture}).
 
-The saliency heatmaps generated using this method have various advantages over the usage of vanilla and keyword highlighted snapshots because synthetic saliency heatmaps
-\begin{inparaenum}[(i)]
-\item explicitly learn to predict the viewing pattern by training an end-to-end model on actual eye-tracking data, and 
-\item reduce the average storage requirement by $93.5\%$ and $77\%$, respectively, compared to the $3\times224\times224$ snapshot images when stored as $1\times64\times64$ and $3\times224\times224$ saliency heatmap images.
-\end{inparaenum}
+\if0
+The trained model is applied to the $3\times224\times224$ input images \todo{where do such images come from?}, resulting in grayscale heatmaps with a dimension of $1\times64\times64$.
+\todo{Does this model always reduce the dimension size by 3?}
+These heatmaps are then used as the an input image $x_{v}$ for the visual feature extractors described above (see Figure~\ref{fig:multimodelarchitecture}) by linearly scaling them to $3\times224\times224$, matching them with the VGG-16 and ResNet-152 input dimensions.
+\fi
