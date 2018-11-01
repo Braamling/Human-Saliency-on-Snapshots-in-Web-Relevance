@@ -8,7 +8,7 @@
 In \ac{LTR} research, both the amount and type of non-visual features used for training vary widely per dataset and study.
 To assess the performance of the 11 non-visual features used in this study, we use a set of known LTR algorithms on the million query track 2007 (MQ2007)\cite{allan2007million} with the LETOR 4.0\footnote{\url{https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/}} non-visual features.
 MQ2007 and LETOR 4.0 have a total of 46 features containing all 11 features from Table~\ref{tab:setdescription}.
-The experiment uses the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank, and LambdaMart on both 46 and 11 features using their default settings. 
+The experiment uses the RankLib implementations of RankBoost, AdaRank, and LambdaMart on both 46 and 11 features using their default settings. 
 
 The results of all three ranking methods using both 46 and 11 features are shown in Table~\ref{tab:11vs46}.
 From the results we see that the number of non-visual features has a significant effect on the performance of AdaRank. However, the RankBoost and LambdaRank comparison suggests that the features used in the \datasetname~dataset are powerful enough to be used for \ac{LTR} research.

@@ -38,7 +38,7 @@ which showed good performance in preliminary experiments.
 \end{figure}
 
 \subsection{Visual Feature Extractors} \label{sec:visualfeatures}
-Since our introduced \datasetname{} data\-set has a relatively low number of snapshots to train a separate feature extractor, we use the VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep} models from Torchvision,\footnote{\url{https://pytorch.org/docs/stable/torchvision/models.html}} pretrained on ImageNet, as two separate feature extractors.
+Since our introduced \datasetname{} data\-set has a relatively low number of snapshots to train a separate feature extractor, we use the VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep} models pretrained on ImageNet as two separate feature extractors.
 \todo{Change the story: (1) we need visual feature extractors, (2) the amount of training data is usually low, so it is better to pretrain, (3) say something about the state-of-the-art, i.e., how novel and up-to-date these methods are.}
 
 VGG-16~\cite{simonyan2014very} is commonly used for training transfer-learned models,

@@ -45,7 +45,8 @@ Although each entry in the ClueWeb12 collection contains the webpage's HTML sour
 To overcome this issue, we use the Wayback Machine,\footnote{\url{http://archive.org/web/}} which offers various archived versions of webpages with styling and images since 2005.
 For each page in ClueWeb12, that is also judged in the TREC Web Tracks 2013 \& 2014,
 we scrape an entry on the Wayback Machine that is closest to the original page scrape date as recorded in ClueWeb12.
-A snapshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework.\footnote{\url{http://selenium-python.readthedocs.io/}}
+A snapshot is then taken using a headless instance of the Firefox browser.
+%together with the Python implementation of the Selenium testing framework.\footnote{\url{http://selenium-python.readthedocs.io/}}
 To reproduce \cite{fan2017learning}, we also create a separate query-dependent dataset with the same snapshots where all query words are highlighted in red (HEX value: \#ff0000).
 Examples of snapshots and snapshots with highlights are shown in Figure~\ref{fig:exampleshots} (first two columns). 
 
