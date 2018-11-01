@@ -5,7 +5,7 @@ In this section, we describe the \datasetname~data\-set.
 Section~\ref{sec:trecclue} contains information about the underlying ClueWeb12 collection and TREC Web Track topics. Section~\ref{sec:screenshotsec} explains how the snapshots for ClueWeb12 were acquired using the Wayback Machine\footnote{\url{http://archive.org/web/}} and ClueWeb12 Online rendering service.\footnote{\url{http://boston.lti.cs.cmu.edu/Services/}} Section~\ref{sec:contentfeature} discusses the details on how content features, such as BM25 and TF-IDF, are calculated using Apache Spark.\footnote{\url{https://spark.apache.org/}} Finally, Section~\ref{sec:finalcollection} gives an overview of the structure in which the \datasetname~dataset is presented.
 
 \subsection{ClueWeb12 \& TREC Web Track}\label{sec:trecclue}
-For the \datasetname{} dataset we choose to use a combination of the ClueWeb12 document collection and the topics from the TREC Web Tracks 2013 \& 2014~\cite{collins2013trec,collins2015trec},
+For the \datasetname{} dataset we choose to use a combination of the ClueWeb12 document collection and the topics from the TREC Web Tracks 2013 \& 2014~\cite{collins2013trec,collins2015trec}
 because this is currently the most recent combination of a large-scale web page collection together with judged queries (with graded relevance). 
 
 ClueWeb12 is a highly diverse collection of web pages scraped in the first half of 2012.
@@ -37,11 +37,11 @@ Table~\ref{tab:countsources} shows the breakdown of the total number of pages an
 \subsection{Snapshots} \label{sec:screenshotsec}
 Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack styling and images files in order to render the full page.
 To overcome this issue, we use the Wayback Machine,\footnote{\url{http://archive.org/web/}} which offers various archived versions of web pages with styling and images since 2005.
-For each page in CueWeb12 that is also judged in the TREC Web Tracks 2013 \& 2014 (see the first row in Table~\ref{tab:countsources})
+For each page in ClueWeb12 that is also judged in the TREC Web Tracks 2013 \& 2014.
 we scrape an entry on the Wayback Machine that is closest to the original page scrape date as recorded in ClueWeb12.
 A snapshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework.\footnote{\url{http://selenium-python.readthedocs.io/}}
-To reproduce \cite{fan2017learning}, we also create a separate query dependent dataset with the same snapshots where all query words are highlighted in red (HEX value: \#ff0000).
-Examples of snapshots and snapshots with highlights are shown in Fig.~\ref{fig:exampleshots} (first two columns).
+To reproduce \cite{fan2017learning}, we also create a separate query-dependent dataset with the same snapshots where all query words are highlighted in red (HEX value: \#ff0000).
+Examples of snapshots and snapshots with highlights are shown in Figure~\ref{fig:exampleshots} (first two columns). 
 
 \begin{figure}[t]
 \begin{tabular}{ccc}
@@ -61,27 +61,27 @@ Examples of snapshots and snapshots with highlights are shown in Fig.~\ref{fig:e
 
 
 \label{sec:datasetsum}
-As the Wayback Machine does not contain an archived or working version of each document in the ClueWeb12 collection, a filtering process was introduced to maximize the quality of each snapshot. Using the following criteria, a snapshot was selected for each available document. 
+Since the Wayback Machine does not contain an archived or working version of each document in the ClueWeb12 collection, a filtering process is introduced to maximize the quality of each snapshot. Using the following criteria, a snapshot is selected for each available document. 
 \begin{enumerate}[nosep,leftmargin=14pt]
 \item Each document is requested from the Wayback Machine. 
 \item A document that is not on the Wayback Machine, times out, throws a JavaScript error or results in a PNG snapshot smaller than 100KB is marked as broken. Such documents are rendered again using the online rendering service provided by ClueWeb12.\footnote{\url{http://boston.lti.cs.cmu.edu/Services/}}
 \item A manual selection is made between all documents that are rendered from both sources. The Wayback version is used if it contains more styling elements and if the content is the same as in the rendering service. Otherwise, the rendering service version is used. 
 \end{enumerate}
 %
-As a result, most of the 28,906 judged documents had a corresponding snapshot from either the Wayback Machine or ClueWeb12 rendering service; only 265 documents did not pass the filtering and were discarded.
-Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetname{} dataset~acquisition process.
+As a result, most of the 28,906 judged documents have a corresponding snapshot from either the Wayback Machine or ClueWeb12 rendering service; only 265 documents did not pass the filtering and were discarded.
+Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetname{} dataset~acquisition process. Additionally, the table also shows the distribution of judgment scores among the snapshots that were discarded, taken from the Wayback Machine and taken from the ClueWeb12 rendering service. 
 
 
 \subsection{Non-Visual Features} 
 \label{sec:contentfeature}
-In LTR, documents are ranked based on various types of features, such as content features (BM25), quality indicators (PageRank) and behavioral features (CTR).
+In LTR, documents are ranked based on various types of features, such as content features (e.g. BM25), quality indicators (e.g. PageRank) and behavioral features (e.g. CTR).
 In order to use the \datasetname{} dataset to measure the effect of visual features, we also add a set of content features and quality indicators.
 In preliminary experiments, we compared the effect of reducing the 46 features in LETOR~\cite{qin2010letor} to just the 11 features described in Table~\ref{tab:setdescription}.
-As these features are relatively easy to compute and the experiments showed a minimal drop in performance, we decided to limit ourselves to these features for the \datasetname{} dataset.
+As these features are relatively easy to compute and the experiments showed a minimal drop in performance, we decided to limit the \datasetname{} dataset to these features.
 Also note that behavioral features, such as CTR, are not available for the TREC Web Tracks.
 
 The content features are computed by doing a full pass over the complete ClueWeb12 collection using Apache Spark.\footnote{\url{https://spark.apache.org/}}$^{ }$\footnote{This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21Gb memory each.}
-During this process an HTML parser (jsoup\footnote{\url{https://jsoup.org/}} in our case) extracts the title and content from the raw HTML.
+During this process an HTML parser (jsoup\footnote{\url{https://jsoup.org/}}) extracts the title and content from the raw HTML.
 Because the HTML structure in very large documents cannot be parsed efficiently by jsoup, all documents with more than one million tokens are ignored.
 Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained for each term in each document. Finally, the sparse vectors are loaded into a Python Pandas dataframe, which is used to compute the TF, IDF, TF-IDF and BM25 scores for each document-query pair.
 
@@ -105,8 +105,8 @@ Finally, the following modifications based on the feature transformations descri
 \toprule
 Id & Description & Id & Description & Id & Description    \\ 
 \midrule
-1  & Pagerank  & 5  & Content TFIDF  & 9  & Title IDF   \\
-2  & Content length & 6  & Content BM25   & 10 & Title TFIDF   \\
+1  & Pagerank  & 5  & Content TF-IDF  & 9  & Title IDF   \\
+2  & Content length & 6  & Content BM25   & 10 & Title TF-IDF   \\
 3  & Content TF  & 7  & Title length & 11 & Title BM25  \\
 4  & Content IDF & 8  & Title TF  & & \\
 \bottomrule

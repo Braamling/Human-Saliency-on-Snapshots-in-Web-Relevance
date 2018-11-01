@@ -16,7 +16,7 @@
 In this section, we discuss experiments performed on the proposed \datasetname~dataset.
 These experiments are set out to test whether:
 \begin{inparaenum}[(i)]
-\item the \modelname~model can improve the \ac{LTR} performance when introducing visual feature vectors. 
+\item the \modelname~model can improve the \ac{LTR} performance when introducing visual feature vectors, 
 \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
 \item the \modelname~model results can improve both visual and non-visual state-of-the-art \ac{LTR} methods.
 \end{inparaenum}
@@ -28,16 +28,16 @@ The experiments are divided into two types of setups:
 \item visual experiments using both content and visual features.
 \end{inparaenum}
 
-The \modelname~baseline refers to the baseline that demonstrates the performance increase of introducing visual features. We do so by using the \modelname~model and feeding the content features into the scoring component directly, without adding any visual features. 
+The \modelname~baseline refers to the \modelname~model without any visual features, such that it demonstrates the performance increase of introducing visual features. We do so by feeding the content features into the scoring component directly, without adding any visual features. 
 The other content baseline experiments are performed using BM25 and the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank, and LambdaMart.
 
-As a baseline comparison for our multimodal model, we implement ViP, the visual feature extractor proposed in~\citet{fan2017learning} using PyTorch. We train ViP on both the vanilla and highlighted snapshot datasets with the results being referred to as ViP snapshots and ViP highlights respectively.
+As a baseline comparison for our multimodal model, we implement ViP, the visual feature extractor proposed in~\citet{fan2017learning} using PyTorch. We train ViP on both the vanilla and highlighted snapshot datasets with the results being referred to as ViP snapshots and ViP highlights, respectively.
 
 The performance of the \modelname~model is demonstrated by learning visual feature vectors using VGG-16 and ResNet-152. Similarly as with the ViP model, both VGG-16 and ResNet-152 are trained on both the vanilla and highlighted snapshot dataset. 
 
 Finally, we use the synthetic saliency heatmaps as an input to the \modelname~model. For the saliency heatmaps, we again use both VGG-16 and ResNet-152 to learn the visual feature vectors.
 
-Each run is generated using the Adam optimizer with a batch size of $100$. The learning rates for all ResNet-152 and VGG-16 setups were set to $0.00005$ and $0.0001$ respectively. We empirically found that these values yield the highest performance for each model.
+Each run is generated using the Adam optimizer with a batch size of $100$. The learning rates for all ResNet-152 and VGG-16 setups were set to $0.00005$ and $0.0001$, respectively. 
 
 To measure the retrieval performance, we used precision and ndcg at $\{1,10\}$ and MAP.
 Significance is determined using a two-tailed paired t-test (p-value $\leq 0.05$). 
@@ -87,7 +87,7 @@ ResNet saliency    & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
 \end{table}
 
 \paragraph{\modelname~model with synthetic saliency heatmaps}
-The last two rows of Table~\ref{tab:letorvisresults} shows the \ac{LTR} performance when using synthetic saliency heatmaps as an input to the \modelname~model. Similarly as the vanilla and higlighted snapshots, the visual feature vectors are learned by using both VGG-16 and ResNet-152. In contract to the vanilla and highlighted snapshots, ResNet-152 seems to consistently outperform VGG-16 when using synthetic saliency images. Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with synthetic saliency images on p@10, ndcg@10 and MAP, the synthetic saliency images match and outperform performance when looking at p@1 and ndcg@1, respectively. 
+The last two rows of Table~\ref{tab:letorvisresults} show the \ac{LTR} performance when using synthetic saliency heatmaps as an input to the \modelname~model. Similarly as the vanilla and higlighted snapshots, the visual feature vectors are learned by using both VGG-16 and ResNet-152. In contract to the vanilla and highlighted snapshots, ResNet-152 seems to consistently outperform VGG-16 when using synthetic saliency images. Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with synthetic saliency images on p@10, ndcg@10 and MAP, the synthetic saliency images match and outperform performance when looking at p@1 and ndcg@1, respectively. 
 
 \paragraph{Baseline comparison}
 Table~\ref{tab:baseresults} compares the performance of the \modelname~model compared to both BM25, non-visual \ac{LTR} methods and the ViP model by~\citet{fan2017learning}. 

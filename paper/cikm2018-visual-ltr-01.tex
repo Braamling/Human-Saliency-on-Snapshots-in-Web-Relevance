@@ -2,12 +2,12 @@
 
 \section{Introduction}
 The design and appearance of a web page are determining factors for a user to examine the page or divert to another page~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.
-Relatively little is known about the potential of visual features to help determine the perceived relevance of a (web) page. In \acf{LTR}, visual features can be used in addition to content features such as BM25, quality indicators such as PageRank, and behavioral features such as CTR.
+However, relatively little is known about the potential of visual features to help determine the perceived relevance of a (web) page. In \acf{LTR}, visual features can be used in addition to content features such as BM25, quality indicators such as PageRank, and behavioral features such as CTR.
 Recently, \citet{fan2017learning} have introduced ViP, a \ac{LTR} model that uses a combination of both visual and content features.
 Visual features are calculated from snapshots, which are in turn created by rendering web pages.
 The authors demonstrate that adding these visual features helps to significantly improve the \ac{LTR} performance.
 
-The work by \citet{fan2017learning} is important because it indicates that the visual appearance of a web page can have a significant impact on perceived utility, which opens a new direction in web search and \ac{LTR}.
+The work by \citet{fan2017learning} indicates that the visual appearance of a web page can have a significant impact on perceived utility, which opens a new direction in web search and \ac{LTR}.
 However, there are several limitations in \cite{fan2017learning}.
 First, the method used to extract visual features in the ViP architecture
 \begin{inparaenum}[(i)]
@@ -21,15 +21,15 @@ the rendered web pages come from the GOV2 collection.\footnote{\url{http://ir.dc
 This collection is limited in the sense that 
 \begin{inparaenum}[(i)]
 \item it solely contains web pages within the .gov domain crawled in 2004, i.e., somewhat outdated pages with a relatively narrow scope, and
-\item the web pages in the dataset do not contain their original images.
+\item the webpages in the dataset do not contain their original images.
 %\item the styling information is not available together with web pages \todo{what do we mean with this?}.
 \end{inparaenum}
-In order to advance research on \ac{LTR} with visual features, it is important to have a dataset with more diverse and up-to-date documents and richer visual information (e.g., styling, images, etc).
+In order to advance research on \ac{LTR} with visual features, it is important to have a dataset with more diverse and up-to-date documents and richer visual information (e.g., styling, images).
 
 In this work, we address the above limitations.
 First, we propose a multimodal architecture for comparing the performance of using modern feature extraction methods on webpage snapshots. Using transfer learning, we transform a pretrained VGG-16 and ResNet-152 ~\cite{simonyan2014very, he2016deep} model into a powerful \ac{LTR} visual feature extractor. These transfer learned models do not suffer from the previously mentioned limitations from \cite{fan2017learning} and show a significant increase in retrieval performance.
 
-Second, we introduce a novel \ac{LTR} feature by training a model to explicitly model user web viewing patterns by using synthetic saliency heatmaps. Other than increasing the retrieval performance compared to traditional \ac{LTR} methods, these saliency heatmaps also have a significantly lower storage requirement then using webpage snapshots.
+Second, we introduce a novel \ac{LTR} feature by training a model to explicitly model user web viewing patterns by using synthetic saliency heatmaps. Other than increasing the retrieval performance compared to traditional \ac{LTR} methods, these saliency heatmaps also have a significantly lower storage requirement than using webpage snapshots.
 
 Third, we release \datasetname, a dataset that contains rich and highly diverse snapshots from the ClueWeb12 collection.\footnote{\url{https://lemurproject.org/clueweb12/}} The snapshots are acquired for judged documents in the TREC Web Track 2013 \& 2014~\cite{collins2013trec,collins2015trec}. For each document, we also calculate content features, such as BM25 and TF-IDF, that can be used for \ac{LTR}.
 The proposed dataset is made publicly available.\footnote{URL removed for review.}

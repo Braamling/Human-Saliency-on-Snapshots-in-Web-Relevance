@@ -44,7 +44,7 @@ The proposed multimodal \modelname~architecture introduces two properties that c
 \end{inparaenum}
 
 \paragraph{Training optimization}
-Although we are freezing the parameters in the visual feature extraction layer when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation. We can avoid the computational cost associated with the forward propagation on the frozen layers by storing the output of the visual feature extraction layer to disk prior to training. By storing these vectors to disk, we leave only the parameters of the fully connected layers to be calculated during the forwawrd propagation. 
+Although we are freezing the parameters in the visual feature extraction layer when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation. We can avoid the computational cost associated with the forward propagation on the frozen layers by storing the output of the visual feature extraction layer to disk prior to training. By storing these vectors to disk, we leave only the parameters of the fully connected layers to be calculated during the forward propagation. 
 
 For VGG-16 we converted all $3\times224\times224$ input images to vectors of $1\times25088$, thereby reducing the input size by $84.7\%$. We also reduce the total number of parameters by $12.3\%$ by removing the visual feature extraction layer consisting of $14,714,688$ parameters.
 
@@ -53,7 +53,7 @@ For ResNet-152 we convert each $3\times224\times224$ input image to vectors of $
 These optimizations reduced the computational requirements for ResNet-152 such that the training time of a single epoch decreased from hours minutes, using a single CPU on a 2015 MacBook Pro. 
 
 \paragraph{Inference optimization}
-When using \ac{LTR} in a large scale production environment, the impact of new \ac{LTR} features on computational requirements is a major concern. 
+When using \ac{LTR} in a large-scale production environment, the impact of new \ac{LTR} features on computational requirements is a major concern. 
 In order to deliver real-time search results, the model needs to be both powerful and lightweight during inference. 
 
 Because both the vanilla snapshots and synthetic saliency images are query independent, the output of the visual feature transformation layer will be consistent for each document. This allows us to do the inference on the visual feature transformation separate from the rest of the model inference. Doing the inference on the visual feature transformation layers and storing the visual feature vectors leaves only the scoring component during real-time inference. Because each of the visual feature vectors are only of size $1\times30$, this would increase the number of parameters in the scoring component from $450$ parameters without the visual features to $750$ parameters with visual features. This increase of $300$ parameters is merely negligible compared to the number of parameters in modern deep learning systems. 
