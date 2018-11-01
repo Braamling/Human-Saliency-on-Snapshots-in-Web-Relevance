@@ -37,6 +37,9 @@ The performance of the \modelname~model is demonstrated by learning visual featu
 
 Finally, we use the synthetic saliency heatmaps as an input to the \modelname~model. For the saliency heatmaps, we again use both VGG-16 and ResNet-152 to learn the visual feature vectors.
 
+\todo{Fix this}
+The scoring component uses a single fully connected layer with a hidden size of $10$ and dropout empirically set to $10\%$.
+
 Each run is generated using the Adam optimizer with a batch size of $100$. The learning rates for all ResNet-152 and VGG-16 setups were set to $0.00005$ and $0.0001$, respectively. 
 
 To measure the retrieval performance, we used precision and ndcg at $\{1,10\}$ and MAP.
