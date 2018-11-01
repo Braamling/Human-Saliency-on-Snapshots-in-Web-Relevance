@@ -3,25 +3,25 @@
 \section{Related work}
 \label{sec:relatedwork}
 
-We discuss related research on the relation between the visual appearance of a web page and how it is perceived by users, and the usage of visual information in \ac{LTR}.
+We discuss related research on the relation between the visual appearance of a webpage and how it is perceived by users, and the usage of visual information in \ac{LTR}.
 
 We discuss related research on the usage of visual information in \ac{LTR} and the relation between visual appearance and user perception of webpages.
 
 %The work in the paper is related to various research on user experience design. In this section we will discuss research on:
 %\begin{inparaenum}[(i)]
 %\item measuring usability,  
-%\item predicting saliency on web pages, and 
+%\item predicting saliency on webpages, and 
 %\item visual features in \ac{LTR}.
 %\end{inparaenum} 
 
-Using eye-tracking, \citet{nielsen2006f} and \citet{pernice2017f} demonstrate that web page design and content placement influences the ability for users to find the information they are looking for. 
+Using eye-tracking, \citet{nielsen2006f} and \citet{pernice2017f} demonstrate that webpage design and content placement influences the ability for users to find the information they are looking for. 
 Both studies show that by organizing the content in certain shapes (e.g. an F-shape), information can be  navigated more efficiently.
-\citet{wang2014eye} show that the size of the fixation areas measured using eye-tracking is larger on web pages with more content, which increases the likelihood that the attention of a user is distracted.
-%Finally, \citet{lindgaard2006attention} show that users are able to construct a stable judgment of a web page's visual appeal within 50ms. \todo{Is this important at all? I would drop the last reference and maybe use one or two others.}
-Such studies highlight the importance of the visual appearance of a web page and its effect on how users perceive pages, demonstrating that visual information has to be taken into account when ranking web pages.
+\citet{wang2014eye} show that the size of the fixation areas measured using eye-tracking is larger on webpages with more content, which increases the likelihood that the attention of a user is distracted.
+%Finally, \citet{lindgaard2006attention} show that users are able to construct a stable judgment of a webpage's visual appeal within 50ms. \todo{Is this important at all? I would drop the last reference and maybe use one or two others.}
+Such studies highlight the importance of the visual appearance of a webpage and its effect on how users perceive pages, demonstrating that visual information has to be taken into account when ranking webpages.
 
 \citet{fan2017learning} are the first to approach this problem.
-The authors use snapshots of web pages to extract visual features for LTR
+The authors use snapshots of webpages to extract visual features for LTR
 and show that such visual features significantly improve retrieval performance.
 Tyey feed snapshots through a neural network that attempts to model the previously mentioned F-shape.
 The output of this neural network is then concatenated with more traditional ranking signals, such as BM25 and PageRank.
@@ -37,14 +37,14 @@ Recently, \citet{zhang2018relevance} proposed a multimodal architecture for re-r
 Their work demonstrates that using a multimodal architecture as a method of combining both visual and non-visual features can improve \ac{LTR} performance.
 
 %\todo{Now that we have put saliency more to the foreground, we might want to reintroduce the text below}
-%A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Web page's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on web pages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 
+%A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Webpage's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on webpages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 
 
 %In this work, we create a more generic approach by using synthetic generated saliency heatmaps.
-%These heatmaps are used as an input to a convolution network in order to create features that can be used as an indicator of a web page communication effectiveness and usability. 
+%These heatmaps are used as an input to a convolution network in order to create features that can be used as an indicator of a webpage communication effectiveness and usability. 
 
 %\citet{donahue2014decaf} show that the features learned on large-scale supervised data can be transferred to different tasks and labels. Transferring the feature extraction weights to a new task is a common solution to cope with relatively small datasets. Most query sets used for LTR are relatively small (approximately 30,000 documents) compared to a dataset as ImageNet (1 million images), which indicates that transfer learning methods can be of use. In this work we use a pretrained image classifier and fine-tune its final layers on a LTR task. 
 
-% Write something on how saliency can be used for evaluating web pages
+% Write something on how saliency can be used for evaluating webpages
 
 % TODO: describe more related work.
 % TODO: Show some work on visual features in web design

@@ -6,9 +6,9 @@ Section~\ref{sec:trecclue} contains information about the underlying ClueWeb12 c
 
 \subsection{ClueWeb12 \& TREC Web Track}\label{sec:trecclue}
 For the \datasetname{} dataset we choose to use a combination of the ClueWeb12 document collection and the topics from the TREC Web Tracks 2013 \& 2014~\cite{collins2013trec,collins2015trec}
-because this is currently the most recent combination of a large-scale web page collection together with judged queries (with graded relevance). 
+because this is currently the most recent combination of a large-scale webpage collection together with judged queries (with graded relevance). 
 
-ClueWeb12 is a highly diverse collection of web pages scraped in the first half of 2012.
+ClueWeb12 is a highly diverse collection of webpages scraped in the first half of 2012.
 The total collection contains over 700 million documents that are crawled using the typical crawling settings of the Heritrix archival crawler project.\footnote{\url{https://webarchive.jira.com/wiki/spaces/Heritrix/overview}}
 
 We only use ClueWeb12 documents that have been judged for any of the 100 queries in the TREC Web Tracks 2013 \& 2014. In total, there are 28,906 judged pages.
@@ -36,7 +36,7 @@ Table~\ref{tab:countsources} shows the breakdown of the total number of pages an
 
 \subsection{Snapshots} \label{sec:screenshotsec}
 Although each entry in the ClueWeb12 collection contains the document's HTML source, many pages lack styling and images files in order to render the full page.
-To overcome this issue, we use the Wayback Machine,\footnote{\url{http://archive.org/web/}} which offers various archived versions of web pages with styling and images since 2005.
+To overcome this issue, we use the Wayback Machine,\footnote{\url{http://archive.org/web/}} which offers various archived versions of webpages with styling and images since 2005.
 For each page in ClueWeb12 that is also judged in the TREC Web Tracks 2013 \& 2014.
 we scrape an entry on the Wayback Machine that is closest to the original page scrape date as recorded in ClueWeb12.
 A snapshot is then taken using a headless instance of the Firefox browser together with the Python implementation of the Selenium testing framework.\footnote{\url{http://selenium-python.readthedocs.io/}}
@@ -116,7 +116,7 @@ Id & Description & Id & Description & Id & Description    \\
 \subsection{Final Collection}\label{sec:finalcollection}
 In summary, the \datasetname{} dataset contains:
 \begin{inparaenum}[(i)]
-\item a directory with web page snapshots (Section~\ref{sec:screenshotsec}), and
+\item a directory with webpage snapshots (Section~\ref{sec:screenshotsec}), and
 \item a set of files with content features divided into folds (Section~\ref{sec:contentfeature}).
 \end{inparaenum}
 Each snapshot is stored as a PNG file that can be identified by its corresponding ClueWeb12 document id. 

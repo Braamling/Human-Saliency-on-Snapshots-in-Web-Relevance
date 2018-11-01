@@ -1,13 +1,13 @@
 % !TEX root = cikm2018-visual-ltr.tex
 
 \section{Introduction}
-The design and appearance of a web page are determining factors for a user to examine the page or divert to another page~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.
+The design and appearance of a webpage are determining factors for a user to examine the page or divert to another page~\cite{nielsen1999designing,nielsen2006f,pernice2017f,wang2014eye}.
 However, relatively little is known about the potential of visual features to help determine the perceived relevance of a (web) page. In \acf{LTR}, visual features can be used in addition to content features such as BM25, quality indicators such as PageRank, and behavioral features such as CTR.
 Recently, \citet{fan2017learning} have introduced ViP, a \ac{LTR} model that uses a combination of both visual and content features.
-Visual features are calculated from snapshots, which are in turn created by rendering web pages.
+Visual features are calculated from snapshots, which are in turn created by rendering webpages.
 The authors demonstrate that adding these visual features helps to significantly improve the \ac{LTR} performance.
 
-The work by \citet{fan2017learning} indicates that the visual appearance of a web page can have a significant impact on perceived utility, which opens a new direction in web search and \ac{LTR}.
+The work by \citet{fan2017learning} indicates that the visual appearance of a webpage can have a significant impact on perceived utility, which opens a new direction in web search and \ac{LTR}.
 However, there are several limitations in \cite{fan2017learning}.
 First, the method used to extract visual features in the ViP architecture
 \begin{inparaenum}[(i)]
@@ -17,12 +17,12 @@ First, the method used to extract visual features in the ViP architecture
 \end{inparaenum}
 
 A second limitation in~\citep{fan2017learning} is that
-the rendered web pages come from the GOV2 collection.\footnote{\url{http://ir.dcs.gla.ac.uk/test_collections/gov2-summary.htm}}
+the rendered webpages come from the GOV2 collection.\footnote{\url{http://ir.dcs.gla.ac.uk/test_collections/gov2-summary.htm}}
 This collection is limited in the sense that 
 \begin{inparaenum}[(i)]
-\item it solely contains web pages within the .gov domain crawled in 2004, i.e., somewhat outdated pages with a relatively narrow scope, and
+\item it solely contains webpages within the .gov domain crawled in 2004, i.e., somewhat outdated pages with a relatively narrow scope, and
 \item the webpages in the dataset do not contain their original images.
-%\item the styling information is not available together with web pages \todo{what do we mean with this?}.
+%\item the styling information is not available together with webpages \todo{what do we mean with this?}.
 \end{inparaenum}
 In order to advance research on \ac{LTR} with visual features, it is important to have a dataset with more diverse and up-to-date documents and richer visual information (e.g., styling, images).
 
