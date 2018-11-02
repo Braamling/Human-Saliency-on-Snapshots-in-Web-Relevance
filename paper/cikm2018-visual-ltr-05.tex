@@ -1,27 +1,6 @@
-% !TEX root = cikm2018-visual-ltr.tex
+% !TEX root = www2019-visual-ltr.tex
 
-%\section{Experimental Setup}\label{sec:experiments}
-%In this section, we discuss the setup of the experiments performed on \datasetname. The experiments are set out to demonstrate the abilities of visual features in LTR and set a baseline for future visual LTR research.
-%%All PyTorch experiments were performed on a GTX 1080 Ti with 11gb of RAM. Preprocessing was performed on a Thinkpad X250 with an Intel i5-5300U CPU and 16gb of ram. 
-%
-%\paragraph{\ac{LTR} with visual features}
-%To average out the difference caused by random initialization, the experiments on \ac{LTR} with visual features are run five times for each of the five folds. 
-%Each run is performed using the Adam optimizer with a batch size of 100 using a learning rate of $0.0001$ and $0.00005$ for the ViP and VGG-16 models respectively. These values were found empirically to find the highest performance for each model.
-%Within each fold, the results for all five runs are averaged to create one measurement per fold per query.
-
-% !TEX root = cikm2018-visual-ltr.tex
-
-
-\section{Experiments and Results}
-In this section, we discuss experiments performed on the proposed \datasetname~dataset.
-These experiments are set out to test whether:
-\begin{inparaenum}[(i)]
-\item the \modelname~model can improve the \ac{LTR} performance when introducing visual feature vectors, 
-\item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
-\item the \modelname~model results can improve both visual and non-visual state-of-the-art \ac{LTR} methods.
-\end{inparaenum}
-
-\subsection{Experimental Setup}
+\section{Experimental Setup}\label{sec:setup}
 The experiments are divided into two types of setups:
 \begin{inparaenum}[(i)]
 \item baseline experiments using only content features, and
@@ -46,7 +25,17 @@ All PyTorch experiments were performed on a single GTX 1080 Ti GPU with 11gb of 
 % Preprocessing was performed on a Thinkpad X250 with an Intel i5-5300U CPU and 16gb of ram. 
 
 
-\subsection{Results}
+
+\section{Results}
+In this section, we discuss experiments performed on the proposed \datasetname~dataset.
+These experiments are set out to test whether:
+\begin{inparaenum}[(i)]
+\item the \modelname~model can improve the \ac{LTR} performance when introducing visual feature vectors, 
+\item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
+\item the \modelname~model results can improve both visual and non-visual state-of-the-art \ac{LTR} methods.
+\end{inparaenum}
+
+
 In this section we will compare and discuss the results of the 
 \begin{inparaenum}[(i)]
 \item \modelname~implementions, 
@@ -54,7 +43,7 @@ In this section we will compare and discuss the results of the
 \item visual baselines.
 \end{inparaenum}  
 
-\paragraph{\modelname~model with VGG-16 and ResNet-152}
+\subsection{\modelname~model with VGG-16 and ResNet-152}
 In Table~\ref{tab:letorvisresults}, we compare the performance of the \modelname~model when used with and without visual feature vectors. The first row shows the \modelname~baseline, when using only the content features as an input to the scoring component. The second to fifth rows shows the performance of using VGG-16 and ResNet-152 with both vanilla and highlighted snapshots. 
 These results clearly show that each of the methods of learning visual feature vectors significantly improves the \ac{LTR} performance of the \modelname~model compared to the \modelname~baseline. 
 
@@ -86,10 +75,10 @@ ResNet saliency    & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
 \end{tabular}
 \end{table}
 
-\paragraph{\modelname~model with synthetic saliency heatmaps}
+\subsection{\modelname~model with synthetic saliency heatmaps}
 The last two rows of Table~\ref{tab:letorvisresults} show the \ac{LTR} performance when using synthetic saliency heatmaps as an input to the \modelname~model. Similarly as the vanilla and higlighted snapshots, the visual feature vectors are learned by using both VGG-16 and ResNet-152. In contract to the vanilla and highlighted snapshots, ResNet-152 seems to consistently outperform VGG-16 when using synthetic saliency images. Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with synthetic saliency images on p@10, ndcg@10 and MAP, the synthetic saliency images match and outperform performance when looking at p@1 and ndcg@1, respectively. 
 
-\paragraph{Baseline comparison}
+\subsection{Baseline comparison}
 Table~\ref{tab:baseresults} compares the performance of the \modelname~model compared to both BM25, non-visual \ac{LTR} methods and the ViP model by~\citet{fan2017learning}. 
 The table also shows both VGG-16 with highlighted snapshots and ResNet-152 with synthetic saliency heatmaps. Because these two results yield the highest \ac{LTR} performance, they are used to compare the \modelname~model with the baselines. 
 We clearly see that both methods have a significant performance increase compared to using BM25, almost doubling the \ac{LTR} metrics.
@@ -99,7 +88,7 @@ However, we do find a significant improvement by the \modelname~implementations 
 Finally, we compare the results of the \modelname~implementations with ViP as a visual \ac{LTR} baseline. 
 Here we clearly see that both our implementations significantly outperform ViP on all measures. 
 
-\paragraph{ViP results on \datasetname}
+\subsection{ViP results on \datasetname dataset}
 As addressed in the introduction, both the ViP model and the dataset used by~\citet{fan2017learning} have a number of limitations. The results in Table~\ref{tab:baseresults} clearly show that the limitations in the ViP model become apparent when being used with the more diverse and rich \datasetname~dataset. We do see that the results show a similar pattern as described by ~\citet{fan2017learning} where the model performs better when using highlighted snapshots compared to vanilla snapshots. However, using ViP with vanilla and highlighted snapshots from the \datasetname~dataset is outperformed by both RankBoost and LambdaMart. 
 
 \begin{table}[h]
