@@ -1,4 +1,4 @@
-% !TEX root = cikm2018-visual-ltr.tex
+% !TEX root = www2019-visual-ltr.tex
 
 \section{\protect\datasetname{} Model}
 In this section, we introduce the \datasetname{} model for \ac{LTR} with visual features.
@@ -53,9 +53,8 @@ For this reason, we use the convolutional layers as is, by freezing all the para
 The fully connected layers of VGG-16, instead, can be altered and retrained in order to be used with new inputs and tasks.
 Due to this, we utilize them as a visual feature transformation layer within the \datasetname{} architecture to produce \ac{LTR} specific features $x_{vl}$.
 In particular, we replace the last fully connected layer of VGG-16 by a newly initialized fully connected layer.
+Then we optimize the parameters of all fully connected layers of VGG-16 during training.
 The size of $x_{vl}$ is set to $30$, as this size showed good performance in preliminary experiments.
-The parameters of both the convolutional and fully connected layers are further optimized during training.
-\todo{You said, all parameters are froozen for convolutional layers.}
 
 The ResNet-152~\cite{he2016deep} architecture was shown to outperform VGG-16 in ImageNet classification.
 The residual connections between convolutional layers of ResNet-152 allow for deeper networks to be trained without suffering from vanishing gradients.
@@ -70,7 +69,8 @@ In order to increase the ability to learn the visual quality of a webpage, we pr
 The use of saliency heatmaps could be advantageous compared to the use of raw snapshots for the following reasons.
 First, synthetic saliency heatmaps explicitly learn to predict how users perceive webpages by training an end-to-end model on actual eye-tracking data.
 We expect this information to better correlate with webpage relevance compared to raw snapshots.
-Second, saliency heatmaps reduce the average storage requirements by up to 90\%, because \todo{XXX}.
+Second, saliency heatmaps reduce the average storage requirements by up to 90\%,
+because they are gray-scale images and have large areas of the same color, which can be stored efficiently.
 This makes the use of saliency heatmaps attractive for practical applications.
 Figure~\ref{fig:exampleshots} shows example snapshots with their corresponding heatmaps (first and third columns respectively).
 
