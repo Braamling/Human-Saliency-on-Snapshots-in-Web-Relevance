@@ -1,4 +1,4 @@
-% !TEX root = cikm2018-visual-ltr.tex
+% !TEX root = www2019-visual-ltr.tex
 
 \section{Discussion}
 \label{sec:discussion}
@@ -51,7 +51,7 @@ For VGG-16 we converted all $3\times224\times224$ input images to vectors of $1\
 
 For ResNet-152 we convert each $3\times224\times224$ input image to vectors of $1\times2048$, thereby reducing the input size by $98.6\%$. The visual feature extraction layer consists of $58,144,239$ parameters, which reduces the total amount of parameters during inference by $49.5\%$.
 
-These optimizations reduced the computational requirements for ResNet-152 such that the training time of a single epoch decreased from hours minutes, using a single CPU on a 2015 MacBook Pro. 
+These optimizations reduced the computational requirements for ResNet-152 such that the training time of a single epoch decreased from hours to minutes, using a single CPU on a 2015 MacBook Pro. 
 
 \paragraph{Inference optimization}
 When using \ac{LTR} in a large-scale production environment, the impact of new \ac{LTR} features on computational requirements is a major concern. 
