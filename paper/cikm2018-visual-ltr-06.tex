@@ -60,6 +60,7 @@ In order to deliver real-time search results, the model needs to be both powerfu
 Because both the vanilla snapshots and synthetic saliency images are query independent, the output of the visual feature transformation layer will be consistent for each document. This allows us to do the inference on the visual feature transformation separate from the rest of the model inference. Doing the inference on the visual feature transformation layers and storing the visual feature vectors leaves only the scoring component during real-time inference. Because each of the visual feature vectors are only of size $1\times30$, this would increase the number of parameters in the scoring component from $450$ parameters without the visual features to $750$ parameters with visual features. This increase of $300$ parameters is merely negligible compared to the number of parameters in modern deep learning systems. 
 
 
+\if0
 \subsection{Reproducing ViP on \datasetname{} dataset}
 ViP is the only existing \ac{LTR} method that uses visual features~\cite{fan2017learning}.
 It was evaluated on the GOV2 dataset, which largest limitation is that webpages in this dataset do not contain images and style information and are, thus, visually homogeneous.
@@ -71,6 +72,7 @@ the ViP model with vanilla snapshots outperforms the \ac{LTR} baseline without v
 while the highlighted snapshots outperform the vanilla ones.
 
 that the limitations in the ViP model become apparent when being used with the more diverse and rich \datasetname~dataset. We do see that the results show a similar pattern as described by ~\citet{fan2017learning} where the model performs better when using highlighted snapshots compared to vanilla snapshots. However, using ViP with vanilla and highlighted snapshots from the \datasetname~dataset is outperformed by both RankBoost and LambdaMart. 
+\fi
 
 
 % VGG16 -               134,383,885

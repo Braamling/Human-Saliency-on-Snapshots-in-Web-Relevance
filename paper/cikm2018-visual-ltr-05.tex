@@ -44,13 +44,13 @@ These results clearly show that both VGG-16 and ResNet-152 visual feature extrac
 When comparing the results of the \modelname~model with visual features, we observe the following:
 \begin{inparaenum}[(i)]
     \item The highest ranking performance is achieved by using VGG-16 on the highlighted snapshots.
-    \item For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots. This is to be expected, because highlighted snapshots cary more information compared to vanilla snapshots.
+    \item For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots, which is inline with the findings of~\cite{fan2017learning} and to be expected: highlighted snapshots cary more information compared to vanilla snapshots.
     \item For ResNet-152, however, p@1 and ndcg@1 are lower for highlighted snapshots compared to vanilla snapshots. \todo{Can we explain this? In not, then we should probably skip this line completely.}
 %    \item the performance increase for p@1 and ndcg@1, with an average of $+0.200$ and $+0.118$, is consistently higher than p@10 and ndcg@10, with an average of $+0.134$ and $+0.087$.
 \end{inparaenum}
 Based on these results, we conclude that the use of visual features in \ac{LTR} significantly improves performance
 and that highlighted snapshots should on average be preferred over vanilla snapshots.
-These results are inline with the findings of~\cite{fan2017learning}.
+%These results are inline with the findings of~\cite{fan2017learning}.
 
 \begin{table}[h]
 \caption{Results for the \modelname~model using only content features (baseline), vanilla snapshots, highlighted snapshots, and saliency heatmaps.
