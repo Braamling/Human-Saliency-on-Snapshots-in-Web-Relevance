@@ -30,9 +30,9 @@ All PyTorch experiments were performed on a single GTX 1080 Ti GPU with 11gb of 
 In this section, we present experiments that are set out to test the following:
 \begin{inparaenum}[(i)]
     \item the \modelname~model improves the \ac{LTR} performance when introducing visual features, 
-    \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model,
-    \item the \modelname~model improves both visual and non-visual state-of-the-art ranking methods, and
-    \item the results of the baseline ViP model~\cite{fan2017learning} are reproduced on the \datasetname{} dataset.
+    \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
+    \item the \modelname~model improves both visual and non-visual state-of-the-art ranking methods.
+%    \item the results of the baseline ViP model~\cite{fan2017learning} are reproduced on the \datasetname{} dataset.
 \end{inparaenum}
 
 \subsection{\modelname~model with VGG-16 and ResNet-152}
@@ -106,9 +106,6 @@ Here, we clearly see that both our implementations significantly outperform ViP 
 The above results show that the proposed \modelname{} model outperforms baselines, whether they are supervised or unsupervised, use visual features or not.
 However, to achieve consistent significant improvements compared to the state-of-the-art \ac{LTR} methods, different loss functions within the \modelname{} model have to be investigated.
 
-
-\subsection{ViP results on \datasetname{} dataset}
-As addressed in the introduction, both the ViP model and the dataset used by~\citet{fan2017learning} have a number of limitations. The results in Table~\ref{tab:baseresults} clearly show that the limitations in the ViP model become apparent when being used with the more diverse and rich \datasetname~dataset. We do see that the results show a similar pattern as described by ~\citet{fan2017learning} where the model performs better when using highlighted snapshots compared to vanilla snapshots. However, using ViP with vanilla and highlighted snapshots from the \datasetname~dataset is outperformed by both RankBoost and LambdaMart. 
 
 \begin{table}[h]
 \caption{Results for the VGG-16 with highlighted snapshots, ResNet-152 with saliency heatmaps, and baselines.
