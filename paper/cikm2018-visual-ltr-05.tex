@@ -102,6 +102,8 @@ As a future work, we plan to investigate the effect of different loss functions 
 
 Finally, we compare the \modelname~implementations to ViP, the only existing \ac{LTR} method with visual features.
 Here, we clearly see that both our implementations significantly outperform ViP on all metrics.
+Also note, that ViP loses to two out of three non-visual \ac{LTR} baselines, namely RankBoost and LambdaMart.
+We believe this is due to the reason discussed above: ViP uses pairwise hinge loss as the \ac{LTR} component~\cite{fan2017learning}, which may be suboptimal.
 
 The above results show that the proposed \modelname{} model outperforms baselines, whether they are supervised or unsupervised, use visual features or not.
 However, to achieve consistent significant improvements compared to the state-of-the-art \ac{LTR} methods, different loss functions within the \modelname{} model have to be investigated.
