@@ -90,7 +90,7 @@ We further elaborate on this in Section~\ref{sec:discussion}.
 Also note that behavioral features, such as CTR, are not available for the TREC Web Tracks.
 
 \if0
- using Apache Spark.\footnote{\url{https://spark.apache.org/}}$^{ }$\footnote{This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21Gb memory each.}
+The content features are computed by doing a full pass over the complete ClueWeb12 collection using Apache Spark.\footnote{\url{https://spark.apache.org/}}$^{ }$\footnote{This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21Gb memory each.}
 During this process an HTML parser (jsoup\footnote{\url{https://jsoup.org/}}) extracts the title and content from the raw HTML.
 Because the HTML structure in very large documents cannot be parsed efficiently by jsoup, all documents with more than one million tokens are ignored.
 Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained for each term in each document. Finally, the sparse vectors are loaded into a Python Pandas dataframe, which is used to compute the TF, IDF, TF-IDF and BM25 scores for each document-query pair.
