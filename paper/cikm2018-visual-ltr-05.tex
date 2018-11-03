@@ -88,20 +88,32 @@ while highlighted snapshots should be used when a high overall performance is ne
 
 
 \subsection{Baseline comparison}
-Table~\ref{tab:baseresults} compares the performance of the \modelname~model compared to both BM25, non-visual \ac{LTR} methods and the ViP model by~\citet{fan2017learning}. 
-The table also shows both VGG-16 with highlighted snapshots and ResNet-152 with synthetic saliency heatmaps. Because these two results yield the highest \ac{LTR} performance, they are used to compare the \modelname~model with the baselines. 
-We clearly see that both methods have a significant performance increase compared to using BM25, almost doubling the \ac{LTR} metrics.
-Although both \modelname~implementations seem to consistently outperform all non-visual \ac{LTR} methods, we cannot confirm the statistical significance of each of the performance measures. 
-However, we do find a significant improvement by the \modelname~implementations on the AdaRank \ac{LTR} results. Furthermore, when using VGG-16 with highlighted snapshots there is a significant performance increase in ndcg@10 compared to LambdaMart and in p@10 for both RankBoost and LambdaMart.
+Table~\ref{tab:baseresults} compares the performance of the \modelname~model to BM25, non-visual \ac{LTR} methods and the ViP model by~\citet{fan2017learning}. 
+Specifically, the table shows the performance of VGG-16 with highlighted snapshots and of ResNet-152 with synthetic saliency heatmaps, as these are the best-performing variants of the \modelname~model according to Table~\ref{tab:letorvisresults}.
+%Because these two results yield the highest \ac{LTR} performance, they are used to compare the \modelname~model with the baselines. 
+We clearly see that both methods have a significant performance increase compared to BM25, almost doubling the metrics values in many cases.
 
-Finally, we compare the results of the \modelname~implementations with ViP as a visual \ac{LTR} baseline. 
-Here we clearly see that both our implementations significantly outperform ViP on all measures. 
+When comparing to non-visual \ac{LTR} methods, both \modelname~implementations show consistently better performance.
+However, not all metrics are improved significantly.
+%However, we do find a significant improvement by the \modelname~implementations on the AdaRank \ac{LTR} results.
+%Furthermore, when using VGG-16 with highlighted snapshots there is a significant performance increase in ndcg@10 compared to LambdaMart and in p@10 for both RankBoost and LambdaMart.
+We attribute this to the fact that, similarly to~\cite{fan2017learning}, the \ac{LTR} component of the \modelname{} model is based on pairwise hinge loss, which is a relatively simple loss function.
+As a future work, we plan to investigate the effect of different loss functions on the performance of the \modelname{} model.
 
-\subsection{ViP results on \datasetname dataset}
+Finally, we compare the \modelname~implementations to ViP, the only existing \ac{LTR} method with visual features.
+Here, we clearly see that both our implementations significantly outperform ViP on all metrics.
+
+The above results show that the proposed \modelname{} model outperforms baselines, whether they are supervised or unsupervised, use visual features or not.
+However, to achieve consistent significant improvements compared to the state-of-the-art \ac{LTR} methods, different loss functions within the \modelname{} model have to be investigated.
+
+
+\subsection{ViP results on \datasetname{} dataset}
 As addressed in the introduction, both the ViP model and the dataset used by~\citet{fan2017learning} have a number of limitations. The results in Table~\ref{tab:baseresults} clearly show that the limitations in the ViP model become apparent when being used with the more diverse and rich \datasetname~dataset. We do see that the results show a similar pattern as described by ~\citet{fan2017learning} where the model performs better when using highlighted snapshots compared to vanilla snapshots. However, using ViP with vanilla and highlighted snapshots from the \datasetname~dataset is outperformed by both RankBoost and LambdaMart. 
 
 \begin{table}[h]
-\caption{The $\dagger$ indicates a significant decrease in performance compared to the VGG-16 model with highlighted snapshots and $\ddagger$ indicates a significant decrease in performance for both \modelname~model results.}
+\caption{Results for the VGG-16 with highlighted snapshots, ResNet-152 with saliency heatmaps, and baselines.
+$\dagger$ indicates a significant decrease in performance compared to VGG highlights and $\ddagger$ indicates a significant decrease in performance compared to both \modelname{} implementations.
+Best results are shown in bold.}
 
 \label{tab:baseresults}
 \begin{tabular}{l\OK l\OK l\OK l\OK l\OK l}
