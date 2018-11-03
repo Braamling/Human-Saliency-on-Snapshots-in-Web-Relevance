@@ -1,23 +1,23 @@
 % !TEX root = www2019-visual-ltr.tex
 
-\section{\protect\datasetname{} Model}
-In this section, we introduce the \datasetname{} model for \ac{LTR} with visual features.
+\section{\protect\modelname{} Model}
+In this section, we introduce the \modelname{} model for \ac{LTR} with visual features.
 The proposed model consists of three parts.
 First, we introduce the model architecture in Section~\ref{sec:multimodal}.
-Then, in Section~\ref{sec:visualfeatures} we describe two visual feature extractors used by \datasetname{}:
+Then, in Section~\ref{sec:visualfeatures} we describe two visual feature extractors used by \modelname{}:
 VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep}, both pretrained on ImageNet.
-Finally, in Section~\ref{sec:saliency} we propose to enhance \datasetname{} by generating synthetic saliency heatmaps for each of the input images.
+Finally, in Section~\ref{sec:saliency} we propose to enhance \modelname{} by generating synthetic saliency heatmaps for each of the input images.
 %These synthetic saliency images are trained to learn a more expressive representation of the viewing pattern of a user. 
-The implementation of the proposed \datasetname{} model is available online.\footnote{URL removed for review.}
+The implementation of the proposed \modelname{} model is available online.\footnote{URL removed for review.}
 
 \subsection{Architecture} \label{sec:multimodal}
 %In order to compare the performance of various visual feature extractor methods, we propose a reusable multimodal architecture. 
-The \datasetname{} architecture is visualized in Figure~\ref{fig:multimodelarchitecture}. 
+The \modelname{} architecture is visualized in Figure~\ref{fig:multimodelarchitecture}. 
 The model starts by taking an image $x_i$ (1) as an input to the visual feature extraction layer (2) in order to create a generic visual feature vector $x_{vf}$. In turn, $x_{vf}$ is then used as an input to the visual feature transformation layer (3).
 This visual feature transformation layer learns into transforms the generic visual features to a \ac{LTR} specific visual feature vector $x_{vl}$.
 \todo{Why do we need this transformation? what is the difference between the generic and LTR-specific features?}
 %
-The \datasetname{} architecture also makes use of content features $x_{c}$ (4), e.g., BM25, PageRank, etc.
+The \modelname{} architecture also makes use of content features $x_{c}$ (4), e.g., BM25, PageRank, etc.
 The final feature vector $x_{l}$ is constructed by concatenating the visual features $x_{vl}$ with the content features~$x_{c}$.
 %
 This final feature vector $x_{l}$ is then used as an input to the scoring component (5),
@@ -33,7 +33,7 @@ which showed good performance in preliminary experiments.
 
 \begin{figure}[t]
 \includegraphics[width = 3.4in]{images/multimodelarchitecture.pdf}
-\caption{\datasetname{} architecture.}
+\caption{\modelname{} architecture.}
 \label{fig:multimodelarchitecture}
 \end{figure}
 
@@ -48,10 +48,10 @@ because it provides a reasonable trade-off between effectiveness and simplicity.
 The VGG-16 architecture consists of a set of convolutional filters and fully connected layers. 
 The convolutional filters extract features from an input image, which are then used by the fully connected layers to classify the image. 
 The convolutional layers of VGG-16 are generic with respect to an input and task~\citep{donahue2014decaf}
-and, thus, can be used as a visual feature extractor within the \datasetname{} architecture to create generic visual features $x_{vf}$.
+and, thus, can be used as a visual feature extractor within the \modelname{} architecture to create generic visual features $x_{vf}$.
 For this reason, we use the convolutional layers as is, by freezing all the parameters during training.
 The fully connected layers of VGG-16, instead, can be altered and retrained in order to be used with new inputs and tasks.
-Due to this, we utilize them as a visual feature transformation layer within the \datasetname{} architecture to produce \ac{LTR} specific features $x_{vl}$.
+Due to this, we utilize them as a visual feature transformation layer within the \modelname{} architecture to produce \ac{LTR} specific features $x_{vl}$.
 In particular, we replace the last fully connected layer of VGG-16 by a newly initialized fully connected layer.
 Then we optimize the parameters of all fully connected layers of VGG-16 during training.
 The size of $x_{vl}$ is set to $30$, as this size showed good performance in preliminary experiments.
@@ -81,7 +81,7 @@ Similarly to the visual feature extraction approaches above, \cite{shan2017two} 
 \item the webpage saliency dataset from \cite{shen2014webpage}, a smaller dataset containing saliency heatmaps created with eye-tracking hardware on webpages.
 \end{inparaenum}
 
-The trained model is used to convert a raw snapshot into a synthetic saliency heatmap. This heatmap is then used as an input image $x_i$ for the \datasetname{} model (see Figure~\ref{fig:multimodelarchitecture}).
+The trained model is used to convert a raw snapshot into a synthetic saliency heatmap. This heatmap is then used as an input image $x_i$ for the \modelname{} model (see Figure~\ref{fig:multimodelarchitecture}).
 
 \if0
 The trained model is applied to the $3\times224\times224$ input images \todo{where do such images come from?}, resulting in grayscale heatmaps with a dimension of $1\times64\times64$.
