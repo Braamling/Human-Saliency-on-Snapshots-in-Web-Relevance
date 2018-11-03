@@ -24,7 +24,9 @@ This collection is limited in the sense that
 \item the webpages in the dataset do not contain their original images.
 %\item the styling information is not available together with webpages \todo{what do we mean with this?}.
 \end{inparaenum}
-In order to advance research on \ac{LTR} with visual features, it is important to have a dataset with more diverse and up-to-date documents and richer visual information (e.g., styling, images).
+This dataset is not suitable for research on \ac{LTR} with visual features because it does not reflect the diverse and rich webpages (e.g., styling, images) found on the internet today. 
+Additionally, the webpage snapshots have not been made publically available, making it difficult to reproduce results. 
+In order to advance research on \ac{LTR} with visual features, it is important to have a public dataset with more diverse and up-to-date documents and richer visual information.
 
 In this work, we address the above limitations.
 First, we propose a multimodal architecture for comparing the performance of using modern feature extraction methods on webpage snapshots. Using transfer learning, we transform a pretrained VGG-16 and ResNet-152 ~\cite{simonyan2014very, he2016deep} model into a powerful \ac{LTR} visual feature extractor. These transfer learned models do not suffer from the previously mentioned limitations from \cite{fan2017learning} and show a significant increase in retrieval performance.

@@ -86,7 +86,7 @@ In LTR, documents are ranked based on various types of features, such as content
 In order to use the \datasetname{} dataset to measure the effect of visual features, we also add a set of content features and quality indicators,
 listed in Table~\ref{tab:setdescription}.
 These 11 features are easy to compute and show a minimal drop in performance compared to the standard 46 features in LETOR~\cite{qin2010letor}.
-We further elaborate on this in Section~\ref{sec:discussion}.
+Because the number of features are not central to this work, we further elaborate the performance comparison in Section~\ref{sec:discussion}.
 Also note that behavioral features, such as CTR, are not available for the TREC Web Tracks.
 
 \if0
@@ -134,7 +134,6 @@ Each snapshot is stored as a PNG file that can be identified by its correspondin
 The non-visual features are stored in LETOR formatted files containing the raw, logged and query normalized values.
 The query normalized values are randomly split per query into five equal partitions.
 These partitions are then used to create five folds, where each fold contains three partitions for training and the remaining two partitions for validation and testing.
-The \datasetname{} dataset is available at \url{http://anonymized.url.}
 
 %A separate file contains an entry for each snapshot indicating whether the snapshots was created using the Wayback Machine or online rendering service. 
 
