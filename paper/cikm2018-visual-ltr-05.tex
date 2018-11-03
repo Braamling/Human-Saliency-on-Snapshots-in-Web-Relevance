@@ -27,35 +27,32 @@ All PyTorch experiments were performed on a single GTX 1080 Ti GPU with 11gb of 
 
 
 \section{Results}
-In this section, we discuss experiments performed on the proposed \datasetname~dataset.
-These experiments are set out to test whether:
+In this section, we present experiments that are set out to test the following:
 \begin{inparaenum}[(i)]
-\item the \modelname~model can improve the \ac{LTR} performance when introducing visual feature vectors, 
-\item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
-\item the \modelname~model results can improve both visual and non-visual state-of-the-art \ac{LTR} methods.
+    \item the \modelname~model improves the \ac{LTR} performance when introducing visual features, 
+    \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model,
+    \item the \modelname~model improves both visual and non-visual state-of-the-art ranking methods, and
+    \item the results of the baseline ViP model~\cite{fan2017learning} are reproduced on the \datasetname{} dataset.
 \end{inparaenum}
 
-
-In this section we will compare and discuss the results of the 
-\begin{inparaenum}[(i)]
-\item \modelname~implementions, 
-\item non-visual baselines, and 
-\item visual baselines.
-\end{inparaenum}  
-
 \subsection{\modelname~model with VGG-16 and ResNet-152}
-In Table~\ref{tab:letorvisresults}, we compare the performance of the \modelname~model when used with and without visual feature vectors. The first row shows the \modelname~baseline, when using only the content features as an input to the scoring component. The second to fifth rows shows the performance of using VGG-16 and ResNet-152 with both vanilla and highlighted snapshots. 
-These results clearly show that each of the methods of learning visual feature vectors significantly improves the \ac{LTR} performance of the \modelname~model compared to the \modelname~baseline. 
+In Table~\ref{tab:letorvisresults}, we compare the performance of the \modelname~model when used with and without visual features.
+The first row shows the \modelname~baseline, when using only the content features as an input to the scoring component.
+The second to fifth rows show the performance of using VGG-16 and ResNet-152 with both vanilla and highlighted snapshots. 
+These results clearly show that both VGG-16 and ResNet-152 visual feature extraction methods significantly improve the performance compared to the \modelname~baseline. 
 
-When comparing the results of using visual feature vectors we observe the following:
+When comparing the results of the \modelname~model with visual features, we observe the following:
 \begin{inparaenum}[(i)]
-\item the highest ranking performance is achieved by using VGG-16 on the highlighted snapshots, 
-\item performance on all performance metrics is consistently better when comparing highlighted with vanilla snapshots using VGG-16, which is not the case when comparing the two datasets using ResNet-152, and 
-\item the performance increase for p@1 and ndcg@1, with an average of $+0.200$ and $+0.118$, is consistently higher than p@10 and ndcg@10, with an average of $+0.134$ and $+0.087$.
+    \item The highest ranking performance is achieved by using VGG-16 on the highlighted snapshots.
+    \item For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots, which is to be expected and is inline with the findings of~\cite{fan2017learning}. Indeed, highlighted snapshots cary more information (query terms are more prominent than other terms) compared to vanilla snapshots.
+    \item For ResNet-152, however, p@1 and ndcg@1 are lower for highlighted snapshots compared to vanilla snapshots. \todo{Can we explain this? In not, then we should probably skip this line completely.}
+%    \item the performance increase for p@1 and ndcg@1, with an average of $+0.200$ and $+0.118$, is consistently higher than p@10 and ndcg@10, with an average of $+0.134$ and $+0.087$.
 \end{inparaenum}
 
 \begin{table}[h]
-\caption{The \ac{LTR} results for the \modelname~model using vanilla snapshots, highlighted snapshots, saliency heatmaps and content features only. All results have a significant improvement over the \modelname~baseline. }
+\caption{Results for the \modelname~model using only content features (baseline), vanilla snapshots, highlighted snapshots, and saliency heatmaps.
+All results have a significant improvement over the \modelname~baseline.
+Best results are shown in bold.}
 \label{tab:letorvisresults}
 \centering
 \begin{tabular}{l\OK l\OK l\OK l\OK l\OK l}
