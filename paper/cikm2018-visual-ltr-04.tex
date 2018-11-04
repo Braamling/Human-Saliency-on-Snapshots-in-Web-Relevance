@@ -6,7 +6,7 @@ Section~\ref{sec:trecclue} contains information about the underlying ClueWeb12 c
 Section~\ref{sec:screenshotsec} explains how the snapshots for ClueWeb12 are acquired.
 % using the Wayback Machine\footnote{\url{http://archive.org/web/}} and ClueWeb12 Online rendering service.\footnote{\url{http://boston.lti.cs.cmu.edu/Services/}}
 Section~\ref{sec:contentfeature} discusses content features, such as BM25 and TF-IDF, included in the \datasetname{} dataset.
-Finally, Section~\ref{sec:finalcollection} gives an overview of the structure in which the \datasetname~dataset is presented and published online.
+Finally, Section~\ref{sec:finalcollection} gives an overview of the structure in which the \datasetname~dataset is presented and published at \url{http://anonymized.url}.
 
 \subsection{ClueWeb12 \& TREC Web Track}\label{sec:trecclue}
 For the \datasetname{} dataset we choose to use a combination of the ClueWeb12 document collection and the topics from the TREC Web Tracks 2013 \& 2014~\cite{collins2013trec,collins2015trec},
@@ -85,8 +85,9 @@ Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetnam
 In LTR, documents are ranked based on various types of features, such as content features (e.g., BM25), quality indicators (e.g., PageRank) and behavioral features (e.g., CTR).
 In order to use the \datasetname{} dataset to measure the effect of visual features, we also add a set of content features and quality indicators,
 listed in Table~\ref{tab:setdescription}.
-These 11 features are easy to compute and show a minimal drop in performance compared to the standard 46 features in LETOR~\cite{qin2010letor}.
-Because the number of features are not central to this work, we further elaborate the performance comparison in Section~\ref{sec:discussion}.
+These 11 features are easy to compute and show a minimal drop in performance compared to the standard 46 features in LETOR~\cite{qin2010letor}
+(see Section~\ref{sec:discussion} for a detailed comparison of feature sets).
+%We further elaborate on this and compare different feature sets in Section~\ref{sec:discussion}.
 Also note that behavioral features, such as CTR, are not available for the TREC Web Tracks.
 
 \if0
@@ -134,6 +135,8 @@ Each snapshot is stored as a PNG file that can be identified by its correspondin
 The non-visual features are stored in LETOR formatted files containing the raw, logged and query normalized values.
 The query normalized values are randomly split per query into five equal partitions.
 These partitions are then used to create five folds, where each fold contains three partitions for training and the remaining two partitions for validation and testing.
+%The \datasetname{} dataset is available at \url{http://anonymized.url}.
+
 
 %A separate file contains an entry for each snapshot indicating whether the snapshots was created using the Wayback Machine or online rendering service. 
 
