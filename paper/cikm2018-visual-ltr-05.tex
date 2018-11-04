@@ -13,7 +13,7 @@ Here, we describe \ldots
 We experiment with four configurations of the \modelname~model.
 \modelname~baseline refers to the \modelname~model with only content features.
 This configuration is trained by feeding content features into the scoring component directly, without adding any visual features.
-\modelname~snapshot and \modelname~highlights use visual features extracted from vanilla snapshots of webpages and from snapshots of webpages with highlighted query terms, respectively.
+\modelname~snapshots and \modelname~highlights use visual features extracted from vanilla snapshots of webpages and from snapshots of webpages with highlighted query terms, respectively.
 Finally, \modelname~saliency uses visual features extracted from synthetic saliency heatmaps.
 
 For the \modelname~configurations with visual features, we experiment with both VGG-16 and ResNet-152 visual feature extraction methods.
@@ -23,6 +23,9 @@ Each experimental run is generated using the Adam optimizer with a batch size of
 
 
 \paragraph{Baselines}
+We compare our proposed \modelname~model to ViP~\citet{fan2017learning}, the only existing \ac{LTR} method that uses visual features.
+We train ViP on both vanilla and highlighted snapshots with the resulting configurations being ViP snapshots and ViP highlights, respectively.
+
 The other content baseline experiments are performed using BM25 and the RankLib\footnote{\url{https://sourceforge.net/p/lemur/wiki/RankLib/}} implementations of RankBoost, AdaRank, and LambdaMart.
 
 As a baseline comparison for our multimodal model, we implement ViP, the visual feature extractor proposed in~\citet{fan2017learning} using PyTorch. We train ViP on both the vanilla and highlighted snapshot datasets with the results being referred to as ViP snapshots and ViP highlights, respectively.
