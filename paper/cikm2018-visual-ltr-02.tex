@@ -3,9 +3,9 @@
 \section{Related work}
 \label{sec:relatedwork}
 
-We discuss related research on the relation between the visual appearance of a webpage and how it is perceived by users, and the usage of visual information in \ac{LTR}.
+%We discuss related research on the relation between the visual appearance of a webpage and how it is perceived by users, and the usage of visual information in \ac{LTR}.
 
-We discuss related research on the usage of visual information in \ac{LTR} and the relation between visual appearance and user perception of webpages.
+In this section, we discuss related research on the usage of visual information in \ac{LTR} and the relation between visual appearance and user perception of webpages.
 
 %The work in the paper is related to various research on user experience design. In this section we will discuss research on:
 %\begin{inparaenum}[(i)]
@@ -14,27 +14,34 @@ We discuss related research on the usage of visual information in \ac{LTR} and t
 %\item visual features in \ac{LTR}.
 %\end{inparaenum} 
 
-Using eye-tracking, \citet{nielsen2006f} and \citet{pernice2017f} demonstrate that webpage design and content placement influences the ability for users to find the information they are looking for. 
-Both studies show that by organizing the content in certain shapes (e.g. an F-shape), information can be  navigated more efficiently.
+Using eye-tracking, \citet{nielsen2006f} and \citet{pernice2017f} demonstrate that webpage design and content placement influences the ability of users to find information they are looking for. 
+Both studies show that by organizing the content in certain shapes (e.g., an F-shape), information can be navigated more efficiently.
 \citet{wang2014eye} show that the size of the fixation areas measured using eye-tracking is larger on webpages with more content, which increases the likelihood that the attention of a user is distracted.
-%Finally, \citet{lindgaard2006attention} show that users are able to construct a stable judgment of a webpage's visual appeal within 50ms. \todo{Is this important at all? I would drop the last reference and maybe use one or two others.}
 Such studies highlight the importance of the visual appearance of a webpage and its effect on how users perceive pages, demonstrating that visual information has to be taken into account when ranking webpages.
 
-\citet{fan2017learning} are the first to approach this problem.
+\citet{zhang2018relevance} consider using visual features for \ac{LTR} and, specifically, for learning to re-rank.
+The authors propose a multimodal architecture for re-ranking snippets on a search engine results page by learning their visual patterns.
+This work demonstrates that combining both visual and non-visual features can improve re-ranking performance.
+%\citet{zhang2018relevance} also acknowledge the lack of appropriate datasets for studying visual features for \ac{LTR}.
+%They create and publish a dataset that contains queries and snippets with corresponding visual, content, and structural information and relevance judgements.
+%Our work is different in that we consider the problem of ranking webpages instead of re-ranking snippets within an existing ranking.
+
+The closest work to ours is the study by \citet{fan2017learning}, which uses visual information to rank webpages instead of re-ranking snippets within an existing ranking.
 The authors use snapshots of webpages to extract visual features for LTR
 and show that such visual features significantly improve retrieval performance.
 They feed snapshots through a neural network that attempts to model the previously mentioned F-shape.
 The output of this neural network is then concatenated with more traditional ranking signals, such as BM25 and PageRank.
-Finally, the proposed model (called ViP) is trained end-to-end by using a pairwise loss.
-%\todo{Here, we have to briefly repeat what we have said in the introduction:
-%there are two limitations in \cite{fan2017learning} (what limitations?), which we fix in this paper (how do we do that?).} 
+Finally, the proposed model (called ViP) is trained end-to-end using a pairwise loss.
+In our paper, we continue this line of research and propose the \modelname~model for \ac{LTR} with visual features
+that makes use of the state-of-the-art visual feature extraction techniques and shows superior performance compared to ViP.
+Also, we develop and publish the \datasetname~dataset that contains visually diverse webpages
+compared to the GOV2 datataset used in~\cite{fan2017learning}, which lacks visual diversity and, importantly, does not contain images and style information together with webpages.
 
+\if0
 The work of \citet{fan2017learning} is limited by not using advanced visual feature extraction methods and by the GOV2 dataset, which lacks visual diversity.
 We approach these problems by proposing an improved feature extraction method using both pre-trained weights from a deep convolutional network~\cite{simonyan2014very} as well as synthetic saliency heatmaps~\cite{shan2017two} as input images, and by introducing \datasetname, a more diverse dataset based on ClueWeb12.
-% TODO reevaluate in which form we want to keep the lines above.
+\fi
 
-Recently, \citet{zhang2018relevance} proposed a multimodal architecture for re-ranking \acp{SERP} by learning visual patterns in the result snippets. 
-Their work demonstrates that using a multimodal architecture as a method of combining both visual and non-visual features can improve \ac{LTR} performance.
 
 %\todo{Now that we have put saliency more to the foreground, we might want to reintroduce the text below}
 %A number of techniques have been developed to predict saliency heatmaps on various images. \citet{buscher2009you} analyse the Webpage's Document Object Model (DOM) to identify highly salient areas. More recent work from \citet{kummerer2016deepgaze} (on natural images) and \citet{shan2017two} (on webpages) use deep learning techniques to predict state-of-the-art saliency heatmaps. 
