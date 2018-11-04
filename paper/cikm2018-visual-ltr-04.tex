@@ -85,8 +85,8 @@ Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetnam
 In LTR, documents are ranked based on various types of features, such as content features (e.g., BM25), quality indicators (e.g., PageRank) and behavioral features (e.g., CTR).
 In order to use the \datasetname{} dataset to measure the effect of visual features, we also add a set of content features and quality indicators,
 listed in Table~\ref{tab:setdescription}.
-These 11 features are easy to compute and show a minimal drop in performance compared to the standard 46 features in LETOR~\cite{qin2010letor}
-(see Section~\ref{sec:discussion} for a detailed comparison of feature sets).
+These 11 features are chosen so that they resemble most informative features of the most recent LETOR 4.0 dataset~\cite{Qin2013:Introducing} and are easy to compute
+(see Section~\ref{sec:discussion} for a detailed comparison of different feature sets).
 %We further elaborate on this and compare different feature sets in Section~\ref{sec:discussion}.
 Also note that behavioral features, such as CTR, are not available for the TREC Web Tracks.
 
@@ -99,7 +99,7 @@ Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained
 
 The content features, such as TF-IDF and BM25, are computed by doing a full pass over the complete ClueWeb12 collection.
 The PageRank scores are taken from the ClueWeb12 Related Data section.\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}}
-The following modifications based on the feature transformations described in LETOR 3.0~\cite{qin2010letor} are made to stabilize training:
+The following modifications based on the feature transformations described in LETOR~\cite{qin2010letor} are made to stabilize training:
 \begin{enumerate}[leftmargin=14pt]
 % \item IDF is calculates as follows: 
 % $$IDF(q, D) = \sum_{t_i \in q} IDF(t_i, D) = \sum_{t_i \in t} \log \frac{|D| + 1}{DF(t_i) + 1}$$

@@ -2,20 +2,81 @@
 
 \section{Discussion}
 \label{sec:discussion}
+In this section, we address two practical aspects of the proposed \modelname~model and dataset:
+\begin{inparaenum}[(i)]
+    \item the number of parameters of the \modelname~model and corresponding optimizations, and
+    \item the performance of content features included in the \datasetname~dataset.
+\end{inparaenum}
+
+
+\subsection{Training and Inference Optimization} \label{sec:sectionoptimalization}
+Both training and inference using deep convolutional networks are generally computationally expensive.
+The proposed \modelname~architecture (see Figure~\ref{fig:multimodelarchitecture}) introduces two properties that can be used to create powerful optimizations for training and inference.
+\todo{What are these two properties?}
+In this section, \todo{the structure, announced here, should correspond to the structure of the subsection, i.e., here we should say something about training optimization and inference optimization.}
+\todo{For now, I removed the list below (see the source file).}
+
+\if0
+we discuss how we
+\begin{inparaenum}[(i)]
+    \item optimize training performance by drastically reducing the number of parameters used for forward propagation during training, 
+    \item reduce memory requirements during training by storing the output of the frozen feature extraction layers prior to training, and
+    \item use query-independent snapshots and synthetic saliency heatmaps to minimize increase in performance requirements when ranking webpages with visual features.
+    %\item the styling information is not available together with web pages \todo{what do we mean with this?}.
+\end{inparaenum}
+\fi
+
+\paragraph{Training optimization} 
+Although we are freezing the parameters in the visual feature extraction layer (component (2) of Figure~\ref{fig:multimodelarchitecture}) when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation.
+We can avoid the computational cost associated with the forward propagation on the frozen layers by storing the output of the visual feature extraction layer to disk prior to training.
+By storing these vectors to disk, we leave only the parameters of the fully connected layers to be calculated during the forward propagation (component (3) of Figure~\ref{fig:multimodelarchitecture}).
+\todo{Is this discussion connected to the two paragraphs below? If yes, then how are they connected? If no, then what exactly do we want to say here talking about storing parameters to disk?}
+
+For VGG-16, we convert $3\times224\times224$ input images to vectors of $1\times25088$, thereby reducing the input size by $84.7\%$.
+\todo{You never talk about these dimension before. We should first explain them here or in Section 3.}
+\todo{How do we convert $3\times224\times224$ to $1\times25088$? Why $1\times25088$?}
+We also reduce the total number of parameters by $12.3\%$ \todo{reduced compared to what?} by removing the visual feature extraction layer consisting of $14,714,688$ parameters.
+
+For ResNet-152, we convert $3\times224\times224$ input images to vectors of $1\times2048$, thereby reducing the input size by $98.6\%$.
+\todo{Why $1\times2048$ as opposed to  $1\times25088$ for VGG-16?}
+The visual feature extraction layer consists of $58,144,239$ parameters, which reduces the total amount of parameters during inference by $49.5\%$.
+\todo{Same here: reduced compared to what?}
+
+The above optimizations reduce the computational requirements when training the \modelname~model with both VGG-16 and ResNet-152.
+%for ResNet-152 such that the training time of a single epoch decreased from hours to minutes, using a single CPU on a 2015 MacBook Pro. 
+
+\paragraph{Real-time inference optimization}
+When using \ac{LTR} in a large-scale production environment, the impact of newly introduced \ac{LTR} features (visual features, in our case) on real-time computational requirements is of major concern.
+%Here, we discuss the impact of the newly introduced visual features on the real-time inference.
+%In order to deliver real-time search results, the model needs to be both powerful and lightweight during inference. 
+
+Since both the vanilla snapshots and synthetic saliency heat\-maps are query independent, the output of the visual feature transformation layer (component (3) of Figure~\ref{fig:multimodelarchitecture}) is consistent for each document.
+\todo{What do you mean by consistency?}
+This allows us to do the inference on the visual feature transformation layer separately from the rest of the model inference.
+\todo{I am not sure I understand, why this is the case. Can we do this inference offline instead of query-time? If yes, we should say so.}
+Doing the inference on the visual feature transformation layer and storing visual features leaves only the scoring component to be inferred in real-time.
+Since a visual feature vector is of size $1\times30$, this would increase the number of parameters in the scoring component from $450$ parameters without the visual features to $750$ parameters with visual features.
+\todo{Where do we get 450 parameters? Why do we multiply 30 visual features by 10?}
+The increase of $300$ parameters is merely negligible compared to the number of parameters in modern deep learning systems.
+\todo{But we are talking about real-time. Do we have DL systems with many parameters running in real-time?}
+
+
 \subsection{Benchmarking Content Features}
+In \ac{LTR} research, both the amount and type of considered features vary widely per dataset and study.
+The most recent LETOR 4.0 dataset~\cite{Qin2013:Introducing} contains 46 features extracted for webpages from the GOV2 dataset and queries from the million query tracks 2007 and 2008 (MQ2007 and MQ2008).
+In the \datasetname~dataset, we use 11 features that are a subset of the 46 features of LETOR (see Table~\ref{tab:setdescription}).
+These 11 features are chosen to be both informative and easy to compute.
+Here, we compare our subset of 11 features to the full set of 46 features.
+The experiments are run on the GOV2 dataset and MQ2007 queries.
+The \ac{LTR} methods considered are the same as in Section~\ref{sec:results}, namely RankBoost, AdaRank, and LambdaMart.
 
-% \todo{In fact, this should go into the discussion and not experimental setup and/or experiments. But let's do this later.}
-In \ac{LTR} research, both the amount and type of non-visual features used for training vary widely per dataset and study.
-To assess the performance of the 11 non-visual features used in this study, we use a set of known LTR algorithms on the million query track 2007 (MQ2007)\cite{allan2007million} with the LETOR 4.0\footnote{\url{https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/}} non-visual features.
-MQ2007 and LETOR 4.0 have a total of 46 features containing all 11 features from Table~\ref{tab:setdescription}.
-The experiment uses the RankLib implementations of RankBoost, AdaRank, and LambdaMart on both 46 and 11 features using their default settings. 
-
-The results of all three ranking methods using both 46 and 11 features are shown in Table~\ref{tab:11vs46}.
-From the results we see that the number of non-visual features has a significant effect on the performance of AdaRank. However, the RankBoost and LambdaRank comparison suggests that the features used in the \datasetname~dataset are powerful enough to be used for \ac{LTR} research.
-%TODO Add a tiny conclusion on these results.
+The results of running the considered \ac{LTR} methods using both 46 and 11 features are shown in Table~\ref{tab:11vs46}.
+From these results, we see that the number of features has a significant effect on the performance of AdaRank.
+However, for the best-performing RankBoost and LambdaRank methods the drop in performance is minor when using 11 features instead of 46 features.
+This indicates that the chosen 11 features included in the \datasetname~dataset form a reasonable trade-off between effectiveness and computation cost.
 
 \begin{table}[h]
-\caption{Benchmark comparison on MQ2007 using all 46 LETOR features and the 11 LETOR features that are also used in \datasetname.}
+\caption{Comparison of 46 LETOR features and 11 LETOR features that are also used in \datasetname.}
 \label{tab:11vs46}
 \centering
 \begin{tabular}{lccccc}
@@ -35,29 +96,6 @@ LambdaMart - 11 & 0.448 & 0.380 & 0.397  & 0.443   & 0.455 \\
 \end{tabular}
 \end{table}
 
-\subsection{Training and Inference Optimization} \label{sec:sectionoptimalization}
-Both training and inference using deep convolutional networks are generally computationally expensive.
-The proposed multimodal \modelname~architecture introduces two properties that can be used to create powerful optimizations for training and inference. In this section, we discuss how we: \begin{inparaenum}[(i)]
-\item optimize training performance by drastically reducing the number of parameters used for forward propagation during training, 
-\item reduce memory requirements during training by storing the output of the frozen feature extraction layers prior to training, and
-\item use the query-independent snapshots and synthetic saliency heatmaps to minimize increase in performance requirements when ranking webpages with visual features.
-%\item the styling information is not available together with web pages \todo{what do we mean with this?}.
-\end{inparaenum}
-
-\paragraph{Training optimization} 
-Although we are freezing the parameters in the visual feature extraction layer when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation. We can avoid the computational cost associated with the forward propagation on the frozen layers by storing the output of the visual feature extraction layer to disk prior to training. By storing these vectors to disk, we leave only the parameters of the fully connected layers to be calculated during the forward propagation. 
-
-For VGG-16 we converted all $3\times224\times224$ input images to vectors of $1\times25088$, thereby reducing the input size by $84.7\%$. We also reduce the total number of parameters by $12.3\%$ by removing the visual feature extraction layer consisting of $14,714,688$ parameters.
-
-For ResNet-152 we convert each $3\times224\times224$ input image to vectors of $1\times2048$, thereby reducing the input size by $98.6\%$. The visual feature extraction layer consists of $58,144,239$ parameters, which reduces the total amount of parameters during inference by $49.5\%$.
-
-These optimizations reduced the computational requirements for ResNet-152 such that the training time of a single epoch decreased from hours to minutes, using a single CPU on a 2015 MacBook Pro. 
-
-\paragraph{Inference optimization}
-When using \ac{LTR} in a large-scale production environment, the impact of new \ac{LTR} features on computational requirements is a major concern. 
-In order to deliver real-time search results, the model needs to be both powerful and lightweight during inference. 
-
-Because both the vanilla snapshots and synthetic saliency images are query independent, the output of the visual feature transformation layer will be consistent for each document. This allows us to do the inference on the visual feature transformation separate from the rest of the model inference. Doing the inference on the visual feature transformation layers and storing the visual feature vectors leaves only the scoring component during real-time inference. Because each of the visual feature vectors are only of size $1\times30$, this would increase the number of parameters in the scoring component from $450$ parameters without the visual features to $750$ parameters with visual features. This increase of $300$ parameters is merely negligible compared to the number of parameters in modern deep learning systems. 
 
 
 \if0
