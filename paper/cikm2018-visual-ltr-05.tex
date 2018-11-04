@@ -57,7 +57,7 @@ These results clearly show that both VGG-16 and ResNet-152 visual feature extrac
 When comparing the results of the \modelname~model with visual features, we observe the following:
 \begin{inparaenum}[(i)]
     \item The highest ranking performance is achieved by using VGG-16 on the highlighted snapshots.
-    \item For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots, which is in line with the findings of~\cite{fan2017learning} and to be expected: highlighted snapshots carry more information compared to vanilla snapshots.
+    \item For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots, which is in line with the findings of~\cite{fan2017learning} and is to be expected: highlighted snapshots carry more information compared to vanilla snapshots.
 \end{inparaenum}
 Based on these results, we conclude that the use of visual features in \ac{LTR} significantly improves performance
 and that highlighted snapshots should on average be preferred over vanilla snapshots.
@@ -89,8 +89,8 @@ ResNet saliency    & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
 
 \subsection{\modelname~model with synthetic saliency heatmaps}
 The last two rows of Table~\ref{tab:letorvisresults} show the performance of the \modelname{} mo\-del when using synthetic saliency heatmaps as an input.
-Similarly to the vanilla and highlighted snapshots, the visual features are learned using both VGG-16 and ResNet-152.
-In contrast to the vanilla and highlighted snapshots, however, ResNet-152 seems to consistently outperform VGG-16 when using synthetic saliency heatmaps.
+The visual features are learned using both VGG-16 and ResNet-152.
+In this case, ResNet-152 consistently outperforms VGG-16.
 Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with saliency heatmaps on p@10, ndcg@10 and MAP, the saliency heatmaps with ResNet-152 match and outperform VGG-16 with highlighted snapshots when looking at p@1 and ndcg@1.
 % \todo{Can we say anything about statistical significance in this subsection? }
 % \todo{Can we explain these results? No.}
