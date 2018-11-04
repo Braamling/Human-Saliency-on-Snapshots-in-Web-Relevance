@@ -2,7 +2,13 @@
 
 \section{Conclusion}
 In this paper, we introduced two feature extraction methods that significantly improve \ac{LTR} performance using visual features, and the \datasetname{} dataset for research on both visual and non-visual webpage \ac{LTR}.
+With the \datasetname{} it is now possible to easily develop and compare \ac{LTR} models with visual features. 
+
+% The \datasetname{} dataset is the first publicly available dataset for \ac{LTR} with visual features and contains screenshots from both diverse and rich webpages. 
 The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only non-visual features. Additionally, we reach similar \ac{LTR} performance introducing synthetic saliency heatmaps which are $93.5\%$ smaller than the webpage snapshots. Finally, we show that the computational cost of adding the query-independent vanilla snapshots and saliency images to existing \ac{LTR} models is merely negligible.
+
+
+
 
 % Although using VGG-16 as a feature extractor results in higher average results, there is no statistically significant improvement on some RankBoost and LambdaMart results. %TODO write something about the optimizations.
 
@@ -10,8 +16,12 @@ In future work, it could be interesting to look at more ways to combine multiple
 A fairly straightforward future improvement would be the usage of more state-of-the-art ranking methods such as RankBoost and LambdaMart, which could improve ranking performance without changing the visual extraction method.
 
 The recently introduced CapsuleNet \cite{sabour2017dynamic}, which is able to learn spatial relations in images, could potentially provide a significant increase in \ac{LTR} performance when used as a visual feature extractor.  
+
+\if0
 During this study, we also explored using the highlights separate from the screenshots. 
 However, this did not produce results worth mentioning. 
+\fi
+
 The dataset with separate highlights is available upon request. 
 Performing a more qualitative analysis on which elements cause the improvements in the visual \ac{LTR} methods would be interesting. 
 The results would not only be useful for improving visual \ac{LTR}, but might also reveal new data-driven design principles that can be used by content creators. 

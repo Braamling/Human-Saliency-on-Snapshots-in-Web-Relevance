@@ -8,15 +8,19 @@ Then, in Section~\ref{sec:visualfeatures} we describe two visual feature extract
 VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep}, both pretrained on ImageNet.
 Finally, in Section~\ref{sec:saliency} we propose to enhance \modelname{} by generating synthetic saliency heatmaps for each of the input images.
 %These synthetic saliency images are trained to learn a more expressive representation of the viewing pattern of a user. 
-The implementation of the proposed \modelname{} model is available online.\footnote{URL removed for review.}
+% The implementation of the proposed \modelname{} model is available online.\footnote{URL removed for review.}
 
 \subsection{Architecture} \label{sec:multimodal}
 %In order to compare the performance of various visual feature extractor methods, we propose a reusable multimodal architecture. 
 The \modelname{} architecture is visualized in Figure~\ref{fig:multimodelarchitecture}. 
-The model starts by taking an image $x_i$ (1) as an input to the visual feature extraction layer (2) in order to create a generic visual feature vector $x_{vf}$. In turn, $x_{vf}$ is then used as an input to the visual feature transformation layer (3).
-This visual feature transformation layer learns into transforms the generic visual features to a \ac{LTR} specific visual feature vector $x_{vl}$.
-\todo{Why do we need this transformation? what is the difference between the generic and LTR-specific features?}
-%
+The model starts by taking an image $x_i$ (1) as an input to the visual feature extraction layer (2) in order to create a generic visual feature vector $x_{vf}$. 
+These features are considered generic because they can be extracted by using a convolutional filters that were trained on a different dataset and task. 
+In order to transform these $x_{vf}$ to an \ac{LTR} specific visual feature vector, we use $x_{vf}$ as an input to the visual feature transformation layer.
+This visual feature transformation layer is optimized to convert generic visual features to a visual feature vector $x_{vl}$ such that they can be used in combination with other \ac{LTR} features. 
+
+Separating the visual feature extraction and feature transformation layers allows us to significantly reduce the computation requirements when using a pre-trained model for visual feature extraction. 
+In Section ~\ref{sec:sectionoptimalization} we further elaborate how the computational requirements can be reduced. In Section~\ref{sec:visualfeatures} we demonstrate how transfer-learning can be applied to use pre-trained models in combination with the \modelname{} architecture.
+
 The \modelname{} architecture also makes use of content features $x_{c}$ (4), e.g., BM25, PageRank, etc.
 The final feature vector $x_{l}$ is constructed by concatenating the visual features $x_{vl}$ with the content features~$x_{c}$.
 %
@@ -38,15 +42,19 @@ which showed good performance in preliminary experiments.
 \end{figure}
 
 \subsection{Visual Feature Extractors} \label{sec:visualfeatures}
-Since our introduced \datasetname{} data\-set has a relatively low number of snapshots to train a separate feature extractor, we use the VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep} models pretrained on ImageNet as two separate feature extractors.
-\todo{Change the story: (1) we need visual feature extractors, (2) the amount of training data is usually low, so it is better to pretrain, (3) say something about the state-of-the-art, i.e., how novel and up-to-date these methods are.}
+In order to use the webpage snapshots in \ac{LTR}, the snapshots have to be transformed to a vector representation that can be used in combination with existing content features. 
+Because the amount of training examples in \datasetname{} is relatively low, it is beneficial to use a model that was pre-trained on a large image dataset and for a different task, eg. image classification. Convolutional filters generalize well and are easily transferable to other tasks.  In this work we use the VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep} models, two well-explored image classification models which both have an implementation with ImageNet pre-trained parameters available for PyTorch. The two paragraphs below describe how these two models are implemented within the \modelname{} architecture.
+
+
+
+
+% Since our introduced \datasetname{} data\-set has a relatively low number of snapshots to train a separate feature extractor, we use the VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep} models pretrained on ImageNet as two separate feature extractors.
+% \todo{Change the story: (1) we need visual feature extractors, (2) the amount of training data is usually low, so it is better to pretrain, (3) say something about the state-of-the-art, i.e., how novel and up-to-date these methods are.}
 
 VGG-16~\cite{simonyan2014very} is commonly used for training transfer-learned models,
-because it provides a reasonable trade-off between effectiveness and simplicity.
-\todo{Can we cite some examples, where VGG-16 is used?}
-\todo{Why do we need transfer learning here?}
-The VGG-16 architecture consists of a set of convolutional filters and fully connected layers. 
-The convolutional filters extract features from an input image, which are then used by the fully connected layers to classify the image. 
+because it provides a reasonable trade-off between effectiveness and simplicity~\cite{shan2017two}.
+The VGG-16 architecture consists of a set of convolutional layers and fully connected layers. 
+The convolutional layers extract features from an input image, which are then used by the fully connected layers to classify the image. 
 The convolutional layers of VGG-16 are generic with respect to an input and task~\citep{donahue2014decaf}
 and, thus, can be used as a visual feature extractor within the \modelname{} architecture to create generic visual features $x_{vf}$.
 For this reason, we use the convolutional layers as is, by freezing all the parameters during training.
@@ -58,10 +66,12 @@ The size of $x_{vl}$ is set to $30$, as this size showed good performance in pre
 
 The ResNet-152~\cite{he2016deep} architecture was shown to outperform VGG-16 in ImageNet classification.
 The residual connections between convolutional layers of ResNet-152 allow for deeper networks to be trained without suffering from vanishing gradients.
-\todo{Please update the text below to make it more detailed, similarly to VGG-16. How exactly do you produce $x_{vf}$? How do you produce $x_{vl}$ from $x_{vf}$?}
-The original ResNet-152 architecture only has a single fully connected layer, which empirically showed to not be enough to successfully train the model.
-Instead, we train a fully connected network from scratch.
-The network was constructed using three layers with $4096$ hidden units and a final layer resulting in $x_{vl}$ with a size of $30$, which was empirically found to provide good performance in preliminary experiments.
+Similarly as VGG-16, ResNet-152 has convolutional layers that extract features from the input images, which are in turn used by a fully connected layer to classify each image.
+We use these convolutional layers as the visual feature extraction layer, which transforms $x_{i}$ to $x_{vf}$. All parameters of these convolutional layers are frozen during training.
+
+Other than VGG-16, the original ResNet-152 architecture only has a single fully connected layer, which empirically showed to not be enough to successfully train the model.
+Instead, we transform $x_{vf}$ to $x_{vl}$ by training a fully connected network from scratch.
+The transformation layer is constructed using three layers with each $4096$ hidden units and a final layer resulting in $x_{vl}$ with a size of $30$, which was empirically found to provide good performance in preliminary experiments.
 
 
 \subsection{Saliency Heatmaps} \label{sec:saliency}
@@ -75,7 +85,7 @@ This makes the use of saliency heatmaps attractive for practical applications.
 Figure~\ref{fig:exampleshots} shows example snapshots with their corresponding heatmaps (first and third columns respectively).
 
 Following \cite{shan2017two}, we use a two-stage transfer learning model that learns how to predict saliency heatmaps on webpages.
-Similarly to the visual feature extraction approaches above, \cite{shan2017two} takes a pretrained image recognition model and finetunes the output layers on the following two datasets in order respectively:
+Similarly to the visual feature extraction approaches above, \cite{shan2017two} takes a pre-trained image recognition model and finetunes the output layers on the following two datasets in order respectively:
 \begin{inparaenum}[(i)]
 \item SALICON~\cite{jiang2015salicon}, a large dataset containing saliency heatmaps created with eye-tracking hardware on natural images, and 
 \item the webpage saliency dataset from \cite{shen2014webpage}, a smaller dataset containing saliency heatmaps created with eye-tracking hardware on webpages.

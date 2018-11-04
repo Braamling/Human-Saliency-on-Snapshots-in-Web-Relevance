@@ -1,7 +1,7 @@
 % !TEX root = www2019-visual-ltr.tex
 
 \section{Experimental Setup}\label{sec:setup}
-Here, we describe \ldots
+In this section, we discuss the configurations of the \modelname~architecture, baselines and metrics used during the experiments.
 
 %The experiments are divided into two types of setups:
 %\begin{inparaenum}[(i)]
@@ -10,7 +10,7 @@ Here, we describe \ldots
 %\end{inparaenum}
 
 \paragraph{\modelname~configurations}
-We experiment with four configurations of the \modelname~model.
+We experiment with four configurations of the \modelname~architecture.
 \modelname~baseline refers to the \modelname~model with only content features.
 This configuration is trained by feeding content features into the scoring component directly, without adding any visual features.
 \modelname~snapshots and \modelname~highlights use visual features extracted from vanilla snapshots of webpages and from snapshots of webpages with highlighted query terms, respectively.
@@ -18,8 +18,7 @@ Finally, \modelname~saliency uses visual features extracted from synthetic salie
 
 For the \modelname~configurations with visual features, we experiment with both VGG-16 and ResNet-152 visual feature extraction methods.
 The learning rates for VGG-16 and ResNet-152 are set to and $0.0001$ and $0.00005$, respectively. 
-Each experimental run is generated using the Adam optimizer with a batch size of $100$.
-\todo{Why these parameters?}
+Each experimental run is generated using the Adam optimizer~\cite{kingma2014adam} with a batch size of $100$. These parameters were chosen based on the results of preliminary experiments.
 
 
 \paragraph{Baselines}
@@ -58,13 +57,11 @@ These results clearly show that both VGG-16 and ResNet-152 visual feature extrac
 When comparing the results of the \modelname~model with visual features, we observe the following:
 \begin{inparaenum}[(i)]
     \item The highest ranking performance is achieved by using VGG-16 on the highlighted snapshots.
-    \item For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots, which is inline with the findings of~\cite{fan2017learning} and to be expected: highlighted snapshots cary more information compared to vanilla snapshots.
-    \item For ResNet-152, however, p@1 and ndcg@1 are lower for highlighted snapshots compared to vanilla snapshots. \todo{Can we explain this? In not, then we should probably skip this line completely.}
-%    \item the performance increase for p@1 and ndcg@1, with an average of $+0.200$ and $+0.118$, is consistently higher than p@10 and ndcg@10, with an average of $+0.134$ and $+0.087$.
+    \item For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots, which is in line with the findings of~\cite{fan2017learning} and to be expected: highlighted snapshots carry more information compared to vanilla snapshots.
 \end{inparaenum}
 Based on these results, we conclude that the use of visual features in \ac{LTR} significantly improves performance
 and that highlighted snapshots should on average be preferred over vanilla snapshots.
-%These results are inline with the findings of~\cite{fan2017learning}.
+%These results are in line with the findings of~\cite{fan2017learning}.
 
 \begin{table}[h]
 \caption{Results for the \modelname~model using only content features (baseline), vanilla snapshots, highlighted snapshots, and saliency heatmaps.
@@ -93,10 +90,10 @@ ResNet saliency    & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
 \subsection{\modelname~model with synthetic saliency heatmaps}
 The last two rows of Table~\ref{tab:letorvisresults} show the performance of the \modelname{} mo\-del when using synthetic saliency heatmaps as an input.
 Similarly to the vanilla and highlighted snapshots, the visual features are learned using both VGG-16 and ResNet-152.
-In contract to the vanilla and highlighted snapshots, however, ResNet-152 seems to consistently outperform VGG-16 when using synthetic saliency heatmaps.
+In contrast to the vanilla and highlighted snapshots, however, ResNet-152 seems to consistently outperform VGG-16 when using synthetic saliency heatmaps.
 Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with saliency heatmaps on p@10, ndcg@10 and MAP, the saliency heatmaps with ResNet-152 match and outperform VGG-16 with highlighted snapshots when looking at p@1 and ndcg@1.
-\todo{Can we say anything about statistical significance in this subsection?}
-\todo{Can we explain these results?}
+% \todo{Can we say anything about statistical significance in this subsection? }
+% \todo{Can we explain these results? No.}
 Based on these results, we conclude that saliency heatmaps should be preferred in applications where early precision is important,
 while highlighted snapshots should be used when a high overall performance is needed.
 
@@ -147,6 +144,7 @@ ResNet saliency       & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 
 \bottomrule
 \end{tabular}
 \end{table}
+
 
 
 

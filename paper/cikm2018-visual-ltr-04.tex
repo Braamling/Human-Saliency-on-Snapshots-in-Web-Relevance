@@ -86,11 +86,11 @@ In LTR, documents are ranked based on various types of features, such as content
 In order to use the \datasetname{} dataset to measure the effect of visual features, we also add a set of content features and quality indicators,
 listed in Table~\ref{tab:setdescription}.
 These 11 features are easy to compute and show a minimal drop in performance compared to the standard 46 features in LETOR~\cite{qin2010letor}.
-We further elaborate on this in Section~\ref{sec:discussion}.
+Because the number of features are not central to this work, we further elaborate the performance comparison in Section~\ref{sec:discussion}.
 Also note that behavioral features, such as CTR, are not available for the TREC Web Tracks.
 
 \if0
- using Apache Spark.\footnote{\url{https://spark.apache.org/}}$^{ }$\footnote{This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21Gb memory each.}
+The content features are computed by doing a full pass over the complete ClueWeb12 collection using Apache Spark.\footnote{\url{https://spark.apache.org/}}$^{ }$\footnote{This took approximately 20 hours on 116 Hadoop worker nodes with 3 executor cores and 21Gb memory each.}
 During this process an HTML parser (jsoup\footnote{\url{https://jsoup.org/}}) extracts the title and content from the raw HTML.
 Because the HTML structure in very large documents cannot be parsed efficiently by jsoup, all documents with more than one million tokens are ignored.
 Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained for each term in each document. Finally, the sparse vectors are loaded into a Python Pandas dataframe, which is used to compute the TF, IDF, TF-IDF and BM25 scores for each document-query pair.
@@ -134,7 +134,6 @@ Each snapshot is stored as a PNG file that can be identified by its correspondin
 The non-visual features are stored in LETOR formatted files containing the raw, logged and query normalized values.
 The query normalized values are randomly split per query into five equal partitions.
 These partitions are then used to create five folds, where each fold contains three partitions for training and the remaining two partitions for validation and testing.
-The \datasetname{} dataset is available at \url{http://anonymized.url.}
 
 %A separate file contains an entry for each snapshot indicating whether the snapshots was created using the Wayback Machine or online rendering service. 
 

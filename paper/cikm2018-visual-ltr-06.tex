@@ -35,7 +35,7 @@ LambdaMart - 11 & 0.448 & 0.380 & 0.397  & 0.443   & 0.455 \\
 \end{tabular}
 \end{table}
 
-\subsection{Training and Inference Optimization}
+\subsection{Training and Inference Optimization} \label{sec:sectionoptimalization}
 Both training and inference using deep convolutional networks are generally computationally expensive.
 The proposed multimodal \modelname~architecture introduces two properties that can be used to create powerful optimizations for training and inference. In this section, we discuss how we: \begin{inparaenum}[(i)]
 \item optimize training performance by drastically reducing the number of parameters used for forward propagation during training, 
@@ -44,7 +44,7 @@ The proposed multimodal \modelname~architecture introduces two properties that c
 %\item the styling information is not available together with web pages \todo{what do we mean with this?}.
 \end{inparaenum}
 
-\paragraph{Training optimization}
+\paragraph{Training optimization} 
 Although we are freezing the parameters in the visual feature extraction layer when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation. We can avoid the computational cost associated with the forward propagation on the frozen layers by storing the output of the visual feature extraction layer to disk prior to training. By storing these vectors to disk, we leave only the parameters of the fully connected layers to be calculated during the forward propagation. 
 
 For VGG-16 we converted all $3\times224\times224$ input images to vectors of $1\times25088$, thereby reducing the input size by $84.7\%$. We also reduce the total number of parameters by $12.3\%$ by removing the visual feature extraction layer consisting of $14,714,688$ parameters.
