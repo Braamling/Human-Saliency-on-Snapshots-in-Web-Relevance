@@ -99,7 +99,7 @@ Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained
 
 The content features, such as TF-IDF and BM25, are computed by doing a full pass over the complete ClueWeb12 collection.
 The PageRank scores are taken from the ClueWeb12 Related Data section.\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}}
-The following modifications based on the feature transformations described in LETOR~\cite{qin2010letor} are made to stabilize training:
+The following modifications based on the feature transformations described in LETOR are made to stabilize training:
 \begin{enumerate}[leftmargin=14pt]
 % \item IDF is calculates as follows: 
 % $$IDF(q, D) = \sum_{t_i \in q} IDF(t_i, D) = \sum_{t_i \in t} \log \frac{|D| + 1}{DF(t_i) + 1}$$
