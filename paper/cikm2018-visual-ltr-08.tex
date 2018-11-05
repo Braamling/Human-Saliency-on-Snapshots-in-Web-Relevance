@@ -1,27 +1,25 @@
 % !TEX root = www2019-visual-ltr.tex
 
 \section{Conclusion}
-In this paper, we introduced two feature extraction methods that significantly improve \ac{LTR} performance using visual features, and the \datasetname{} dataset for research on both visual and non-visual webpage \ac{LTR}.
-With the \datasetname{} it is now possible to easily develop and compare \ac{LTR} models with visual features. 
+In this paper, we considered the problem of \ac{LTR} with visual features.
+We proposed the \modelname~model that extracts visual features from webpage snapshots
+using transfer learning (specifically, pre-trained VGG-16 and ResNet-152 models) and synthetic saliency heatmaps.
+We showed that in both cases the extracted visual features significantly improved the \ac{LTR} performance.
+We also showed that the proposed \modelname~model significantly outperformed the visual \ac{LTR} baselines.
 
-% The \datasetname{} dataset is the first publicly available dataset for \ac{LTR} with visual features and contains screenshots from both diverse and rich webpages. 
-The experiments show that using state-of-the-art visual extraction methods can have a significant performance improvement compared to using only non-visual features. Additionally, we reach similar \ac{LTR} performance introducing synthetic saliency heatmaps which are $93.5\%$ smaller than the webpage snapshots. Finally, we show that the computational cost of adding the query-independent vanilla snapshots and saliency images to existing \ac{LTR} models is merely negligible.
+In addition to the model, we released the \datasetname~dataset, containing visually rich and diverse webpages with corresponding snapshots.
+With the \datasetname~dataset it is now possible to comprehensively study \ac{LTR} with visual features.
 
-
-
-
-% Although using VGG-16 as a feature extractor results in higher average results, there is no statistically significant improvement on some RankBoost and LambdaMart results. %TODO write something about the optimizations.
-
-In future work, it could be interesting to look at more ways to combine multiple visual features. Combining the features extracted from snapshots, highlights and saliency heatmaps could further improve ranking performance. 
-A fairly straightforward future improvement would be the usage of more state-of-the-art ranking methods such as RankBoost and LambdaMart, which could improve ranking performance without changing the visual extraction method.
-
-The recently introduced CapsuleNet \cite{sabour2017dynamic}, which is able to learn spatial relations in images, could potentially provide a significant increase in \ac{LTR} performance when used as a visual feature extractor.  
+A clear direction for future work is the study of state-of-the-art \ac{LTR} methods, such as RankBoost and LambdaMart, within the scoring components of the \modelname~model.
+This could potentially improve performance without changing the visual feature extraction and transformation components.
+Another interesting and promising direction for future work is to combine multiple visual features,
+i.e., visual features extracted from vanilla snapshots, snapshots with highlights and saliency heatmaps.
+Also, the recently introduced CapsuleNet~\cite{sabour2017dynamic} model, which is able to learn spatial relations in images, could potentially provide a significant increase in \ac{LTR} performance when used as a visual feature extractor.
+Finally, performing a more qualitative analysis on which elements cause improvements in \ac{LTR} with visual features would be interesting. 
+The results would not only be useful for improving the \ac{LTR} performance, but might also reveal new data-driven design principles that can be used by content creators.
 
 \if0
 During this study, we also explored using the highlights separate from the screenshots. 
 However, this did not produce results worth mentioning. 
 The dataset with separate highlights is available upon request. 
 \fi
-
-Performing a more qualitative analysis on which elements cause the improvements in the visual \ac{LTR} methods would be interesting. 
-The results would not only be useful for improving visual \ac{LTR}, but might also reveal new data-driven design principles that can be used by content creators. 
