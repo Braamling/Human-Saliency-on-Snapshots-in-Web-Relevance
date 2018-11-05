@@ -13,11 +13,7 @@ In this section, we address two practical aspects of the proposed \modelname~mod
 Both training and inference using deep convolutional networks are generally computationally expensive.
 By separating the feature extraction and transformation layers in the proposed \modelname~architecture (see Figure~\ref{fig:multimodelarchitecture}) we allow powerful computational optimizations for both training and inference. 
 
-% introduces two properties that can be used to create powerful optimizations for training and inference.
-% \todo{What are these two properties?}
-% In this section, \todo{the structure, announced here, should correspond to the structure of the subsection, i.e., here we should say something about training optimization and inference optimization.}
-% \todo{For now, I removed the list below (see the source file).}
-
+\if0
 In this section we discuss how we 
 \begin{inparaenum}[(i)]
     \item optimize training performance by drastically reducing the number of parameters used for forward propagation during training, 
@@ -25,17 +21,22 @@ In this section we discuss how we
     \item use query-independent snapshots and synthetic saliency heatmaps to minimize increase in performance requirements when ranking webpages with visual features.
     %\item the styling information is not available together with web pages \todo{what do we mean with this?}.
 \end{inparaenum}
+\fi
 
 \paragraph{Training optimization} 
-Although we are freezing the parameters in the visual feature extraction layer (component (2) of Figure~\ref{fig:multimodelarchitecture}) when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation.
+Although we freeze the parameters in the visual feature extraction layer (component (2) of Figure~\ref{fig:multimodelarchitecture}) when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation.
 We can avoid the computational cost associated with the forward propagation on the frozen layers by storing the output of the visual feature extraction layer to disk prior to training.
 By storing these vectors to disk, we leave only the parameters of the fully connected layers (component (3) of Figure~\ref{fig:multimodelarchitecture}) to be calculated and stored in memory during the forward propagation. 
 % \todo{Is this discussion connected to the two paragraphs below? If yes, then how are they connected? If no, then what exactly do we want to say here talking about storing parameters to disk?}
 
+By applying the above procedure, we can reduce the number of parameters of the \modelname~model by the following quantities.
+When using VGG-16, the visual feature extraction layer consists of $14,714,688$ parameters, which is $12.3\%$ of the parameters in the \modelname{} model.
+When using ResNet-152, the visual feature extraction layer consists of $58,144,239$ parameters, which is $49.5\%$ of the parameters in the \modelname{} model.
 
-When using VGG-16, the visual feature extraction layer consists of $14,714,688$ parameters, which is $12.3\%$ of the parameters in the \modelname{} architecture. When using ResNet-152, the visual feature extraction layer consists of $58,144,239$ parameters, which is $49.5\%$ of the parameters in the \modelname{} architecture.
+Additionally, by using the stored output of the visual feature extraction layer $x_{vf}$ instead of an actual image $x_{i}$ as the input of the \modelname~model,
+we reduce the size of each input by $84.7\%$ and $98.6\%$ for VGG-16 and ResNet-152 respectively.
+This reduction in input size further reduces the memory required for training the model.
 
-Additionally, by using $x_{vf}$ instead of $x_{i}$ as the input of the model, we reduce the size of each input by $84.7\%$ and $98.6\%$ for VGG-16 and ResNet-152 respectively. This reduction in input size further reduces the memory required for training the model.
 
 \paragraph{Real-time inference optimization}
 When using \ac{LTR} in a large-scale production environment, the impact of newly introduced \ac{LTR} features (visual features, in our case) on real-time computational requirements is of major concern.
