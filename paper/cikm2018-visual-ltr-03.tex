@@ -57,6 +57,8 @@ The convolutional layers extract features from an input image, which are then us
 The convolutional layers of VGG-16 are generic with respect to an input and task~\citep{donahue2014decaf}
 and, thus, can be used as a visual feature extractor within the \modelname{} architecture to create generic visual features $x_{vf}$.
 For this reason, we use the convolutional layers as is, by freezing all the parameters during training.
+Because we do not alter any of the convolutional layers, the size of $x_{vf}$ is determined by the output of the convolutional layers in the original VGG-16 model, being $1\times25088$.
+
 The fully connected layers of VGG-16, instead, can be altered and retrained in order to be used with new inputs and tasks.
 Due to this, we utilize them as a visual feature transformation layer within the \modelname{} architecture to produce \ac{LTR} specific features $x_{vl}$.
 In particular, we replace the last fully connected layer of VGG-16 by a newly initialized fully connected layer.
@@ -66,9 +68,10 @@ The size of $x_{vl}$ is set to $30$, as this size showed good performance in pre
 The ResNet-152~\cite{he2016deep} architecture was shown to outperform VGG-16 in ImageNet classification.
 The residual connections between convolutional layers of ResNet-152 allow for deeper networks to be trained without suffering from vanishing gradients.
 Similarly to VGG-16, ResNet-152 has convolutional layers that extract features from an input images, which are in turn used by a fully connected layer to classify each image.
-We use these convolutional layers as the visual feature extraction layer, which transforms $x_{i}$ to $x_{vf}$. All parameters of these convolutional layers are frozen during training.
+We use these convolutional layers as the visual feature extraction layer, which transforms $x_{i}$ to $x_{vf}$. All parameters of these convolutional layers are frozen during training. As with VGG-16, the size of $x_{vf}$ is determined by the output size of the original convolutional layers in the ResNet-152 model, being $1\times2048$.
 
-As opposed to VGG-16, the original ResNet-152 architecture only has a single fully connected layer, which empirically showed to not be enough to successfully train the \modelname~model.
+
+Additionally, the original ResNet-152 architecture only has a single fully connected layer, which empirically showed to not be enough to successfully train the \modelname~model.
 Instead, we transform $x_{vf}$ to $x_{vl}$ by training a fully connected network from scratch.
 The transformation layer is constructed using three layers with each having $4096$ hidden units and a final layer resulting in $x_{vl}$ with a size of $30$, which was empirically found to provide good performance in preliminary experiments.
 

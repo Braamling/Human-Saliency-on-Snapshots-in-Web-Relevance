@@ -11,54 +11,39 @@ In this section, we address two practical aspects of the proposed \modelname~mod
 
 \subsection{Training and Inference Optimization} \label{sec:sectionoptimalization}
 Both training and inference using deep convolutional networks are generally computationally expensive.
-The proposed \modelname~architecture (see Figure~\ref{fig:multimodelarchitecture}) introduces two properties that can be used to create powerful optimizations for training and inference.
-\todo{What are these two properties?}
-In this section, \todo{the structure, announced here, should correspond to the structure of the subsection, i.e., here we should say something about training optimization and inference optimization.}
-\todo{For now, I removed the list below (see the source file).}
+By separating the feature extraction and transformation layers in the proposed \modelname~architecture (see Figure~\ref{fig:multimodelarchitecture}) we allow powerful computational optimizations for both training and inference. 
 
-\if0
-we discuss how we
+% introduces two properties that can be used to create powerful optimizations for training and inference.
+% \todo{What are these two properties?}
+% In this section, \todo{the structure, announced here, should correspond to the structure of the subsection, i.e., here we should say something about training optimization and inference optimization.}
+% \todo{For now, I removed the list below (see the source file).}
+
+In this section we discuss how we 
 \begin{inparaenum}[(i)]
     \item optimize training performance by drastically reducing the number of parameters used for forward propagation during training, 
     \item reduce memory requirements during training by storing the output of the frozen feature extraction layers prior to training, and
     \item use query-independent snapshots and synthetic saliency heatmaps to minimize increase in performance requirements when ranking webpages with visual features.
     %\item the styling information is not available together with web pages \todo{what do we mean with this?}.
 \end{inparaenum}
-\fi
 
 \paragraph{Training optimization} 
 Although we are freezing the parameters in the visual feature extraction layer (component (2) of Figure~\ref{fig:multimodelarchitecture}) when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation.
 We can avoid the computational cost associated with the forward propagation on the frozen layers by storing the output of the visual feature extraction layer to disk prior to training.
-By storing these vectors to disk, we leave only the parameters of the fully connected layers to be calculated during the forward propagation (component (3) of Figure~\ref{fig:multimodelarchitecture}).
-\todo{Is this discussion connected to the two paragraphs below? If yes, then how are they connected? If no, then what exactly do we want to say here talking about storing parameters to disk?}
+By storing these vectors to disk, we leave only the parameters of the fully connected layers (component (3) of Figure~\ref{fig:multimodelarchitecture}) to be calculated and stored in memory during the forward propagation. 
+% \todo{Is this discussion connected to the two paragraphs below? If yes, then how are they connected? If no, then what exactly do we want to say here talking about storing parameters to disk?}
 
-For VGG-16, we convert $3\times224\times224$ input images to vectors of $1\times25088$, thereby reducing the input size by $84.7\%$.
-\todo{You never talk about these dimension before. We should first explain them here or in Section 3.}
-\todo{How do we convert $3\times224\times224$ to $1\times25088$? Why $1\times25088$?}
-We also reduce the total number of parameters by $12.3\%$ \todo{reduced compared to what?} by removing the visual feature extraction layer consisting of $14,714,688$ parameters.
 
-For ResNet-152, we convert $3\times224\times224$ input images to vectors of $1\times2048$, thereby reducing the input size by $98.6\%$.
-\todo{Why $1\times2048$ as opposed to  $1\times25088$ for VGG-16?}
-The visual feature extraction layer consists of $58,144,239$ parameters, which reduces the total amount of parameters during inference by $49.5\%$.
-\todo{Same here: reduced compared to what?}
+When using VGG-16, the visual feature extraction layer consists of $14,714,688$ parameters, which is $12.3\%$ of the parameters in the \modelname{} architecture. When using ResNet-152, the visual feature extraction layer consists of $58,144,239$ parameters, which is $49.5\%$ of the parameters in the \modelname{} architecture.
 
-The above optimizations reduce the computational requirements when training the \modelname~model with both VGG-16 and ResNet-152.
-%for ResNet-152 such that the training time of a single epoch decreased from hours to minutes, using a single CPU on a 2015 MacBook Pro. 
+Additionally, by using $x_{vf}$ instead of $x_{i}$ as the input of the model, we reduce the size of each input by $84.7\%$ and $98.6\%$ for VGG-16 and ResNet-152 respectively. This reduction in input size further reduces the memory required for training the model.
 
 \paragraph{Real-time inference optimization}
 When using \ac{LTR} in a large-scale production environment, the impact of newly introduced \ac{LTR} features (visual features, in our case) on real-time computational requirements is of major concern.
 %Here, we discuss the impact of the newly introduced visual features on the real-time inference.
 %In order to deliver real-time search results, the model needs to be both powerful and lightweight during inference. 
 
-Since both the vanilla snapshots and synthetic saliency heat\-maps are query independent, the output of the visual feature transformation layer (component (3) of Figure~\ref{fig:multimodelarchitecture}) is consistent for each document.
-\todo{What do you mean by consistency?}
-This allows us to do the inference on the visual feature transformation layer separately from the rest of the model inference.
-\todo{I am not sure I understand, why this is the case. Can we do this inference offline instead of query-time? If yes, we should say so.}
-Doing the inference on the visual feature transformation layer and storing visual features leaves only the scoring component to be inferred in real-time.
-Since a visual feature vector is of size $1\times30$, this would increase the number of parameters in the scoring component from $450$ parameters without the visual features to $750$ parameters with visual features.
-\todo{Where do we get 450 parameters? Why do we multiply 30 visual features by 10?}
-The increase of $300$ parameters is merely negligible compared to the number of parameters in modern deep learning systems.
-\todo{But we are talking about real-time. Do we have DL systems with many parameters running in real-time?}
+Since both the vanilla snapshots and synthetic saliency heat\-maps are query independent, the output of the visual feature transformation layer (component (3) of Figure~\ref{fig:multimodelarchitecture}) does not change for different document/query pairs. This allows us to do inference offline, leaving only the scoring component to be inferred in real-time.
+Since a visual feature vector is of size $1\times30$, using the offline inferred feature vector would result in a \ac{LTR} model with $30 + 11 = 41$ features. This increase in parameters is merely negligible in terms of computational costs.
 
 
 \subsection{Benchmarking Content Features} \label{sec:contentfeatures}
