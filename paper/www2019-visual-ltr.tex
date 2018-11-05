@@ -94,18 +94,20 @@
 %
 %\mdr{In \ac{LTR} webpages using visual features one uses the visual appearance of webpages as (additional) features to rank (textual) webpages in response to a query.}
 \begin{abstract}
-Features learned from the visual appearance of a webpage can help to improve \ac{LTR} performance. 
-We introduce the \modelname~model, a multimodal architecture that can be used to combine both visual features and content features in order to create strong \ac{LTR} features. 
-We demonstrate the \modelname~model performance by introducing two powerful feature extraction methods that significantly improve the performance of \ac{LTR} with visual features, namely: 
+The visual appearance of a webpage carries valuable information about page's quality and can be used to improve the performance of \ac{LTR}.
+%Features learned from the visual appearance of a webpage can help to improve \ac{LTR} performance. 
+We introduce the \modelname~model that combines both visual features, extracted from snapshots of webpages, and standard content features.
+We implement the proposed \modelname~model by adopting two powerful visual feature extraction methods:
 \begin{inparaenum}[(i)]
-\item transfer learning from a pre-trained image recognition model, and
-\item synthetic generated saliency heatmaps from webpage snapshots.
-\end{inparaenum}\ 
-Because there is currently no public dataset for this task, we also introduce and release the \datasetname~dataset, a rich and diverse dataset for \ac{LTR} with visual features.
-\datasetname~consists of visual snapshots, non-visual features and relevance judgments for ClueWeb12 documents and the TREC Web Track.
-The visual snapshots are rendered with both styling and images using the Wayback Machine and ClueWeb12 online rendering service.
-Using \datasetname, we confirm that visual features can improve \ac{LTR} performance
-and show the effectiveness of the newly introduced architecture and visual feature vectors.
+\item transfer learning from a pre-trained image classification model, and
+\item synthetic saliency heatmaps generated from webpage snapshots.
+\end{inparaenum}
+We show that both implementations significantly improve the performance of \ac{LTR} with visual features.
+Since there is currently no public dataset available for the task of \ac{LTR} with visual features, we also introduce and release the \datasetname~dataset, containing visually rich and diverse webpages.
+The \datasetname~dataset consists of visual snapshots, non-visual features and relevance judgments for ClueWeb12 webpages and TREC Web Track queries.
+%The visual snapshots are rendered with both styling and images using the Wayback Machine and ClueWeb12 online rendering service.
+%Using \datasetname, we confirm that visual features can improve \ac{LTR} performance
+%and show the effectiveness of the newly introduced architecture and visual feature vectors.
 % Additionally, we show that visual features can be used efficiently with a merely neglectable increase in computational cost.
 \end{abstract}
 
