@@ -53,11 +53,9 @@ ResNet saliency    & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
 The last two rows of Table~\ref{tab:letorvisresults} show the performance of the \modelname{} mo\-del when using synthetic saliency heatmaps as an input.
 The visual features are learned using both VGG-16 and ResNet-152.
 In this case, ResNet-152 consistently outperforms VGG-16.
-Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with saliency heatmaps on p@10, ndcg@10 and MAP, the saliency heatmaps with ResNet-152 match and outperform VGG-16 with highlighted snapshots when looking at p@1 and ndcg@1.
-% \todo{Can we say anything about statistical significance in this subsection? }
-% \todo{Can we explain these results? No.}
-Based on these results, we conclude that saliency heatmaps should be preferred in applications where early precision is important,
-while highlighted snapshots should be used when a high overall performance is needed.
+Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with saliency heatmaps on p@10, ndcg@10 and MAP, the saliency heatmaps with ResNet-152 match and outperform VGG-16 with highlighted snapshots when looking at p@1 and ndcg@1. 
+We can conclude that saliency heatmaps should be preferred in applications where early precision is important,
+while highlighted snapshots should be used when a high overall performance is needed. However, it is yet unclear what causes these differences,
 
 
 \subsection{Baseline comparison}

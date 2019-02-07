@@ -14,7 +14,7 @@ We experiment with four configurations of the \modelname~architecture.
 \modelname~baseline refers to the \modelname~model with only content features.
 This configuration is trained by feeding content features into the scoring component directly, without adding any visual features.
 \modelname~snapshots and \modelname~highlights use visual features extracted from vanilla snapshots of webpages and from snapshots of webpages with highlighted query terms, respectively.
-Finally, \modelname~saliency uses visual features extracted from synthetic saliency heatmaps.
+Finally, \modelname~saliency uses visual features extracted from synthetic saliency heatmaps. The snapshots, highlights and saliency heatmaps for each model respectively are used as the input image (component (1) of Figure~\ref{fig:multimodelarchitecture}.
 
 For the \modelname~configurations with visual features, we experiment with both VGG-16 and ResNet-152 visual feature extraction methods.
 The learning rates for VGG-16 and ResNet-152 are set to and $0.0001$ and $0.00005$, respectively. 
