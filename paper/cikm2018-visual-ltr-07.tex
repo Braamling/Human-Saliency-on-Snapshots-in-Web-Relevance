@@ -9,7 +9,7 @@ In this section, we address two practical aspects of the proposed \modelname~mod
 \end{inparaenum}
 
 
-\subsection{Training and Inference Optimization} \label{sec:sectionoptimalization}
+\subsection{Training and inference optimization} \label{sec:sectionoptimalization}
 Both training and inference using deep convolutional networks are generally computationally expensive.
 By separating the feature extraction and transformation layers in the proposed \modelname~architecture (see Figure~\ref{fig:multimodelarchitecture}) we allow powerful computational optimizations for both training and inference. 
 
@@ -33,7 +33,7 @@ By applying the above procedure, we can reduce the number of parameters of the \
 When using VGG-16, the visual feature extraction layer consists of $14,714,688$ parameters, which is $12.3\%$ of the parameters in the \modelname{} model.
 When using ResNet-152, the visual feature extraction layer consists of $58,144,239$ parameters, which is $49.5\%$ of the parameters in the \modelname{} model.
 
-Additionally, by using the stored output of the visual feature extraction layer $x_{vf}$ instead of an actual image $x_{i}$ as the input of the \modelname~model,
+By using the stored output of the visual feature extraction layer $x_{vf}$ instead of an actual image $x_{i}$ as the input of the \modelname~model,
 we reduce the size of each input by $84.7\%$ and $98.6\%$ for VGG-16 and ResNet-152 respectively.
 This reduction in input size further reduces the memory required for training the model.
 
@@ -47,7 +47,7 @@ Since both the vanilla snapshots and synthetic saliency heat\-maps are query ind
 Since a visual feature vector is of size $1\times30$, using the offline inferred feature vector would result in a \ac{LTR} model with $30 + 11 = 41$ features. This increase in parameters is merely negligible in terms of computational costs.
 
 
-\subsection{Benchmarking Content Features} \label{sec:contentfeatures}
+\subsection{Benchmarking content features} \label{sec:contentfeatures}
 In \ac{LTR} research, both the amount and type of considered features vary widely per dataset and study.
 The most recent LETOR 4.0 dataset~\cite{Qin2013:Introducing} contains 46 features extracted for webpages from the GOV2 dataset and queries from the million query tracks 2007 and 2008 (MQ2007 and MQ2008).
 In the \datasetname~dataset, we use 11 features that are a subset of the 46 features of LETOR (see Table~\ref{tab:setdescription}).

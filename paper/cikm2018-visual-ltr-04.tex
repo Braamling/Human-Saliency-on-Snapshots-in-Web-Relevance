@@ -70,19 +70,19 @@ Examples of snapshots and snapshots with highlights are shown in Figure~\ref{fig
 
 
 \label{sec:datasetsum}
-Since the Wayback Machine does not contain an archived or working version of each webpage in the ClueWeb12 collection, a filtering process is introduced to maximize the quality of each snapshot. Using the following criteria, a snapshot is selected for each available webpage. 
-\begin{enumerate}[leftmargin=14pt]
+Since the Wayback Machine does not contain an archived or working version of each webpage in the ClueWeb12 collection, a filtering process is introduced to maximize the quality of each snapshot. Using the following criteria, a snapshot is selected for each available webpage:
+\begin{inparaenum}[(1)]%[leftmargin=14pt]
 \item Each webpage is requested from the Wayback Machine. 
 \item A webpage that is not on the Wayback Machine, times out, throws a JavaScript error, or results in a PNG snapshot smaller than 100KB is marked as broken. Such webpages are rendered again using the online rendering service provided by ClueWeb12.\footnote{\url{http://boston.lti.cs.cmu.edu/Services/}}
 \item A manual selection is made between all webpages that are rendered from both sources. The Wayback version is used if it contains more styling elements and if the content is the same as in the rendering service. Otherwise, the rendering service version is used. 
-\end{enumerate}
-%
+\end{inparaenum}
+
 As a result, most of the 28,906 judged webpages have a corresponding snapshot from either the Wayback Machine or ClueWeb12 rendering service.
 Only 265 documents did not pass the filtering and were discarded.
-Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetname{} dataset~acquisition process. Additionally, the table also shows the distribution of judgment scores among the snapshots that were taken from the Wayback Machine and ClueWeb12 rendering service.
+Table~\ref{tab:countsources}, row one, summarizes the results of the \datasetname{} dataset~acquisition process. The table also shows the distribution of judgment scores among the snapshots that were taken from the Wayback Machine and ClueWeb12 rendering service.
 
 
-\subsection{Non-Visual Features} 
+\subsection{Non-visual features} 
 \label{sec:contentfeature}
 In LTR, documents are ranked based on various types of features, such as content features (e.g., BM25), quality indicators (e.g., PageRank) and behavioral features (e.g., CTR).
 In order to use the \datasetname{} dataset to measure the effect of visual features, we also add a set of content features and quality indicators,
@@ -102,7 +102,7 @@ Using the Apache Spark implementation of TF and IDF, a sparse vector is obtained
 The content features, such as TF-IDF and BM25, are computed by doing a full pass over the complete ClueWeb12 collection.
 The PageRank scores are taken from the ClueWeb12 Related Data section.\footnote{\url{https://lemurproject.org/clueweb12/related-data.php}}
 The following modifications based on the feature transformations described in LETOR are made to stabilize training:
-\begin{enumerate}[leftmargin=14pt]
+\begin{inparaenum}[(1)]%[leftmargin=*]
 % \item IDF is calculates as follows: 
 % $$IDF(q, D) = \sum_{t_i \in q} IDF(t_i, D) = \sum_{t_i \in t} \log \frac{|D| + 1}{DF(t_i) + 1}$$
 % Where  $q_i$ and $t_i$ represent a list of all terms in a query and a single query term respectively. $D$ represents a list of all terms in a document with $|D|$ as its total length. $DF(t_i)$ is the document frequency for the given query term.  
@@ -110,7 +110,7 @@ The following modifications based on the feature transformations described in LE
 \item Since the PageRank scores are usually an order of magnitude smaller than all other scores, we multiply them by $10^5$.
 \item The log transformation is applied to each feature.
 \item The log-transformed features are normalized per query.  
-\end{enumerate}
+\end{inparaenum}
 
 \begin{table}[h]
 \centering
@@ -127,7 +127,7 @@ Id & Description & Id & Description & Id & Description    \\
 \end{tabular}
 \end{table}
 
-\subsection{Final Collection}\label{sec:finalcollection}
+\subsection{Final collection}\label{sec:finalcollection}
 In summary, the \datasetname{} dataset contains:
 \begin{inparaenum}[(i)]
 \item a directory with webpage snapshots (Section~\ref{sec:screenshotsec}), and

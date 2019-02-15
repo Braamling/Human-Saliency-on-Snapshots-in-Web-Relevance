@@ -4,19 +4,21 @@
 In this paper, we considered the problem of \ac{LTR} with visual features.
 We proposed the \modelname~model that extracts visual features from webpage snapshots
 using transfer learning (specifically, pre-trained VGG-16 and ResNet-152 models) and synthetic saliency heatmaps.
-We showed that in both cases the extracted visual features significantly improved the \ac{LTR} performance.
+In both cases the extracted visual features significantly improved the \ac{LTR} performance.
 We also showed that the proposed \modelname~model significantly outperformed the visual \ac{LTR} baselines.
 
 In addition to the model, we released the \datasetname~dataset, containing visually rich and diverse webpages with corresponding snapshots.
 With the \datasetname~dataset it is now possible to comprehensively study \ac{LTR} with visual features.
 
-A clear direction for future work is the study of state-of-the-art \ac{LTR} methods, such as RankBoost and LambdaMart, within the scoring components of the \modelname~model.
-This could potentially improve performance without changing the visual feature extraction and transformation components.
-Another interesting and promising direction for future work is to combine multiple visual features,
-i.e., visual features extracted from vanilla snapshots, snapshots with highlights and saliency heatmaps. Other visual feature extractors, such as the recently introduced CapsuleNet~\cite{sabour2017dynamic} model which is able to learn spatial relations in images, might also provide additional performance. Other methods of combining visual and textual features, such as text-image co-embeddings, might also be worth exploring. 
-With the fast amount of various device types and display sizes, future work could also investigate the robustness of this method when using various rendering variations e.g. different browser, resolutions. 
+One direction for future work is the study of state-of-the-art \ac{LTR} methods, such as RankBoost and LambdaMart, within the scoring components of the \modelname~model.
+This could improve performance without changing the visual feature extraction and transformation components.
+Another promising direction for future work is to combine multiple visual features,
+i.e., visual features extracted from vanilla snapshots, snapshots with highlights and saliency heatmaps. Other visual feature extractors, such as the CapsuleNet~\cite{sabour2017dynamic} model, which is able to learn spatial relations in images, might also provide additional performance. Other methods of combining visual and textual features, such as text-image co-embeddings, might also be worth exploring. 
+Future work could also investigate the robustness of this method when using various rendering variations e.g., different browser, resolutions. 
 Finally, performing a more qualitative analysis on which elements cause improvements in \ac{LTR} with visual features would be interesting. For example, this could be achieved by interpreting the filters in the feature extractor~\cite{olah2018the}. 
-The results would not only be useful for improving the \ac{LTR} performance, but might also reveal new data-driven design principles that can be used by content creators. 
+The results 
+%would not only be useful for improving the \ac{LTR} performance, but 
+might also reveal new data-driven design principles that can be used by content creators. 
 
 \if0
 During this study, we also explored using the highlights separate from the screenshots. 

@@ -16,9 +16,9 @@ Second, we introduce a novel set of visual features extracted from synthetic sal
 
 Currently, there is no dataset available to support research on \ac{LTR} with visual features.
 \citet{fan2017learning} experimented with webpages from the GOV2 collection.\footnote{\url{http://ir.dcs.gla.ac.uk/test_collections/gov2-summary.htm}}
-However, GOV2 solely contains webpages within the .gov domain, i.e., pages with a relatively narrow scope,
+However, GOV2 solely contains webpages within the .gov domain, i.e.,  with a relatively narrow scope,
 and, more importantly, these webpages do not contain their original images and styles.
-Due to this, the GOV2 collection cannot fully support research on \ac{LTR} with visual features, as it does not reflect visually rich and diverse webpages found on the internet today.
+Hence, the GOV2 collection cannot fully support research on \ac{LTR} with visual features, as it does not reflect visually rich and diverse webpages found on the internet today.
 
 To overcome this issue, we release the \datasetname~dataset that contains webpages from the ClueWeb12 collection\footnote{\url{https://lemurproject.org/clueweb12/}}
 and queries from the TREC Web Tracks 2013 \& 2014~\cite{collins2013trec,collins2015trec}.
@@ -26,9 +26,9 @@ For each webpage of ClueWeb12 that also appears in the web tracks, the \datasetn
 and a set of content features, such as BM25 and PageRank.
 The introduced dataset is made publicly available.\footnote{\url{https://github.com/Braamling/learning-to-rank-webpages-based-on-visual-features/blob/master/dataset.md}}
 
-To assess the performance of the proposed \modelname~model, we run a set of experiments on the introduced \datasetname~dataset.
-First, our experiments confirm that visual features significantly improve the \ac{LTR} performance, which is inline with previous findings~\cite{fan2017learning}.
-Second, we show that both implementations of the \modelname~model, namely transfer learning (with VGG-16 and ResNet-152) and synthetic saliency heatmaps,
+To assess the performance of the proposed \modelname~model, we run experiments on the introduced \datasetname~dataset.
+Our experiments confirm that visual features significantly improve the \ac{LTR} performance, which is inline with previous findings~\cite{fan2017learning}.
+We also show that both implementations of the \modelname~model, namely transfer learning (with VGG-16 and ResNet-152) and synthetic saliency heatmaps,
 significantly outperform other \ac{LTR} methods with visual features.
 
 \if0
