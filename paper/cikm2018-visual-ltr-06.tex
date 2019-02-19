@@ -2,13 +2,13 @@
 
 \section{Results}
 \label{sec:results}
-In this section, we present experiments that are set out to test the following:
-\begin{inparaenum}[(1)]
-    \item the \modelname~model improves the \ac{LTR} performance when introducing visual features, 
-    \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
-    \item the \modelname~model improves both visual and non-visual state-of-the-art ranking methods.
-%    \item the results of the baseline ViP model~\cite{fan2017learning} are reproduced on the \datasetname{} dataset.
-\end{inparaenum}
+%In this section, we present experiments that are set out to test the following:
+%\begin{inparaenum}[(1)]
+%    \item the \modelname~model improves the \ac{LTR} performance when introducing visual features, 
+%    \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
+%    \item the \modelname~model improves both visual and non-visual state-of-the-art ranking methods.
+%%    \item the results of the baseline ViP model~\cite{fan2017learning} are reproduced on the \datasetname{} dataset.
+%\end{inparaenum}
 
 \subsection{\modelname~model with VGG-16 and ResNet-152}
 In Table~\ref{tab:letorvisresults}, we compare the performance of the \modelname~model when used with and without visual features.
@@ -25,7 +25,7 @@ Based on these results, we conclude that the use of visual features in \ac{LTR} 
 and that highlighted snapshots should on average be preferred over vanilla snapshots.
 %These results are in line with the findings of~\cite{fan2017learning}.
 
-\begin{table}[h]
+\begin{table}[t]
 \caption{Results for the \modelname~model using only content features (baseline), vanilla snapshots, highlighted snapshots, and saliency heatmaps.
 All results significantly improve over the \modelname~baseline.
 Best results are shown in bold.}
@@ -46,30 +46,32 @@ VGG saliency       & 0.554 & 0.453 & 0.310   & 0.302   & 0.422 \\
 ResNet saliency    & \textbf{0.560} & 0.476 & \textbf{0.333} & 0.321 & 0.442 \\
 \bottomrule
 \end{tabular}
+\vspace*{-.5\baselineskip}
 \end{table}
 
 
-\subsection{\modelname{} model with saliency heatmaps}
-The last two rows of Table~\ref{tab:letorvisresults} show the performance of the \modelname{} mo\-del when using synthetic saliency heatmaps as an input.
+\subsection{\modelname{} model with saliency heat maps}
+The last two rows of Table~\ref{tab:letorvisresults} show the performance of the \modelname{} mo\-del when using synthetic saliency heat maps as an input.
 The visual features are learned using both VGG-16 and ResNet-152.
 In this case, ResNet-152 consistently outperforms VGG-16.
-Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with saliency heatmaps on p@10, ndcg@10 and MAP, the saliency heatmaps with ResNet-152 match and outperform VGG-16 with highlighted snapshots when looking at p@1 and ndcg@1. 
-We can conclude that saliency heatmaps should be preferred in applications where early precision is important,
-while highlighted snapshots should be used when a high overall performance is needed. However, it is yet unclear what causes these differences,
+Although the highlighted snapshots with VGG-16 still outperform ResNet-152 with saliency heat maps on p@10, ndcg@10 and MAP, the saliency heat maps with ResNet-152 match and outperform VGG-16 with highlighted snapshots when looking at p@1 and ndcg@1. 
+Hence, saliency heat maps should be preferred in applications where early precision is important,
+while highlighted snapshots should be used when a high overall performance is needed. 
+%However, it is yet unclear what causes these differences,
 
 
 \subsection{Baseline comparison}
 Table~\ref{tab:baseresults} compares the performance of the \modelname~model to BM25, non-visual \ac{LTR} methods and the ViP model by~\citet{fan2017learning}. 
-Specifically, the table shows the performance of VGG-16 with highlighted snapshots and of ResNet-152 with synthetic saliency heatmaps, as these are the best-performing variants of the \modelname~model according to Table~\ref{tab:letorvisresults}.
+The table shows the performance of VGG-16 with highlighted snapshots and of ResNet-152 with synthetic saliency heatmaps, as these are the best-performing variants of the \modelname~model according to Table~\ref{tab:letorvisresults}.
 %Because these two results yield the highest \ac{LTR} performance, they are used to compare the \modelname~model with the baselines. 
-We clearly see that both methods have a significant performance increase compared to BM25, almost doubling the metrics values in many cases.
+Both methods have a significant performance increase compared to BM25, almost doubling the metrics values in many cases.
 
 When comparing to non-visual \ac{LTR} methods, both \modelname~implementations show consistently better performance.
 However, not all metrics are improved significantly.
 %However, we do find a significant improvement by the \modelname~implementations on the AdaRank \ac{LTR} results.
 %Furthermore, when using VGG-16 with highlighted snapshots there is a significant performance increase in ndcg@10 compared to LambdaMart and in p@10 for both RankBoost and LambdaMart.
 We attribute this to the fact that, similarly to~\cite{fan2017learning}, the \ac{LTR} component of the \modelname{} model is based on pairwise hinge loss, which is a relatively simple loss function.
-As a future work, we plan to investigate the effect of different loss functions on the performance of the \modelname{} model.
+%As a future work, we plan to investigate the effect of different loss functions on the performance of the \modelname{} model.
 
 Finally, we compare the \modelname~implementations to ViP, the only existing \ac{LTR} method with visual features.
 Here, we clearly see that both our implementations significantly outperform ViP on all metrics.
@@ -80,7 +82,7 @@ The above results show that the proposed \modelname{} model outperforms baseline
 However, to achieve consistent significant improvements compared to the state-of-the-art \ac{LTR} methods, different loss functions within the \modelname{} model have to be investigated.
 
 
-\begin{table}[h]
+\begin{table}[t]
 \caption{Results for the VGG-16 with highlighted snapshots, ResNet-152 with saliency heatmaps, and baselines.
 $\dagger$ indicates a significant decrease in performance compared to VGG highlights and $\ddagger$ indicates a significant decrease in performance compared to both \modelname{} implementations.
 Best results are shown in bold.}

@@ -1,36 +1,33 @@
 % !TEX root = www2019-visual-ltr.tex
 
 \section{Experimental Setup}\label{sec:setup}
-In this section, we discuss the configurations of the \modelname~architecture, baselines and metrics used during our experiments.
-
+%In this section, we discuss the configurations of the \modelname~architecture, baselines and metrics used during our experiments.
+%
 %The experiments are divided into two types of setups:
 %\begin{inparaenum}[(i)]
 %\item baseline experiments using only content features, and
 %\item visual experiments using both content and visual features.
 %\end{inparaenum}
 
-\paragraph{\modelname~configurations}
+\mbox{}\indent\emph{\modelname~configurations.}
 We experiment with four configurations of the \modelname~architecture.
 \modelname~baseline refers to the \modelname~model with only content features.
 This configuration is trained by feeding content features into the scoring component directly, without adding any visual features.
 \modelname~snapshots and \modelname~highlights use visual features extracted from vanilla snapshots of webpages and from snapshots of webpages with highlighted query terms, respectively.
 Finally, \modelname~saliency uses visual features extracted from synthetic saliency heatmaps. The snapshots, highlights and saliency heatmaps for each model respectively are used as the input image (component (1) of Figure~\ref{fig:multimodelarchitecture}.
-
 For the \modelname~configurations with visual features, we experiment with both VGG-16 and ResNet-152 visual feature extraction methods.
 The learning rates for VGG-16 and ResNet-152 are set to and $0.0001$ and $0.00005$, respectively. 
 Each experimental run is generated using the Adam optimizer~\cite{kingma2014adam} with a batch size of $100$.
-These parameters are chosen based on preliminary experiments.
+%These parameters are chosen based on preliminary experiments.
 
 
-\paragraph{Baselines}
+\MyParagraph{Baselines}
 We compare our proposed \modelname~model to the ViP model by~\citet{fan2017learning}, the only existing \ac{LTR} method that uses visual features.
 We train ViP on both vanilla and highlighted snapshots with the resulting configurations being ViP snapshots and ViP highlights, respectively.
-
 Following~\cite{fan2017learning}, we also compare the \modelname~model to a number of content-based ranking methods,
 namely BM25 and state-of-the-art \ac{LTR} techniques, such as RankBoost, AdaRank, and LambdaMart.\footnote{The \ac{LTR} methods are taken from \url{https://sourceforge.net/p/lemur/wiki/RankLib}.}
 
-
-\paragraph{Metrics}
+\MyParagraph{Metrics}
 To measure the retrieval performance, we use precision and ndcg at $\{1,10\}$ and MAP.
 Statistical significance is determined using a two-tailed paired t-test (p-value $\leq 0.05$). 
 

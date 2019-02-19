@@ -20,7 +20,6 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-
 %% \CharacterTable
 %%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
 %%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
@@ -38,7 +37,7 @@
 %%   Right brace   \}     Tilde         \~}
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{acmart}
-[2018/10/20 v1.55 Typesetting articles for the Association for
+[2018/12/16 v1.57 Typesetting articles for the Association for
 Computing Machinery]
 \def\@classname{acmart}
 \InputIfFileExists{acmart-preload-hook.tex}{%
@@ -109,6 +108,10 @@ Computing Machinery]
   \fi}{\PackageError{\@classname}{The option nonacm can be either true or
     false}}
 \ExecuteOptionsX{nonacm=false}
+\define@boolkey+{acmart.cls}[@ACM@]{balance}[true]{}{%
+  \PackageError{\@classname}{The option balance can be either true or
+    false}}
+\ExecuteOptionsX{balance}
 \define@boolkey+{acmart.cls}[@ACM@]{natbib}[true]{%
   \if@ACM@natbib
     \PackageInfo{\@classname}{Explicitly selecting natbib mode}%
@@ -213,6 +216,7 @@ Computing Machinery]
 \LoadClass[\ACM@fontsize, reqno]{amsart}
 \RequirePackage{microtype}
 \RequirePackage{etoolbox}
+\RequirePackage{booktabs}
 \RequirePackage{refcount}
 \RequirePackage{totpages}
 \RequirePackage{environ}
@@ -482,7 +486,7 @@ Computing Machinery]
     \else
     \hypersetup{hidelinks}
   \fi
-  \hypersetup{pdflang={English},
+  \hypersetup{pdflang={en},
     pdfdisplaydoctitle}}
 \if@ACM@natbib
   \let\citeN\cite
@@ -629,6 +633,22 @@ Computing Machinery]
   \expandafter\@iiiparbox\@mpargs{\unvbox\@tempboxa}}
 \def\@textbottom{\vskip \z@ \@plus 1pt}
 \let\@texttop\relax
+\ifcase\ACM@format@nr
+\relax % manuscript
+\or % acmsmall
+\or % acmlarge
+\or % acmtog
+  \flushbottom
+\or % sigconf
+  \flushbottom
+\or % siggraph
+  \flushbottom
+\or % sigplan
+  \flushbottom
+\or % sigchi
+  \flushbottom
+\or % sigchi-a
+\fi
 \RequirePackage{iftex}
 \ifPDFTeX
 \input{glyphtounicode}
@@ -657,6 +677,7 @@ Computing Machinery]
   \RequirePackage[T1]{fontenc}
 \ifxetex
   \RequirePackage[tt=false]{libertine}
+  \setmonofont{inconsolata}
 \else
   \RequirePackage[tt=false, type1=true]{libertine}
 \fi
@@ -669,6 +690,21 @@ Computing Machinery]
 \if@ACM@sigchiamode
   \renewcommand{\familydefault}{\sfdefault}
 \fi
+\newif\if@Description@present
+\@Description@presenttrue
+\newif\if@undescribed@images
+\@undescribed@imagesfalse
+\newcommand\Description[2][]{\global\@Description@presenttrue}
+\AtEndDocument{\if@undescribed@images
+  \ClassWarningNoLine{\@classname}{Some images may lack descriptions}\fi}
+\AtBeginEnvironment{figure}{\@Description@presentfalse}
+\AtBeginEnvironment{figure*}{\@Description@presentfalse}
+\AtEndEnvironment{figure}{\if@Description@present\else
+  \global\@undescribed@imagestrue
+  \ClassWarning{\@classname}{A possible image without description}\fi}
+\AtEndEnvironment{figure*}{\if@Description@present\else
+  \global\@undescribed@imagestrue
+  \ClassWarning{\@classname}{A possible image without description}\fi}
 \RequirePackage{caption, float}
 \captionsetup[table]{position=top}
 \if@ACM@journal
@@ -707,8 +743,14 @@ Computing Machinery]
 \long\def\@sidebar#1{\bgroup\captionsetup{type=sidebar}%
   \marginpar{\small#1}\egroup}
 \newenvironment{marginfigure}{\Collect@Body\@marginfigure}{}
-\long\def\@marginfigure#1{\bgroup\captionsetup{type=figure}%
-  \marginpar{\centering\small#1}\egroup}
+\long\def\@marginfigure#1{\bgroup
+  \captionsetup{type=figure}%
+  \marginpar{\@Description@presentfalse\centering
+    \small#1\if@Description@present\else
+      \global\@undescribed@imagestrue
+      \ClassWarning{\@classname}{A possible image without description}
+      \fi}%
+  \egroup}
 \newenvironment{margintable}{\Collect@Body\@margintable}{}
 \long\def\@margintable#1{\bgroup\captionsetup{type=table}%
   \marginpar{\centering\small#1}\egroup}
@@ -1124,6 +1166,8 @@ Computing Machinery]
 \newif\if@insideauthorgroup
 \@insideauthorgroupfalse
 \renewcommand\author[2][]{%
+  \IfSubStr{#2}{,}{\ClassWarning{\@classname}{Do not put several
+      authors in the same \string\author\space macro!}}{}%
   \global\advance\num@authors by 1\relax
   \if@insideauthorgroup\else
     \global\advance\num@authorgroups by 1\relax
@@ -1187,6 +1231,8 @@ Computing Machinery]
   \let\country\position
   Also with #1\unskip.\egroup}
 \renewcommand{\email}[2][]{%
+  \IfSubStr{#2}{,}{\ClassWarning{\@classname}{Do not put several
+      addresses in the same \string\email\space macro!}}{}%
   \if@ACM@anonymous\else
     \g@addto@macro\addresses{\email{#1}{#2}}%
   \fi}
@@ -1332,10 +1378,12 @@ Computing Machinery]
 \RequirePackage{comment}
 \excludecomment{CCSXML}
 \let\@concepts\@empty
+\newcounter{@concepts}
 \newcommand\ccsdesc[2][100]{%
   \ccsdesc@parse#1~#2~~\ccsdesc@parse@end}
 \RequirePackage{textcomp}
 \def\ccsdesc@parse#1~#2~#3~{%
+  \stepcounter{@concepts}%
   \expandafter\ifx\csname CCS@General@#2\endcsname\relax
     \expandafter\gdef\csname CCS@General@#2\endcsname{\textbullet\
       \textbf{#2}}%
@@ -1349,9 +1397,10 @@ Computing Machinery]
     \expandafter\gdef\csname CCS@Punctuation@#2\endcsname{
       \textrightarrow\ }%
     \expandafter\g@addto@macro\expandafter{\csname CCS@Specific@#2\endcsname}{%
-     \ifnum#1>499\textbf{#3}; \else
-     \ifnum#1>299\textit{#3}; \else
-     #3; \fi\fi}%
+     \addtocounter{@concepts}{-1}%
+     \ifnum#1>499\textbf{#3}\else
+     \ifnum#1>299\textit{#3}\else
+     #3\fi\fi\ifnum\value{@concepts}=0.\else; \fi}%
   \fi
 \ccsdesc@parse@finish}
 \def\ccsdesc@parse@finish#1\ccsdesc@parse@end{}
@@ -2061,9 +2110,11 @@ Computing Machinery]
   \fi
   \gdef\and{}}%
   \def\email##1##2{\ifx\@currentaffiliation\@empty
-    \gdef\@currentaffiliation{\nolinkurl{##2}}%
+    \gdef\@currentaffiliation{\bgroup
+      \mathchardef\UrlBreakPenalty=10000\nolinkurl{##2}\egroup}%
   \else
-    \g@addto@macro\@currentaffiliation{\par\nolinkurl{##2}}%
+    \g@addto@macro\@currentaffiliation{\par\bgroup
+      \mathchardef\UrlBreakPenalty=10000\nolinkurl{##2}\egroup}%
   \fi}%
   \def\affiliation##1##2{\ifx\@currentaffiliation\@empty
     \gdef\@currentaffiliation{%
@@ -2149,7 +2200,12 @@ Computing Machinery]
     \def\@teaser##1{\par\bigskip\bgroup
       \captionsetup{type=figure}##1\egroup\par}
     \global\setbox\mktitle@bx=\vbox{\noindent\box\mktitle@bx\par
-    \noindent\@teaserfigures\par\medskip}%
+      \noindent\@Description@presentfalse
+      \@teaserfigures\par\if@Description@present\else
+         \global\@undescribed@imagestrue
+         \ClassWarning{\@classname}{A possible image without
+           description}\fi
+    \medskip}%
   \fi}
 \def\@mkabstract{\bgroup
   \ifx\@abstract\@lempty\else
@@ -2639,10 +2695,40 @@ Computing Machinery]
 }{%
   \popQED\endtrivlist\@endpefalse
 }
+\AtEndPreamble{%
+  \if@ACM@balance
+    \ifcase\ACM@format@nr
+    \relax % manuscript
+         \global\@ACM@balancefalse
+       \or % acmsmall
+         \global\@ACM@balancefalse
+       \or % acmlarge
+         \global\@ACM@balancefalse
+       \or % acmtog
+          \RequirePackage{balance}%
+       \or % sigconf
+          \RequirePackage{balance}%
+       \or % siggraph
+          \RequirePackage{balance}%
+       \or % sigplan
+          \RequirePackage{balance}%
+       \or % sigchi
+          \RequirePackage{balance}%
+       \or % sigchi-a
+          \global\@ACM@balancefalse
+    \fi
+  \fi
+}
+\AtEndDocument{%
+  \if@ACM@balance
+  \if@twocolumn
+  \balance
+  \fi\fi}
+\newcommand\acksname{Acknowledgments}
 \specialcomment{acks}{%
   \begingroup
-  \section*{Acknowledgments}
-  \phantomsection\addcontentsline{toc}{section}{Acknowledgments}
+  \section*{\acksname}
+  \phantomsection\addcontentsline{toc}{section}{\acksname}
 }{%
   \endgroup
 }
@@ -2670,6 +2756,17 @@ Computing Machinery]
   \ifx\@tempa\@tempb
      arXiv:\href{http://arxiv.org/abs/#2}{#2}\else arXiv:#2%
   \fi}
+\apptocmd{\@vspace}{\ClassWarning{\@classname}{\string\vspace\space should
+    only be used to provide space above/below surrounding
+    objects}}{}{}
+\apptocmd{\@vspacer}{\ClassWarning{\@classname}{\string\vspace\space should
+    only be used to provide space above/below surrounding
+    objects}}{}{}
+\let\ACM@origbaselinestretch\baselinestretch
+\AtEndDocument{\ifx\baselinestretch\ACM@origbaselinestretch\else
+  \ClassError{\@classname}{An attempt to redefine
+    \string\baselinestretch\space detected.  Please do not do this for
+    ACM submissions!}\fi}
 \normalsize\normalfont\frenchspacing
 \endinput
 %%

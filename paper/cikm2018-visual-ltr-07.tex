@@ -2,11 +2,11 @@
 
 \section{Discussion}
 \label{sec:discussion}
-In this section, we address two practical aspects of the proposed \modelname~model and dataset:
-\begin{inparaenum}[(i)]
-    \item the number of parameters of the \modelname{} model and corresponding optimizations, and
-    \item the performance of content features included in the \datasetname~dataset.
-\end{inparaenum}
+%In this section, we address two practical aspects of the proposed \modelname~model and dataset:
+%\begin{inparaenum}[(i)]
+%    \item the number of parameters of the \modelname{} model and corresponding optimizations, and
+%    \item the performance of content features included in the \datasetname~dataset.
+%\end{inparaenum}
 
 
 \subsection{Training and inference optimization} \label{sec:sectionoptimalization}
@@ -23,13 +23,13 @@ In this section we discuss how we
 \end{inparaenum}
 \fi
 
-\paragraph{Training optimization} 
+\MyParagraph{Training optimization} 
 Although we freeze the parameters in the visual feature extraction layer (component (2) of Figure~\ref{fig:multimodelarchitecture}) when using a pre-trained model, we still need to compute the output from all the frozen parameters during the forward propagation.
 We can avoid the computational cost associated with the forward propagation on the frozen layers by storing the output of the visual feature extraction layer to disk prior to training.
 By storing these vectors to disk, we leave only the parameters of the fully connected layers (component (3) of Figure~\ref{fig:multimodelarchitecture}) to be calculated and stored in memory during the forward propagation. 
 % \todo{Is this discussion connected to the two paragraphs below? If yes, then how are they connected? If no, then what exactly do we want to say here talking about storing parameters to disk?}
 
-By applying the above procedure, we can reduce the number of parameters of the \modelname~model by the following quantities.
+By applying the above procedure, we can reduce the number of parameters of the \modelname~model.
 When using VGG-16, the visual feature extraction layer consists of $14,714,688$ parameters, which is $12.3\%$ of the parameters in the \modelname{} model.
 When using ResNet-152, the visual feature extraction layer consists of $58,144,239$ parameters, which is $49.5\%$ of the parameters in the \modelname{} model.
 
@@ -38,13 +38,13 @@ we reduce the size of each input by $84.7\%$ and $98.6\%$ for VGG-16 and ResNet-
 This reduction in input size further reduces the memory required for training the model.
 
 
-\paragraph{Real-time inference optimization}
+\MyParagraph{Real-time inference optimization}
 When using \ac{LTR} in a large-scale production environment, the impact of newly introduced \ac{LTR} features (visual features, in our case) on real-time computational requirements is of major concern.
 %Here, we discuss the impact of the newly introduced visual features on the real-time inference.
 %In order to deliver real-time search results, the model needs to be both powerful and lightweight during inference. 
 
-Since both the vanilla snapshots and synthetic saliency heat\-maps are query independent, the output of the visual feature transformation layer (component (3) of Figure~\ref{fig:multimodelarchitecture}) does not change for different document/query pairs. This allows us to do inference offline, leaving only the scoring component to be inferred in real-time.
-Since a visual feature vector is of size $1\times30$, using the offline inferred feature vector would result in a \ac{LTR} model with $30 + 11 = 41$ features. This increase in parameters is merely negligible in terms of computational costs.
+Since both the vanilla snapshots and synthetic saliency heat\-maps are query independent, the output of the visual feature transformation layer (component (3) of Figure~\ref{fig:multimodelarchitecture}) does not change for different document/query pairs. This enables offline inference, leaving only the scoring component to be inferred in real-time.
+Since a visual feature vector is has $1\times30$, using the offline inferred feature vector would result in a \ac{LTR} model with $30 + 11 = 41$ features. This increase in parameters is negligible in terms of computational costs.
 
 
 \subsection{Benchmarking content features} \label{sec:contentfeatures}
@@ -61,11 +61,11 @@ From these results, we see that the number of features has a significant effect 
 However, for the best-performing RankBoost and LambdaRank methods the drop in performance is minor when using 11 features instead of 46 features.
 This indicates that the chosen 11 features included in the \datasetname~dataset form a reasonable trade-off between effectiveness and computation cost.
 
-\begin{table}[h]
+\begin{table}[t]
 \caption{Comparison of 46 LETOR features and 11 LETOR features that are also used in \datasetname.}
 \label{tab:11vs46}
 \centering
-\begin{tabular}{lccccc}
+\begin{tabular}{l@{~~}ccccc}
 \toprule
 %& \multicolumn{7}{c}{MQ2007 46 features vs 11 features}                                     \\
            & p@1  & p@10   & ndcg@1 & ndcg@10 & MAP \\ 
