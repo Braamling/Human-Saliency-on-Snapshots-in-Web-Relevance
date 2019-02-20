@@ -2,13 +2,13 @@
 
 \section{Results}
 \label{sec:results}
-%In this section, we present experiments that are set out to test the following:
-%\begin{inparaenum}[(1)]
-%    \item the \modelname~model improves the \ac{LTR} performance when introducing visual features, 
-%    \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
-%    \item the \modelname~model improves both visual and non-visual state-of-the-art ranking methods.
-%%    \item the results of the baseline ViP model~\cite{fan2017learning} are reproduced on the \datasetname{} dataset.
-%\end{inparaenum}
+In this section, we present experiments that are set out to test the following:
+\begin{inparaenum}[(1)]
+    \item the \modelname~model improves the \ac{LTR} performance when introducing visual features, 
+    \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
+    \item the \modelname~model improves both visual and non-visual state-of-the-art ranking methods.
+%    \item the results of the baseline ViP model~\cite{fan2017learning} are reproduced on the \datasetname{} dataset.
+\end{inparaenum}
 
 \subsection{\modelname~model with VGG-16 and ResNet-152}
 In Table~\ref{tab:letorvisresults}, we compare the performance of the \modelname~model when used with and without visual features.
@@ -62,7 +62,7 @@ while highlighted snapshots should be used when a high overall performance is ne
 
 \subsection{Baseline comparison}
 Table~\ref{tab:baseresults} compares the performance of the \modelname~model to BM25, non-visual \ac{LTR} methods and the ViP model by~\citet{fan2017learning}. 
-The table shows the performance of VGG-16 with highlighted snapshots and of ResNet-152 with synthetic saliency heatmaps, as these are the best-performing variants of the \modelname~model according to Table~\ref{tab:letorvisresults}.
+Specifically, the table shows the performance of VGG-16 with highlighted snapshots and of ResNet-152 with synthetic saliency heatmaps, as these are the best-performing variants of the \modelname~model according to Table~\ref{tab:letorvisresults}.
 %Because these two results yield the highest \ac{LTR} performance, they are used to compare the \modelname~model with the baselines. 
 Both methods have a significant performance increase compared to BM25, almost doubling the metrics values in many cases.
 

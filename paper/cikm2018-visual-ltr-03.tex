@@ -1,13 +1,14 @@
 % !TEX root = www2019-visual-ltr.tex
 
 \section{\protect\modelname{} Model}
-%In this section, we introduce the \modelname{} model for \ac{LTR} with visual features.
-%The model consists of three parts.
-%We introduce the model architecture in Section~\ref{sec:multimodal}.
-%Then, in Section~\ref{sec:visualfeatures} we describe two visual feature extractors used by \modelname{}:
-%VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep}.
-%Finally, in Section~\ref{sec:saliency} we propose to enhance \modelname{} by generating synthetic saliency heatmaps for each of the input images.
-%The implementation of the \modelname{} model is available online.\footnote{\label{coderef}\url{https://github.com/Braamling/learning-to-rank-webpages-based-on-visual-features}}
+In this section, we introduce the \modelname{} model for \ac{LTR} with visual features.
+The proposed model consists of three parts.
+First, we introduce the model architecture in Section~\ref{sec:multimodal}.
+Then, in Section~\ref{sec:visualfeatures} we describe two visual feature extractors used by \modelname{}:
+VGG-16~\cite{simonyan2014very} and ResNet-152~\cite{he2016deep}, both pre-trained on ImageNet.
+Finally, in Section~\ref{sec:saliency} we propose to enhance \modelname{} by generating synthetic saliency heatmaps for each of the input images.
+%These synthetic saliency images are trained to learn a more expressive representation of the viewing pattern of a user. 
+ The implementation of the proposed \modelname{} model is available online.\footnote{\label{coderef}\url{https://github.com/Braamling/learning-to-rank-webpages-based-on-visual-features}}
 
 \subsection{Architecture} \label{sec:multimodal}
 %In order to compare the performance of various visual feature extractor methods, we propose a reusable multimodal architecture. 
@@ -59,7 +60,7 @@ Hence, we use the convolutional layers as is, by freezing all the parameters dur
 Because we do not alter any of the convolutional layers, the size of $x_{vf}$ is determined by the output of the convolutional layers in the original VGG-16 model, being $1\times25088$.
 
 The fully connected layers of VGG-16, instead, can be altered and retrained in order to be used with new inputs and tasks.
-Henbce, we utilize them as a visual feature transformation layer within the \modelname{} architecture to produce \ac{LTR} specific features $x_{vl}$.
+Due to this, we utilize them as a visual feature transformation layer within the \modelname{} architecture to produce \ac{LTR} specific features $x_{vl}$.
 In particular, we replace the last fully connected layer of VGG-16 by a newly initialized fully connected layer.
 Then we optimize the parameters of all fully connected layers of VGG-16 during training.
 The size of $x_{vl}$ is set to $30$, as this size showed good performance in preliminary experiments.
