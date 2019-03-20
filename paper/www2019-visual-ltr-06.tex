@@ -3,12 +3,10 @@
 \section{Results}
 \label{sec:results}
 In this section, we present experiments that are set out to test the following:
-\begin{inparaenum}[(1)]
-    \item the \modelname~model improves the \ac{LTR} performance when introducing visual features, 
-    \item synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
-    \item the \modelname~model improves both visual and non-visual state-of-the-art ranking methods.
+(1) the \modelname~model improves the \ac{LTR} performance when introducing visual features, 
+(2) synthetic saliency heatmaps improve the \ac{LTR} performance when used as an input the \modelname{} model, and
+(3) the \modelname~model improves both visual and non-visual state-of-the-art ranking methods.
 %    \item the results of the baseline ViP model~\cite{fan2017learning} are reproduced on the \datasetname{} dataset.
-\end{inparaenum}
 
 \subsection{\modelname~model with VGG-16 and ResNet-152}
 In Table~\ref{tab:letorvisresults}, we compare the performance of the \modelname~model when used with and without visual features.
@@ -17,10 +15,8 @@ The second to fifth rows show the performance of using VGG-16 and ResNet-152 wit
 These results clearly show that both VGG-16 and ResNet-152 visual feature extraction methods significantly improve the performance compared to the \modelname~baseline. 
 
 When comparing the results of the \modelname~model with visual features, we observe the following:
-\begin{inparaenum}[(i)]
-    \item The highest ranking performance is achieved by using VGG-16 on the highlighted snapshots.
-    \item For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots, which is in line with the findings of~\cite{fan2017learning} and is to be expected: highlighted snapshots carry more information compared to vanilla snapshots.
-\end{inparaenum}
+(i) The highest ranking performance is achieved by using VGG-16 on the highlighted snapshots.
+(ii) For VGG-16, the values of all metrics are consistently better for highlighted snapshots compared to vanilla snapshots, which is in line with the findings of~\cite{fan2017learning} and is to be expected: highlighted snapshots carry more information compared to vanilla snapshots.
 Based on these results, we conclude that the use of visual features in \ac{LTR} significantly improves performance
 and that highlighted snapshots should on average be preferred over vanilla snapshots.
 %These results are in line with the findings of~\cite{fan2017learning}.

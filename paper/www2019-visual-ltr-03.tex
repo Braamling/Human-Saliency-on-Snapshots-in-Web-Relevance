@@ -88,10 +88,8 @@ Figure~\ref{fig:exampleshots} shows example snapshots with their corresponding h
 
 Following \cite{shan2017two}, we use a two-stage transfer learning model that learns how to predict saliency heatmaps on webpages.
 Similarly to the visual feature extraction approaches above, \cite{shan2017two} takes a pre-trained image recognition model and finetunes the output layers on the following two datasets in order respectively:
-\begin{inparaenum}[(i)]
-\item SALICON~\cite{jiang2015salicon}, a large dataset containing saliency heatmaps created with eye-tracking hardware on natural images, and 
-\item the webpage saliency dataset from \cite{shen2014webpage}, a smaller dataset containing saliency heatmaps created with eye-tracking hardware on webpages.
-\end{inparaenum}
+(i) SALICON~\cite{jiang2015salicon}, a large dataset containing saliency heatmaps created with eye-tracking hardware on natural images, and 
+(ii) the webpage saliency dataset from \cite{shen2014webpage}, a smaller dataset containing saliency heatmaps created with eye-tracking hardware on webpages.
 
 The trained model is used to convert a raw snapshot into a synthetic saliency heatmap. This heatmap is then used as an input image $x_i$ for the \modelname{} model (see Figure~\ref{fig:multimodelarchitecture}).
 %

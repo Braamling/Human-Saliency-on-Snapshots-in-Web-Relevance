@@ -35,20 +35,16 @@ significantly outperform other \ac{LTR} methods with visual features.
 The work by \citet{fan2017learning} indicates that the visual appearance of a webpage can have a significant impact on perceived utility, which opens a new direction in web search and \ac{LTR}.
 However, there are several limitations in \cite{fan2017learning}.
 First, the method used to extract visual features in the ViP architecture
-\begin{inparaenum}[(i)]
-\item is based on a strong assumption that users view websites in an F-shape pattern, 
-\item grayscales and shrinks the input images to $64\times64$, and
-\item does not use a state-of-the-art visual feature extraction method.
-\end{inparaenum}
+(i) is based on a strong assumption that users view websites in an F-shape pattern, 
+(ii) grayscales and shrinks the input images to $64\times64$, and
+(iii) does not use a state-of-the-art visual feature extraction method.
 
 A second limitation in~\citep{fan2017learning} is that
 the rendered webpages come from the GOV2 collection.\footnote{\url{http://ir.dcs.gla.ac.uk/test_collections/gov2-summary.htm}}
 This collection is limited in the sense that 
-\begin{inparaenum}[(i)]
-\item it solely contains webpages within the .gov domain crawled in 2004, i.e., somewhat outdated pages with a relatively narrow scope, and
-\item the webpages in the dataset do not contain their original images.
+(i) it solely contains webpages within the .gov domain crawled in 2004, i.e., somewhat outdated pages with a relatively narrow scope, and
+(ii) the webpages in the dataset do not contain their original images.
 %\item the styling information is not available together with webpages \todo{what do we mean with this?}.
-\end{inparaenum}
 This dataset is not suitable for research on \ac{LTR} with visual features because it does not reflect the diverse and rich webpages (e.g., styling, images) found on the internet today. 
 Additionally, the webpage snapshots have not been made publically available, making it difficult to reproduce results. 
 In order to advance research on \ac{LTR} with visual features, it is important to have a public dataset with more diverse and up-to-date documents and richer visual information.
@@ -56,11 +52,9 @@ In order to advance research on \ac{LTR} with visual features, it is important t
 
 
 In summary, the main contributions of this work are:
-\begin{inparaenum}[(i)]
-\item We introduce transfer learning to extract visual features for \ac{LTR}.
-\item We introduce synthetic saliency heatmaps as a novel set of \ac{LTR} features.
-\item We introduce and publish \datasetname, an out-of-the-box dataset for \ac{LTR} with visual features.
-\end{inparaenum}
+(i) We introduce transfer learning to extract visual features for \ac{LTR}.
+(ii) We introduce synthetic saliency heatmaps as a novel set of \ac{LTR} features.
+(iii) We introduce and publish \datasetname, an out-of-the-box dataset for \ac{LTR} with visual features.
 
 
 \if0

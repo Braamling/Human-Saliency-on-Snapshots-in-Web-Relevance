@@ -3,10 +3,8 @@
 \section{Discussion}
 \label{sec:discussion}
 In this section, we address two practical aspects of the proposed \modelname~model and dataset:
-\begin{inparaenum}[(i)]
-    \item the number of parameters of the \modelname{} model and corresponding optimizations, and
-    \item the performance of content features included in the \datasetname~dataset.
-\end{inparaenum}
+(i) the number of parameters of the \modelname{} model and corresponding optimizations, and
+(ii) the performance of content features included in the \datasetname~dataset.
 
 
 \subsection{Training and inference optimization} \label{sec:sectionoptimalization}
@@ -15,12 +13,10 @@ By separating the feature extraction and transformation layers in the proposed \
 
 \if0
 In this section we discuss how we 
-\begin{inparaenum}[(i)]
-    \item optimize training performance by drastically reducing the number of parameters used for forward propagation during training, 
-    \item reduce memory requirements during training by storing the output of the frozen feature extraction layers prior to training, and
-    \item use query-independent snapshots and synthetic saliency heatmaps to minimize increase in performance requirements when ranking webpages with visual features.
+(i) optimize training performance by drastically reducing the number of parameters used for forward propagation during training, 
+(ii) reduce memory requirements during training by storing the output of the frozen feature extraction layers prior to training, and
+(iii) use query-independent snapshots and synthetic saliency heatmaps to minimize increase in performance requirements when ranking webpages with visual features.
     %\item the styling information is not available together with web pages \todo{what do we mean with this?}.
-\end{inparaenum}
 \fi
 
 \MyParagraph{Training optimization} 
@@ -44,7 +40,7 @@ When using \ac{LTR} in a large-scale production environment, the impact of newly
 %In order to deliver real-time search results, the model needs to be both powerful and lightweight during inference. 
 
 Since both the vanilla snapshots and synthetic saliency heat\-maps are query independent, the output of the visual feature transformation layer (component (3) of Figure~\ref{fig:multimodelarchitecture}) does not change for different document/query pairs. This enables offline inference, leaving only the scoring component to be inferred in real-time.
-Since a visual feature vector is has $1\times30$, using the offline inferred feature vector would result in a \ac{LTR} model with $30 + 11 = 41$ features. This increase in parameters is negligible in terms of computational costs.
+Since a visual feature vector is $1\times30$, using the offline inferred feature vector would result in a \ac{LTR} model with $30 + 11 = 41$ features. This increase in parameters is negligible in terms of computational costs.
 
 
 \subsection{Benchmarking content features} \label{sec:contentfeatures}
